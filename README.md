@@ -3,6 +3,8 @@ WP-OAuth
 
 A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook or LinkedIn account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
 
+Functions in a similar way to the StackExchange/StackOverflow login system.
+
 Features
 --------
 * Fully integrates with WordPress.
@@ -10,6 +12,7 @@ Features
 * Authenticated users are automatically registered and/or logged into their WordPress user accounts.
 * Users can manage their third-party login providers via the My Profile page.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url.
+* Supports WordPress Multisite.
 
 Quick Start
 -----------
