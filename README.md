@@ -13,6 +13,7 @@ Features
 * Users can manage their third-party login providers via the My Profile page.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url.
 * Supports WordPress Multisite.
+* Supports cURL or stream context for the authentication flow.
 
 Quick Start
 -----------
