@@ -5,11 +5,11 @@ A WordPress plugin that allows users to login or register by authenticating with
 
 Functions in a similar way to the StackExchange/StackOverflow login system.
 
-Screenshot - Settings page - configure the plugin:
+*The Settings page is where you'll configure the plugin:*
 
 ![wpoa](http://files.glassocean.net/github/wpoa1.jpg)
 
-Screenshot - Your Profile page - manage your linked accounts:
+*The Your Profile page is where you'll manage your linked accounts:*
 
 ![wpoa](http://files.glassocean.net/github/wpoa2.jpg)
 
