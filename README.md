@@ -5,6 +5,8 @@ A WordPress plugin that allows users to login or register by authenticating with
 
 Functions in a similar way to the StackExchange/StackOverflow login system.
 
+![wpoa](http://files.glassocean.net/github/wpoa1.jpg)
+
 Features
 --------
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
