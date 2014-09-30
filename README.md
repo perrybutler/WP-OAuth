@@ -22,7 +22,7 @@ Features
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
 * Supports WordPress Multisite.
 * Supports cURL or stream context for the authentication flow.
-* The authentication flow has been rigorously tested and debugged for solid error handling per several OAuth2 documentations and other resources.
+* The authentication flow was adapted from samples provided by Google, Facebook and LinkedIn. It has been rigorously tested and debugged for solid error handling per several OAuth2 documentations and other resources. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
 
 Quick Start
@@ -39,7 +39,7 @@ FAQ
 
 *How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?* OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers.
 
-*How is WP-OAuth different than Single Sign On?*
+*How is WP-OAuth different than SAML or Single Sign-On?* The latter two technologies are for enterprise-scale apps and environments where a single identity is used to gain access to any site or app within an enterprise environment, whether locally or remotely. Basically, the user signs in once and for the lifetime of their session they will have secure, authenticated access to all resources in the enterprise environment. This is not exactly what OAuth2 was designed for. OAuth2 lets us request information about a user from a trusted third-party, which we can assume to be authentic, allowing us to identify the user in some way and associate that user identity with a user account in our site or app. The main difference is that with OAuth2, each site or app that is requesting your user information *must be explicitly granted permission by you* in order to access it. OAuth2 was designed with REST in mind and functions exclusively over the HTTP protocol, whereas SAML allows for other implementations.
 
 Roadmap
 -------
