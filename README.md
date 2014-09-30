@@ -17,7 +17,7 @@ Features
 --------
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
 * Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled.
-* Authenticated users are automatically registered and/or logged into their WordPress user accounts.
+* Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's email address only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
 * Users can manage their third-party login providers via the standard "Your Profile" WordPress page.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
 * Supports WordPress Multisite.
