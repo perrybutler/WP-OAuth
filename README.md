@@ -9,7 +9,7 @@ Functions in a similar way to the StackExchange/StackOverflow login system.
 
 ![wpoa](http://files.glassocean.net/github/wpoa1.jpg)
 
-*The Your Profile page is users will manage their linked accounts:*
+*The Your Profile page is where users will manage their linked accounts:*
 
 ![wpoa](http://files.glassocean.net/github/wpoa2.jpg)
 
