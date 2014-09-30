@@ -33,11 +33,13 @@ Quick Start
 
 FAQ
 ---
-*How is WP-OAuth different from other "OAuth" plugins such as OAuth2 Complete or OAuth Provider?* These turn your site into an OAuth2 *provider* which is probably not what you want. Google, Facebook and LinkedIn are providers and our goal is to be a *consumer* which lets us delegate user authentication to those providers.
+*How is WP-OAuth different than other "OAuth" plugins such as OAuth2 Complete or OAuth Provider?* These turn your site into an OAuth2 *provider* which is probably not what you want. Google, Facebook and LinkedIn are providers and our goal is to be a *consumer* which lets us delegate user authentication to those providers.
 
-*How is WP-OAuth different from other "Connect" plugins such as Google Apps Login or WordPress Social Connect?* These are similar alternatives.
+*How is WP-OAuth different than other "Connect" plugins such as Google Apps Login or WordPress Social Connect?* These are similar alternatives.
 
-*How is WP-OAuth different from OpenID, OpenID Connect and OpenID Authorization 2.0?* OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers.
+*How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?* OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers.
+
+*How is WP-OAuth different than Single Sign On?*
 
 Roadmap
 -------
