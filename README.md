@@ -17,6 +17,10 @@ WP-OAuth functions in a similar way to the StackExchange/StackOverflow login sys
 
 ![wpoa](http://files.glassocean.net/github/wpoa2.jpg)
 
+*The Login page can easily be customized:*
+
+![wpoa](http://files.glassocean.net/github/wpoa3.jpg)
+
 Features
 --------
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
