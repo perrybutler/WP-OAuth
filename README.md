@@ -37,17 +37,17 @@ Quick Start
 
 FAQ
 ---
-*I don't get it...what's OAuth? Why does it matter?*
+***I don't get it...what's OAuth? Why does it matter?***
 
 With WP-OAuth, people will have the ability of logging into your WordPress site using their existing Google, Facebook or LinkedIn account. Most people probably already have one of those accounts, and they probably don't want to register/manage yet another account. That's where WP-OAuth bridges the gap by offering a fast and secure alternative login method which might even boost your membership and user retention. Think about it...people like to use the same passwords everywhere; they might even use their same online banking password for logging into your WordPress site. You never know, and you don't want to be held responsible or liable for that.
 
-*Okay then, how does it work?*
+***Okay then, how does it work?***
 
 Let's say a person chooses to log into your WordPress site with Google. First they click the Google button on your site and are immediately redirected to Google's login page. Right after logging into Google they will be prompted to grant your website permission to access some[1] of their Google user info. Right here, you are observing OAuth in its very basic form. So once they grant access, they are redirected back to your WordPress site, along with an OAuth identity provided by Google. This identity is unique for every Google user and it never changes, so we tie the Google user's identity to a WordPress user account. Now any time in the future when that Google user logs in with Google, we'll match the Google user's identity to an existing WordPress account and log them into your site automatically. If they don't have a WordPress account, WP-OAuth can register one for them automatically as well.
 
 [1] We only request the minimum amount of user info from Google (and all other providers) that will give us the user's OAuth identity. During a request for user info, Google (and all other providers) may send additional information about the user, such as their full name or public email address. We have no way of turning that off, but it shouldn't matter because we discard this info immediately after extracting the user's OAuth identity. I'm not aware of any OAuth provider that lets us *only* ask for a user's OAuth identity, which is kind of a let down and makes me wonder why that is.
 
-*Can I trust WP-OAuth with keeping sensitive user info private and secure? Can WP-OAuth or someone malicious steal a user's  password or hijack their account? If a site gets hacked where WP-OAuth is installed, will sensitive user info be at risk?*
+***Can I trust WP-OAuth with keeping sensitive user info private and secure? Can WP-OAuth or someone malicious steal a user's  password or hijack their account? If a site gets hacked where WP-OAuth is installed, will sensitive user info be at risk?***
 
 WP-OAuth (and the official [OAuth2 spec](https://tools.ietf.org/html/rfc6749)) will never get access to a user's password from their third-party provider; instead they will be redirected to the third-party provider and then redirected back to your site with an identity. There are no exceptions, we don't need your password and we certainly don't want the responsibility of storing it securely! That is the wonderful nature of OAuth. When a user decides to authenticate with a third-party provider through WP-OAuth, we only ask for their basic user info - the minimum info required to obtain the user's OAuth identity. This is not to say WP-OAuth or the OAuth2 spec is fool-proof, as nothing truly is. It turns out that each provider has decided to implement their OAuth2 API slightly differently, which leaves a lot of room for human error when it comes to developers who build and implement OAuth clients, such as WP-OAuth. For more information, see [here](http://lifehacker.com/5918086/understanding-oauth-what-happens-when-you-log-into-a-site-with-google-twitter-or-facebook).
 
@@ -55,19 +55,19 @@ What makes matters worse is that developers are forced to make unavoidable assum
 
 With all that said, OAuth2 is still viable and will remain prevalent in the web landscape for years to come. I think we just need stronger and stricter specifications so it is easier to implement correctly for both providers and clients. With WP-OAuth, we've taken the time to understand these gory details in the attempt to deliver a solid plugin and clean code base.
 
-*How is WP-OAuth different than other "OAuth" plugins such as OAuth2 Complete or OAuth Provider?*
+***How is WP-OAuth different than other "OAuth" plugins such as OAuth2 Complete or OAuth Provider?***
 
 These turn your site into an OAuth2 *provider* which is probably not what you want. Google, Facebook and LinkedIn are providers and our goal is to be a *consumer* which lets us delegate user authentication to those providers.
 
-*How is WP-OAuth different than other "Connect" plugins such as Google Apps Login or WordPress Social Connect?*
+***How is WP-OAuth different than other "Connect" plugins such as Google Apps Login or WordPress Social Connect?***
 
 These are similar alternatives.
 
-*How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?*
+***How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?***
 
 OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers.
 
-*How is WP-OAuth different than SAML or Single Sign-On?*
+***How is WP-OAuth different than SAML or Single Sign-On?***
 
 The latter two technologies are for enterprise-scale apps and environments where a single identity is used to gain access to any site or app within an enterprise environment, whether locally or remotely. Basically, the user signs in once and for the lifetime of their session they will have secure, authenticated access to all resources in the enterprise environment. This is not exactly what OAuth2 was designed for. OAuth2 lets us request information about a user from a trusted third-party, which we can assume to be authentic, allowing us to identify the user in some way and associate that user identity with a user account in our site or app. The main difference is that with OAuth2, each site or app that is requesting your user information *must be explicitly granted permission by you* in order to access it. This access can also be revoked *by you*. This gives users full control over their personal info and what sites or apps may use it. OAuth2 was designed with REST in mind and functions exclusively over the HTTP protocol, whereas SAML allows for other implementations.
 
