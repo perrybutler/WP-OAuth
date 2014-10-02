@@ -3,7 +3,7 @@ WP-OAuth
 
 A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook or LinkedIn account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
 
-**In this readme:** [Features](#features) - [Quick Start](#quick-start) - [FAQ](#faq) - [Roadmap](#roadmap) - [History](#history)
+**In this readme:** [Features](#features) - [Requirements](#requirements) -[Quick Start](#quick-start) - [FAQ](#faq) - [Roadmap](#roadmap) - [History](#history)
 
 Introduction
 ------------
@@ -20,14 +20,20 @@ WP-OAuth functions in a similar way to the StackExchange/StackOverflow login sys
 Features
 --------
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
-* Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled.
-* Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's email address only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
-* Users can manage their third-party login providers via the standard "Your Profile" WordPress page.
+* Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled. 
+* Customize the login screen with a logo or background. Hide the default login form if you want. Automatically include login buttons for any providers that are enabled.
+* Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's id/email address only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
+* Users can manage their third-party login providers via the standard "Your Profile" WordPress page. They may link more accounts, or unlink existing accounts.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
 * Supports WordPress Multisite.
 * Supports cURL or stream context for the authentication flow.
 * The authentication flow was adapted from samples provided by Google, Facebook and LinkedIn. It has been rigorously tested and debugged for solid error handling per several OAuth2 documentations and other resources. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
+
+Requirements
+------------
+* WordPress
+* Javascript enabled in the browser
 
 Quick Start
 -----------
@@ -59,9 +65,9 @@ OAuth2 doesn't abide by strict standards, and that is what I believe to be the m
 
 These turn your site into an OAuth2 *provider* which is probably not what you want. Google, Facebook and LinkedIn are providers and our goal is to be a *consumer* which lets us delegate user authentication to those providers.
 
-***How is WP-OAuth different than other "Connect" plugins such as Google Apps Login or WordPress Social Connect?***
+***How is WP-OAuth different than other "Connect" plugins such as WordPress Social Connect, WordPress Social Login, Google Apps Login or WP Glogin?***
 
-These are similar alternatives.
+These are similar alternatives. Some of them may include or require the use other third-party libraries, which may add bloat or become outdated. WP-OAuth is a complete solution with zero dependencies.
 
 ***How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?***
 
@@ -77,4 +83,4 @@ Roadmap
 
 History
 -------
-This project is a continuation of [WP-OpenLogin](http://github.com/perrybutler/wp-openlogin) which was originally developed with OpenID in mind. OAuth 2.0 is now the standard.
+This project is a continuation of [WP-OpenLogin](http://github.com/perrybutler/wp-openlogin) which was originally developed with OpenID in mind. We're moving on; OAuth 2.0 is now the standard.
