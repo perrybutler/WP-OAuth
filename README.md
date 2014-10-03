@@ -7,7 +7,7 @@ A WordPress plugin that allows users to login or register by authenticating with
 
 Introduction
 ------------
-WP-OAuth functions in a similar way to the StackExchange/StackOverflow login system.
+WP-OAuth functions in a similar way to the StackExchange/StackOverflow login system which allows users to register or login with the least amount of steps required.
 
 *The Settings page is where you'll configure the plugin:*
 
@@ -31,7 +31,7 @@ Features
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
 * Supports WordPress Multisite.
 * Supports cURL or stream context for the authentication flow.
-* The authentication flow was adapted from samples provided by Google, Facebook and LinkedIn. It has been rigorously tested and debugged for solid error handling per several OAuth2 documentations and other resources. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
+* The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated,  rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
 
 Requirements
