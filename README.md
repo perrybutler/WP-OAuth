@@ -83,7 +83,9 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 Roadmap
 -------
-* Login with Github; Login with Reddit.
+* Advanced options for account merging.
+* More login screen customization options.
+* Commit, publish first release and submit it to the WordPress Plugins repository.
 
 History
 -------
