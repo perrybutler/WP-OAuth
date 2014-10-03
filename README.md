@@ -85,7 +85,7 @@ Roadmap
 -------
 * Advanced options for account merging.
 * More login screen customization options.
-* Commit, publish first release and submit it to the WordPress Plugins repository.
+* Commit, publish first release and submit it to the WordPress Plugin Directory.
 
 History
 -------
