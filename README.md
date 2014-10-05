@@ -21,6 +21,11 @@ WP-OAuth functions in a similar way to the StackExchange/StackOverflow login sys
 
 ![wpoa](http://files.glassocean.net/github/wpoa3.jpg)
 
+Facts:
+* With so many sites offering membership now, users may suffer registration fatigue and forget their passwords, or use the same password for several sites, increasing their security risk.
+* [92% of users](http://www.slideshare.net/webby2001/the-social-habit-2012-by-edison-research) abandon their shopping carts when they forget their login info.
+* [56% of Americans](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords.
+
 Features
 --------
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
@@ -65,7 +70,10 @@ What makes matters worse is that developers are forced to make unavoidable assum
 
 OAuth2 doesn't abide by strict standards, and that is what I believe to be the most troubling aspect of it, which the ex-lead developer of OAuth2 has [spoken openly about](http://hueniverse.com/2012/07/26/oauth-2-0-and-the-road-to-hell/). With all that said, OAuth2 is still viable and will remain prevalent in the web landscape for years to come. I think we just need stronger and stricter specifications so it is easier to implement correctly for both providers and clients. With WP-OAuth, we've taken the time to understand these gory details in the attempt to deliver a solid plugin and clean code base.
 
-For more information, see [here](http://lifehacker.com/5918086/understanding-oauth-what-happens-when-you-log-into-a-site-with-google-twitter-or-facebook).
+For more information, see:
+
+* [Understanding OAuth - What Happens When You Log Into a Site With Google, Twitter or Facebook](http://lifehacker.com/5918086/understanding-oauth-what-happens-when-you-log-into-a-site-with-google-twitter-or-facebook).
+* [Four Attacks on OAuth - How to Secure Your OAuth Implementation](http://www.sans.org/reading-room/whitepapers/application/attacks-oauth-secure-oauth-implementation-33644)
 
 ***How is WP-OAuth different than other "OAuth" plugins such as OAuth2 Complete or OAuth Provider?***
 
