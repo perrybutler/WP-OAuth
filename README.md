@@ -23,8 +23,8 @@ WP-OAuth functions in a similar way to the StackExchange/StackOverflow login sys
 
 *Facts:*
 * With so many sites offering membership now, users may suffer registration fatigue and forget their passwords, or use the same password for several sites, increasing their security risk.
-* [92% of users](http://www.slideshare.net/webby2001/the-social-habit-2012-by-edison-research) abandon their shopping carts when they forget their login info.
-* [56% of Americans](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords.
+* [56% of consumers](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords.
+* [40% of consumers](http://www.marketingprofs.com/charts/2012/7060/social-media-users-prefer-social-login-over-traditional) currently utilize social login.
 
 Features
 --------
