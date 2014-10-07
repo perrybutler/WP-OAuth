@@ -24,9 +24,9 @@ Class WPOA {
 	protected static $instance = NULL;
 	public static function get_instance() {
 		NULL === self::$instance and self::$instance = new self;
-        return self::$instance;
+		return self::$instance;
 	}
-
+	
 	// define the settings used by this plugin; these will get registered by wordpress and inserted into the database:
 	public $settings = array(
 		'wpoa_show_login_messages',
@@ -73,6 +73,7 @@ Class WPOA {
 
 	// initialize the plugin's functionality by hooking into wordpress:
 	function init() {
+		$plugin = plugin_basename(__FILE__);
 		// hook activation and deactivation for the plugin:
 		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
 		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
@@ -83,6 +84,7 @@ Class WPOA {
 		add_action('admin_enqueue_scripts', array($this, 'wpoa_init_backend_scripts_styles'));
 		add_action('admin_menu', array($this, 'wpoa_settings_page'));
 		add_action('admin_init', array($this, 'wpoa_register_settings'));
+		add_filter("plugin_action_links_$plugin", array($this, 'wpoa_settings_link'));
 		// hook scripts and styles for login page:
 		add_action('login_enqueue_scripts', array($this, 'wpoa_init_login_scripts_styles'));
 		if (get_option('wpoa_logo_links_to_site') == true) {add_filter('login_headerurl', array($this, 'wpoa_logo_link'));}
@@ -175,6 +177,12 @@ Class WPOA {
 		// load the core plugin scripts/styles:
 		wp_enqueue_script('wpoa-script', plugin_dir_url( __FILE__ ) . 'wp-oauth.js', array());
 		wp_enqueue_style('wpoa-style', plugin_dir_url( __FILE__ ) . 'wp-oauth.css', array());
+	}
+	
+	function wpoa_settings_link($links) { 
+		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings</a>"; 
+		array_unshift($links, $settings_link); 
+		return $links; 
 	}
 
 	// force the login screen logo to point to the site instead of wordpress.org:
@@ -389,6 +397,7 @@ Class WPOA {
 		<div class='wrap wpoa-settings'>
 			<h2>WP-OAuth Settings</h2>
 			<p>Manage settings for WP-OAuth here. Most third-party authentication providers will require the developer to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing the third-party API.</p>
+			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----"><input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"><img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"></form>
 			<form method='post' action='options.php'>
 				<?php settings_fields('wpoa_settings'); ?>
 				<?php do_settings_sections('wpoa_settings'); ?>
@@ -638,6 +647,10 @@ Class WPOA {
 					<tr valign='top'>
 					<th scope='row'>Delete settings on uninstall</th>
 					<td><p><input type='checkbox' name='wpoa_delete_settings_on_uninstall' value='1' <?php checked(get_option('wpoa_delete_settings_on_uninstall') == 1); ?> /><hr/><strong>Warning:</strong> This will delete all settings that may have been created in your database by this plugin, including all linked third-party login providers. This will not delete any WordPress user accounts, but users who may have registered with or relied upon their third-party login providers may have trouble logging into your site. Make absolutely sure you won't need the values on this page any time in the future, because they will be deleted permanently.<hr/><strong>Instructions:</strong> Check the box above, click the Save Changes button, then uninstall this plugin as normal from the Plugins page.</p></td>
+					</tr>
+					<tr valign='top'>
+					<th scope='row'>Donate</th>
+					<td></td>
 					</tr>
 				</table>
 				<?php submit_button(); ?>

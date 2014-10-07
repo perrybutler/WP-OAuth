@@ -80,7 +80,9 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 == Screenshots ==
 
-1. 
+1. The Settings page is where you'll configure the plugin.
+2. The Your Profile page is where users will manage their linked accounts.
+3. The Login page can easily be customized.
 
 == Changelog ==
 

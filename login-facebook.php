@@ -174,7 +174,7 @@ function get_oauth_identity() {
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
 	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Facebook returns the user's unique id
-	//$oauth_identity['email'] = $result_obj['email']; //PROVIDER SPECIFIC: this is how Facebook returns the email address
+	//$oauth_identity['email'] = $result_obj['email']; // PROVIDER SPECIFIC: this is how Facebook returns the email address
 	return $oauth_identity;
 }
 # END OF AUTHENTICATION FLOW HELPER FUNCTIONS #
