@@ -1,0 +1,20 @@
+/* backend */
+.wpoa-settings h3 {background:#ddd; padding:5px;}
+.wpoa-settings hr {border:0; margin-bottom:1em;}
+.wpoa-linked-accounts {font-weight:bold;}
+
+/* login */
+.wpoa-login-button:last-of-type {margin-bottom:2px;}
+.wpoa-login-button {text-align:center; font-size:1.2em; padding:10px; background:#1e8cbe; color:#fff; margin-bottom:1px; -webkit-transition:all 0.5s ease; cursor:pointer;}
+.wpoa-login-button:hover {background:#c5c5c5;}
+.wpoa-login-button.loading{background:#fff !important; color:#000; cursor:default;}
+.wpoa-login-button.loading-other{background:rgba(255,255,255,0) !important; color:#999; cursor:default;}
+
+/* frontend & login */
+#wpoa-result {display:none;}
+
+/* all */
+.wpoa-login-message{text-align:center; left:0; right:0; top:5px; position:absolute; font-size:1em; z-index:999999;}
+.wpoa-login-message span {padding:4px 6px; background:#fff; color:#000; border-radius:5px; display:inline-block;}
+
+#wpoa-title {text-align:center; font-size: 1.2em; padding:5px;}

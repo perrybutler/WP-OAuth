@@ -1,0 +1,1 @@
+<?php	// load the Wordpress core so this page can access WP functions during an ajax call	require_once( "../../../wp-load.php" );	// start the session:	session_start();		// log out the user:	$user = null; 		// nullify the user	session_destroy(); 	// destroy the php user session	wp_logout(); 		// logout the wordpress user	?>
