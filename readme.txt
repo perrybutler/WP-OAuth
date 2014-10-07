@@ -1,33 +1,25 @@
-WP-OAuth
-========
+=== WP-OAuth ===
+Contributors: hectavex
+Donate link: http://glassocean.net
+Tags: login, membership, users, registration, oauth, social, social networking, community, security
+Requires at least: 4.0
+Tested up to: 4.0
+Stable tag: 0.1
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
+Allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0.
 
-**In this readme:** [Features](#features) - [Requirements](#requirements) - [Quick Start](#quick-start) - [FAQ](#faq) - [Roadmap](#roadmap) - [History](#history)
-
-Introduction
-------------
-WP-OAuth functions in a similar way to the StackExchange/StackOverflow login system which allows users to register or login with the least amount of steps required.
-
-*The Settings page is where you'll configure the plugin:*
-
-![wpoa](http://files.glassocean.net/github/wpoa1.jpg)
-
-*The Your Profile page is where users will manage their linked accounts:*
-
-![wpoa](http://files.glassocean.net/github/wpoa2.jpg)
-
-*The Login page can easily be customized:*
-
-![wpoa](http://files.glassocean.net/github/wpoa3.jpg)
+== Description ==
 
 *Facts:*
+
 * With so many sites offering membership now, users may suffer registration fatigue and forget their passwords, or use the same password for several sites, increasing their security risk.
 * [56% of consumers](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords.
 * [40% of consumers](http://www.marketingprofs.com/charts/2012/7060/social-media-users-prefer-social-login-over-traditional) currently utilize social login.
 
-Features
---------
+*Features:*
+
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
 * Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled. 
 * Customize the login screen with a logo or background. Hide the default login form if you want. Automatically include login buttons for any providers that are enabled.
@@ -39,19 +31,14 @@ Features
 * The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated,  rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
 
-Requirements
-------------
-* WordPress
-* Javascript enabled in the browser
+== Installation ==
 
-Quick Start
------------
 1. Download and install the WP-OAuth plugin.
 2. Setup your desired authentication providers' API key/secret in the WordPress backend under Settings > WP-OAuth.
 3. Enable the included login buttons, or add login buttons anywhere to your site/theme with the included shortcodes.
 
-FAQ
----
+== Frequently Asked Questions ==
+
 ***I don't get it...what's OAuth? Why does it matter?***
 
 With WP-OAuth, people will have the ability of logging into your WordPress site using their existing Google, Facebook or LinkedIn account. Most people probably already have one of those accounts, and they probably don't want to register/manage yet another account. That's where WP-OAuth bridges the gap by offering a fast and secure alternative login method which might even boost your membership and user retention. Think about it...people like to use the same passwords everywhere; they might even use their same online banking password for logging into your WordPress site. You never know, and you don't want to be held responsible or liable for that.
@@ -81,7 +68,7 @@ These turn your site into an OAuth2 *provider* which is probably not what you wa
 
 ***How is WP-OAuth different than other "Connect" plugins such as WordPress Social Connect, WordPress Social Login, Google Apps Login or WP Glogin?***
 
-These are similar alternatives. Some of them may include or require the use other third-party libraries, which may add bloat or become outdated. WP-OAuth is a complete solution with zero dependencies.
+These are similar alternatives. Some of them may include or require the use of other third-party libraries, which may add bloat or become outdated. WP-OAuth is a complete solution with zero dependencies.
 
 ***How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?***
 
@@ -91,12 +78,20 @@ OpenID functions on the assumption that each person will have their own unique i
 
 The latter two technologies are for enterprise-scale apps and environments where a single identity is used to gain access to any site or app within an enterprise environment, whether locally or remotely. Basically, the user signs in once and for the lifetime of their session they will have secure, authenticated access to all resources in the enterprise environment. This is not exactly what OAuth2 was designed for. OAuth2 lets us request information about a user from a trusted third-party, which we can assume to be authentic, allowing us to identify the user in some way and associate that user identity with a user account in our site or app. The main difference is that with OAuth2, each site or app that is requesting your user information *must be explicitly granted permission by you* in order to access it. This access can also be revoked *by you*. This gives users full control over their personal info and what sites or apps may use it. OAuth2 was designed with REST in mind and functions exclusively over the HTTP protocol, whereas SAML allows for other implementations.
 
-Roadmap
--------
-* Advanced options for account merging.
-* More login screen customization options.
-* Commit, publish first release and submit it to the WordPress Plugin Directory.
+== Screenshots ==
 
-History
--------
+1. 
+
+== Changelog ==
+
+= 0.1 =
+* First release.
+
+== Upgrade Notice ==
+
+= 0.1 =
+* First release, no upgrades yet.
+
+== History ==
+
 This project is a continuation of [WP-OpenLogin](http://github.com/perrybutler/wp-openlogin) which was originally developed with OpenID in mind. We're moving on; OAuth 2.0 is now the standard.
