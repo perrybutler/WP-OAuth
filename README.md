@@ -81,7 +81,7 @@ These turn your site into an OAuth2 *provider* which is probably not what you wa
 
 ***How is WP-OAuth different than other "Connect" plugins such as WordPress Social Connect, WordPress Social Login, Google Apps Login or WP Glogin?***
 
-These are similar alternatives. Some of them may include or require the use other third-party libraries, which may add bloat or become outdated. WP-OAuth is a complete solution with zero dependencies.
+These are similar alternatives. Some of them may include or require the use of other third-party libraries, which may add bloat or become outdated. WP-OAuth is a complete solution with zero dependencies.
 
 ***How is WP-OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0?***
 
