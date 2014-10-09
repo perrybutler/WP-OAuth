@@ -1,5 +1,6 @@
 var wp_media_dialog_field; // field to populate after the admin selects an image using the wordpress media dialog
 
+// store the client's GMT offset (timezone) for converting server time into local time on a per-client basis (this makes the time at which a provider was linked more accurate):
 d = new Date; 
 gmtoffset = d.getTimezoneOffset() / 60;
 document.cookie = 'gmtoffset=' + gmtoffset;
@@ -100,33 +101,37 @@ function notify(msg) {
 }
 
 function loginGoogle() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-google.php";
+	window.location = wpoa_cvars.url + "?connect=google";
 }
 
 function loginFacebook() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-facebook.php";
+	window.location = wpoa_cvars.url + "?connect=facebook";
 }
 
 function loginLinkedIn() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-linkedin.php";
+	window.location = wpoa_cvars.url + "?connect=linkedin";
 }
 
 function loginGithub() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-github.php";
+	window.location = wpoa_cvars.url + "?connect=github";
 }
 
 function loginReddit() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-reddit.php";
+	window.location = wpoa_cvars.url + "?connect=reddit";
 }
 
 function loginWindowsLive() {
-	window.location = wpoa_cvars.plugin_dir_url + "login-windowslive.php";
+	window.location = wpoa_cvars.url + "?connect=windowslive";
 }
 
 function processLogout(callback) {
+	var data = {
+		'action': 'wpoa_logout',
+	};
 	jQuery.ajax({
-		url: wpoa_cvars.plugin_dir_url + "/logout.php", 
-		success: function() {
+		url: wpoa_cvars.ajaxurl,
+		data: data,
+		success: function(json) {
 			window.location = wpoa_cvars.url + "/";
 		}
 	});

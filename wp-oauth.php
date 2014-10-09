@@ -73,17 +73,19 @@ Class WPOA {
 
 	// initialize the plugin's functionality by hooking into wordpress:
 	function init() {
-		$plugin = plugin_basename(__FILE__);
+		// hook the query_vars and template_redirect so we can stay within the wordpress context no matter what (avoids having to use wp-load.php)
+		add_filter('query_vars', array($this, 'wpoa_qvar_triggers'));
+		add_action('template_redirect', array($this, 'wpoa_qvar_handlers'));
 		// hook activation and deactivation for the plugin:
 		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
 		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
 		// hook scripts and styles for frontend pages:
 		add_action('wp_enqueue_scripts', array($this, 'wpoa_init_frontend_scripts_styles'));
 		// hook scripts and styles for backend pages:
-		//add_action('admin_enqueue_scripts', array($this, 'wpoa_init_frontend_scripts_styles')); TODO: probably don't need this since we separated the inits into frontend/backend/login...
 		add_action('admin_enqueue_scripts', array($this, 'wpoa_init_backend_scripts_styles'));
 		add_action('admin_menu', array($this, 'wpoa_settings_page'));
 		add_action('admin_init', array($this, 'wpoa_register_settings'));
+		$plugin = plugin_basename(__FILE__);
 		add_filter("plugin_action_links_$plugin", array($this, 'wpoa_settings_link'));
 		// hook scripts and styles for login page:
 		add_action('login_enqueue_scripts', array($this, 'wpoa_init_login_scripts_styles'));
@@ -91,6 +93,7 @@ Class WPOA {
 		add_filter('login_message', array($this, 'wpoa_customize_login_screen'));
 		// hooks used globally:
 		add_action('show_user_profile', array($this, 'wpoa_linked_accounts'));
+		add_action('wp_ajax_wpoa_logout', array($this, 'wpoa_logout'));
 		add_action('wp_ajax_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
 		add_action('wp_ajax_nopriv_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
 		add_shortcode('wpoa_custom_login_form', array($this, 'wpoa_custom_login_form') );
@@ -178,9 +181,63 @@ Class WPOA {
 		wp_enqueue_script('wpoa-script', plugin_dir_url( __FILE__ ) . 'wp-oauth.js', array());
 		wp_enqueue_style('wpoa-style', plugin_dir_url( __FILE__ ) . 'wp-oauth.css', array());
 	}
+
+	// define the querystring variables that should trigger an action:
+	function wpoa_qvar_triggers($vars) {
+		$vars[] = 'connect';
+		$vars[] = 'code';
+		return $vars;
+	}
 	
+	// handle the querystring triggers:
+	function wpoa_qvar_handlers() {
+		if (get_query_var('connect')) {
+			$provider = get_query_var('connect');
+			$this->wpoa_include_connector($provider);
+		}
+		elseif (get_query_var('code')) {
+			$provider = $_SESSION['WPOA']['PROVIDER'];
+			$this->wpoa_include_connector($provider);
+		}
+	}
+	
+	// load the provider handler that is being requested by the user or being called back after authentication:
+	function wpoa_include_connector($provider) {
+		// normalize the provider name (no caps, no spaces):
+		$provider = strtolower($provider);
+		$provider = str_replace(" ", "", $provider);
+		switch ($provider) {
+			case 'google':
+				include 'login-google.php';
+				break;
+			case 'facebook':
+				include 'login-facebook.php';
+				break;
+			case 'linkedin':
+				include 'login-linkedin.php';
+				break;
+			case 'github':
+				include 'login-github.php';
+				break;
+			case 'reddit':
+				include 'login-reddit.php';
+				break;
+			case 'windowslive':
+				include 'login-windowslive.php';
+				break;
+		}
+	}
+	
+	// logout the wordpress user:
+	function wpoa_logout() {
+		$user = null; 		// nullify the user
+		session_destroy(); 	// destroy the php user session
+		wp_logout(); 		// logout the wordpress user
+	}
+	
+	// add a settings link to the plugins page:
 	function wpoa_settings_link($links) { 
-		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings</a>"; 
+		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings</a>"; // CASE SeNsItIvE filename!
 		array_unshift($links, $settings_link); 
 		return $links; 
 	}
@@ -203,6 +260,7 @@ Class WPOA {
 		}
 	}
 	
+	// adds basic http auth to a given url string:
 	function wpoa_add_basic_auth($url, $username, $password) {
 		$url = str_replace("https://", "", $url);
 		$url = "https://" . $username . ":" . $password . "@" . $url;
@@ -239,7 +297,7 @@ Class WPOA {
 		// delete the wpoa_identity record from the wp_usermeta table:
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
-		$query_string = "DELETE FROM $usermeta_table WHERE $usermeta_table.user_id = $user_id AND $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.umeta_id = $wpoa_identity_row";
+		$query_string = $wpdb->prepare("DELETE FROM $usermeta_table WHERE $usermeta_table.user_id = $user_id AND $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.umeta_id = %d", $wpoa_identity_row);
 		$query_result = $wpdb->query($query_string);
 		// notify client of the result;
 		if ($query_result) {
@@ -252,7 +310,7 @@ Class WPOA {
 		die();
 	}
 	
-	// TODO: UNSAFE!!! use prepare() before get_results()...
+	// shows the user's linked providers on the 'Your Profile' page where they may be managed:
 	function wpoa_linked_accounts() {
 		// get the current user:
 		global $current_user;
@@ -314,13 +372,12 @@ Class WPOA {
 		return $html;
 	}
 	
+	// login (or register and login) a wordpress user based on their oauth identity:
 	function wpoa_login_user($oauth_identity) {
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
-
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->match_wordpress_user($oauth_identity);
-
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
 			// there was a matching wordpress user account, log it in now:
@@ -332,7 +389,6 @@ Class WPOA {
 			// after login, redirect to the user's last location
 			$this->wpoa_end_login("Logged in successfully!");
 		}
-
 		// handle the already logged in user if there is one:
 		if ( is_user_logged_in() ) {
 			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
@@ -343,18 +399,16 @@ Class WPOA {
 			// after linking the account, redirect user to their last url
 			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
 		}
-
 		// handle the logged out user or no matching user (register the user):
 		if ( !is_user_logged_in() && !$matched_user ) {
 			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
-			header("Location: " . plugins_url('', __FILE__) . "/register.php");
-			exit;
+			include 'register.php';
 		}
-		
 		// we shouldn't be here, but just in case...
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
 	}
 	
+	// ends the login request by clearing the login state and redirecting the user back to their last page:
 	function wpoa_end_login($msg) {
 		$last_url = $_SESSION["WPOA"]["LAST_URL"];
 		$_SESSION["WPOA"]["RESULT"] = $msg;
@@ -363,12 +417,14 @@ Class WPOA {
 		exit;
 	}
 	
+	// pushes login messages into the dom where they can be extracted by javascript:
 	function wpoa_push_login_messages() {
 		$result = $_SESSION['WPOA']['RESULT'];
 		$_SESSION['WPOA']['RESULT'] = '';
 		echo "<div id='wpoa-result'>" . $result . "</div>";
 	}
 	
+	// clears the login state:
 	function wpoa_clear_login_state() {
 		unset($_SESSION["WPOA"]["USER_ID"]);
 		unset($_SESSION["WPOA"]["USER_EMAIL"]);
@@ -385,10 +441,12 @@ Class WPOA {
 		}
 	}
 	
+	// add the main settings page:
 	function wpoa_settings_page() {
 		add_options_page( 'WP-OAuth Options', 'WP-OAuth', 'manage_options', 'WP-OAuth', array($this, 'wpoa_settings_page_content') );
 	}
 
+	// render the main settings page content:
 	function wpoa_settings_page_content() {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
@@ -647,10 +705,6 @@ Class WPOA {
 					<tr valign='top'>
 					<th scope='row'>Delete settings on uninstall</th>
 					<td><p><input type='checkbox' name='wpoa_delete_settings_on_uninstall' value='1' <?php checked(get_option('wpoa_delete_settings_on_uninstall') == 1); ?> /><hr/><strong>Warning:</strong> This will delete all settings that may have been created in your database by this plugin, including all linked third-party login providers. This will not delete any WordPress user accounts, but users who may have registered with or relied upon their third-party login providers may have trouble logging into your site. Make absolutely sure you won't need the values on this page any time in the future, because they will be deleted permanently.<hr/><strong>Instructions:</strong> Check the box above, click the Save Changes button, then uninstall this plugin as normal from the Plugins page.</p></td>
-					</tr>
-					<tr valign='top'>
-					<th scope='row'>Donate</th>
-					<td></td>
 					</tr>
 				</table>
 				<?php submit_button(); ?>

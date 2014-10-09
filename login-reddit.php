@@ -1,7 +1,7 @@
 <?php
 
-// load the wordpress core so this page can access wp functions during an ajax/cross-domain call:
-require_once("../../../wp-load.php");
+// access the plugin class instance:
+global $wpoa;
 
 // start the user session for maintaining individual user states during the multi-stage authentication flow:
 session_start();
@@ -12,7 +12,7 @@ define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_reddit_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_reddit_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_reddit_api_secret'));
-define('REDIRECT_URI', "http://" . $_SERVER['SERVER_NAME'] . $_SERVER['SCRIPT_NAME']);
+define('REDIRECT_URI', "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/");
 define('SCOPE', 'identity'); // PROVIDER SPECIFIC: 'identity' is the minimum scope required to get the user's id from Reddit
 define('URL_AUTH', "https://ssl.reddit.com/api/v1/authorize?");
 define('URL_TOKEN', "https://ssl.reddit.com/api/v1/access_token?");
@@ -31,9 +31,13 @@ elseif (!CLIENT_ID || !CLIENT_SECRET) {
 	// do not proceed if id or secret is null:
 	$wpoa->wpoa_end_login("This third-party authentication provider has not been configured with an API key/secret. Please notify the admin or try again later.");
 }
-elseif (isset($_GET['error'])) {
+elseif (isset($_GET['error_description'])) {
 	// do not proceed if an error was detected:
-	$wpoa->wpoa_end_login($_GET['error'] . ": " . $_GET['error_description']);
+	$wpoa->wpoa_end_login($_GET['error_description']);
+}
+elseif (isset($_GET['error_message'])) {
+	// do not proceed if an error was detected:
+	$wpoa->wpoa_end_login($_GET['error_message']);
 }
 elseif (isset($_GET['code'])) {
 	// post-auth phase, verify the state:
@@ -64,7 +68,6 @@ $wpoa->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow te
 
 # AUTHENTICATION FLOW HELPER FUNCTIONS #
 function get_oauth_code() {
-	global $wpoa;
 	$params = array(
 		'response_type' => 'code',
 		'client_id' => CLIENT_ID,
@@ -181,5 +184,4 @@ function get_oauth_identity() {
 	return $oauth_identity;
 }
 # END OF AUTHENTICATION FLOW HELPER FUNCTIONS #
-
 ?>
