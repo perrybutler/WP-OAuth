@@ -451,6 +451,7 @@ Class WPOA {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
+		$blog_url = "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/";
 		?>
 		<div class='wrap wpoa-settings'>
 			<h2>WP-OAuth Settings</h2>
@@ -529,19 +530,14 @@ Class WPOA {
 					<th scope='row'>Client Secret</th>
 					<td><input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' /></td>
 					</tr>
-
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-google.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Visit the Google website for developers <a href='https://console.developers.google.com/project'>console.developers.google.com</a>.</li>
 						<li>At Google, create a new Project and enable the Google+ API. This will enable your site to access the Google+ API.</li>
-						<li>At Google, provide the Redirect URI listed above for the new Project.</li>
-						<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when granting access to your site/app.</li>
+						<li>At Google, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new Project's Redirect URI. Don't forget the trailing slash!</li>
+						<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when they are asked to grant access to your site/app.</li>
 						<li>Paste your Client ID/Secret provided by Google into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
@@ -561,18 +557,13 @@ Class WPOA {
 					<th scope='row'>App Secret</th>
 					<td><input type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' /></td>
 					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-facebook.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Register as a Facebook Developer at <a href='https://developers.facebook.com/'>developers.facebook.com</a>.</li>
 						<li>At Facebook, create a new App. This will enable your site to access the Facebook API.</li>
-						<li>At Facebook, provide your site's URL for the new App.</li>
+						<li>At Facebook, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 						<li>Paste your App ID/Secret provided by Facebook into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
@@ -592,18 +583,13 @@ Class WPOA {
 					<th scope='row'>Secret Key</th>
 					<td><input type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' /></td>
 					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-linkedin.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Register as a LinkedIn Developer at <a href='https://developers.linkedin.com/'>developers.linkedin.com</a>.</li>
 						<li>At LinkedIn, create a new App. This will enable your site to access the LinkedIn API.</li>
-						<li>At LinkedIn, provide the Redirect URI listed above for the new App.</li>
+						<li>At LinkedIn, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 						<li>Paste your API Key/Secret provided by LinkedIn into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
@@ -623,18 +609,13 @@ Class WPOA {
 					<th scope='row'>Client Secret</th>
 					<td><input type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' /></td>
 					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-github.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Register as a Github Developer at <a href='https://developers.github.com/'>developers.github.com</a>.</li>
 						<li>At Github, create a new App. This will enable your site to access the Github API.</li>
-						<li>At Github, provide the Redirect URI listed above for the new App.</li>
+						<li>At Github, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 						<li>Paste your API Key/Secret provided by Github into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
@@ -654,18 +635,13 @@ Class WPOA {
 					<th scope='row'>Client Secret</th>
 					<td><input type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' /></td>
 					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-reddit.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Register as a Reddit Developer at <a href='https://ssl.reddit.com/prefs/apps'>ssl.reddit.com/prefs/apps</a>.</li>
 						<li>At Reddit, create a new App. This will enable your site to access the Reddit API.</li>
-						<li>At Reddit, provide the Redirect URI listed above for the new App.</li>
+						<li>At Reddit, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 						<li>Paste your Client ID/Secret provided by Reddit into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
@@ -685,18 +661,13 @@ Class WPOA {
 					<th scope='row'>Client Secret</th>
 					<td><input type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' /></td>
 					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Redirect URI:</th>
-					<td><span><?php echo plugins_url() . '/wp-oauth/login-windowslive.php' ?></span></td>
-					</tr>
 				</table>
 				<p>
 					<strong>Instructions:</strong>
 					<ol>
 						<li>Register as a Windows Live Developer at <a href='https://manage.dev.live.com'>manage.dev.live.com</a>.</li>
 						<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
-						<li>At Windows Live, provide the Redirect URI listed above for the new App.</li>
+						<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 						<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click Save Changes at the bottom of this page.</li>
 					</ol>
 				</p>
