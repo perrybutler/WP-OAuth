@@ -26,7 +26,6 @@ Allows users to login or register by authenticating with an existing Google, Fac
 * Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's id/email address only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
 * Users can manage their third-party login providers via the standard "Your Profile" WordPress page. They may link more accounts, or unlink existing accounts.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
-* Supports WordPress Multisite.
 * Supports cURL or stream context for the authentication flow.
 * The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated,  rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
