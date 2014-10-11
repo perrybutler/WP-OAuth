@@ -8,25 +8,17 @@ document.cookie = 'gmtoffset=' + gmtoffset;
 // after the document has loaded, we hook up our events and initialize any other js functionality:
 jQuery(document).ready(function() {
 	// show the wordpress media dialog for selecting a logo image:
-	jQuery('#wpoa_logo_image_button').click(function() {
+	jQuery('#wpoa_logo_image_button').click(function(e) {
+		e.preventDefault();
 		wp_media_dialog_field = jQuery('#wpoa_logo_image');
-		formfield = jQuery('#wpoa_logo_image').attr('name');
-		tb_show('', 'media-upload.php?type=image&TB_iframe=true');
-		return false;
+		selectMedia();
 	});
 	// show the wordpress media dialog for selecting a bg image:
-	jQuery('#bg_image_button').click(function() {
+	jQuery('#wpoa_bg_image_button').click(function(e) {
+		e.preventDefault();
 		wp_media_dialog_field = jQuery('#wpoa_bg_image');
-		formfield = jQuery('#wpoa_logo_image').attr('name');
-		tb_show('', 'media-upload.php?type=image&TB_iframe=true');
-		return false;
+		selectMedia();
 	});
-	// handle the wordpress media dialog selection event by pushing the selected media url into the form field:
-	window.send_to_editor = function(html) {
-		imgurl = jQuery('img', html).attr('src');
-		wp_media_dialog_field.val(imgurl);
-		tb_remove();
-	}
 	// attach unlink button click events:
 	jQuery(".wpoa-unlink-account").click(function(event) {
 		event.preventDefault();
@@ -90,6 +82,27 @@ jQuery(document).ready(function() {
 		}
 	}
 });
+
+// shows the default wordpress media dialog for selecting or uploading an image:
+function selectMedia() {
+	var custom_uploader;
+	if (custom_uploader) {
+		custom_uploader.open();
+		return;
+	}
+	custom_uploader = wp.media.frames.file_frame = wp.media({
+		title: 'Choose Image',
+		button: {
+			text: 'Choose Image'
+		},
+		multiple: false
+	});
+	custom_uploader.on('select', function() {
+		attachment = custom_uploader.state().get('selection').first().toJSON();
+		wp_media_dialog_field.val(attachment.url);
+	});
+	custom_uploader.open();
+}
 
 // displays a short-lived notification message at the top of the screen:
 function notify(msg) {

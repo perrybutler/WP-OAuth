@@ -1,20 +1,33 @@
-/* backend */
+/* general */
+#wpoa-result {display:none;}
+.wpoa-login-message{text-align:center; left:0; right:0; top:5px; position:absolute; font-size:1em; z-index:999999;}
+.wpoa-login-message span {padding:4px 6px; background:#fff; color:#000; border-radius:5px; display:inline-block;}
+
+/* settings page */
 .wpoa-settings h3 {background:#ddd; padding:5px;}
 .wpoa-settings hr {border:0; margin-bottom:1em;}
 .wpoa-linked-accounts {font-weight:bold;}
 
-/* login */
-.wpoa-login-button:last-of-type {margin-bottom:2px;}
-.wpoa-login-button {text-align:center; font-size:1.2em; padding:10px; background:#1e8cbe; color:#fff; margin-bottom:1px; -webkit-transition:all 0.5s ease; cursor:pointer;}
-.wpoa-login-button:hover {background:#c5c5c5;}
-.wpoa-login-button.loading{background:#fff !important; color:#000; cursor:default;}
-.wpoa-login-button.loading-other{background:rgba(255,255,255,0) !important; color:#999; cursor:default;}
-
-/* frontend & login */
-#wpoa-result {display:none;}
-
-/* all */
-.wpoa-login-message{text-align:center; left:0; right:0; top:5px; position:absolute; font-size:1em; z-index:999999;}
-.wpoa-login-message span {padding:4px 6px; background:#fff; color:#000; border-radius:5px; display:inline-block;}
-
+/* default login form */
 #wpoa-title {text-align:center; font-size: 1.2em; padding:5px;}
+#login nav {text-align:center;}
+
+/* shared login form styles */
+.wpoa-layout-links-row {}
+.wpoa-layout-links-row a {display:inline; margin-right:0.5em;}
+
+.wpoa-layout-links-column {}
+.wpoa-layout-links-column a {display:inline; margin-bottom:1px;}
+.wpoa-layout-links-column a:after {content:"\A"; white-space:pre;}
+
+.wpoa-layout-buttons-row {}
+.wpoa-layout-buttons-row a {display:inline-block; width:7em; text-decoration:none; text-align:center; font-size:1.2em; padding:10px; background:#1e8cbe; color:#fff; margin-bottom:1px; margin-right:1px; -webkit-transition:all 0.5s ease; cursor:pointer;}
+.wpoa-layout-buttons-row a:hover {background:#c5c5c5;}
+.wpoa-layout-buttons-row a.loading{background:#fff !important; color:#000; cursor:default;}
+.wpoa-layout-buttons-row a.loading-other{background:rgba(255,255,255,0) !important; color:#999; cursor:default;}
+
+.wpoa-layout-buttons-column {}
+.wpoa-layout-buttons-column a {display:block; text-decoration:none; text-align:center; font-size:1.2em; padding:10px; background:#1e8cbe; color:#fff; margin-bottom:1px; -webkit-transition:all 0.5s ease; cursor:pointer;}
+.wpoa-layout-buttons-column a:hover {background:#c5c5c5;}
+.wpoa-layout-buttons-column a.loading{background:#fff !important; color:#000; cursor:default;}
+.wpoa-layout-buttons-column a.loading-other{background:rgba(255,255,255,0) !important; color:#999; cursor:default;}

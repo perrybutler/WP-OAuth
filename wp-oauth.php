@@ -58,12 +58,12 @@ Class WPOA {
 		'wpoa_delete_settings_on_uninstall',
 	);
 	
+	// do something during plugin activation:
 	function wpoa_activate() {
-	
 	}
 	
+	// do something during plugin deactivation:
 	function wpoa_deactivate() {
-	
 	}
 
 	// when the plugin class gets created, fire the initialization:
@@ -96,7 +96,7 @@ Class WPOA {
 		add_action('wp_ajax_wpoa_logout', array($this, 'wpoa_logout'));
 		add_action('wp_ajax_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
 		add_action('wp_ajax_nopriv_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
-		add_shortcode('wpoa_custom_login_form', array($this, 'wpoa_custom_login_form') );
+		add_shortcode('wpoa_login_form', 'wpoa_login_form');
 		// push login messages into the DOM if the setting is enabled:
 		if (get_option('wpoa_show_login_messages') !== false) {
 			add_action('wp_footer', array($this, 'wpoa_push_login_messages'));
@@ -150,9 +150,7 @@ Class WPOA {
 		wp_enqueue_script('wpoa-script', plugin_dir_url( __FILE__ ) . 'wp-oauth.js', array());
 		wp_enqueue_style('wpoa-style', plugin_dir_url( __FILE__ ) . 'wp-oauth.css', array());
 		// load the default wordpress media screen:
-		wp_enqueue_script('media-upload');
-		wp_enqueue_script('thickbox');
-		wp_enqueue_style('thickbox');
+		wp_enqueue_media();
 	}
 	
 	// init scripts and styles for use on the LOGIN PAGE:
@@ -201,11 +199,12 @@ Class WPOA {
 		}
 	}
 	
-	// load the provider handler that is being requested by the user or being called back after authentication:
+	// load the provider script that is being requested by the user or being called back after authentication:
 	function wpoa_include_connector($provider) {
 		// normalize the provider name (no caps, no spaces):
 		$provider = strtolower($provider);
 		$provider = str_replace(" ", "", $provider);
+		// include the provider script:
 		switch ($provider) {
 			case 'google':
 				include 'login-google.php';
@@ -245,19 +244,6 @@ Class WPOA {
 	// force the login screen logo to point to the site instead of wordpress.org:
 	function wpoa_logo_link() {
 		return get_bloginfo('url');
-	}
-	
-	// show the login customizations per the admin's chosen settings:
-	function wpoa_customize_login_screen() {
-		echo "<p id='wpoa-title'>" . get_option('wpoa_title') . "</p>";
-		if (get_option('wpoa_show_provider_buttons')) {
-			if (get_option('wpoa_google_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginGoogle(); return false;'>Google</div>";}
-			if (get_option('wpoa_facebook_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginFacebook(); return false;'>Facebook</div>";}
-			if (get_option('wpoa_linkedin_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginLinkedIn(); return false;'>LinkedIn</div>";}
-			if (get_option('wpoa_github_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginGithub(); return false;'>Github</div>";}
-			if (get_option('wpoa_reddit_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginReddit(); return false;'>Reddit</div>";}
-			if (get_option('wpoa_windowslive_api_enabled')) {echo "<div class='wpoa-login-button' onclick='loginWindowsLive(); return false;'>Windows Live</div>";}
-		}
 	}
 	
 	// adds basic http auth to a given url string:
@@ -322,7 +308,7 @@ Class WPOA {
 		$query_string = "SELECT * FROM $usermeta_table WHERE $user_id = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wpoa_identity'";
 		$query_result = $wpdb->get_results($query_string);
 		// list the wpoa_identity records:
-		echo "<div class='wpoa-settings'>";
+		echo "<div id='wpoa-linked-accounts' class='wpoa-settings'>";
 		echo "<h3>Linked Accounts</h3>";
 		echo "<p>Manage the linked accounts which you have previously authorized to be used for logging into this website.</p>";
 		echo "<table class='form-table'>";
@@ -347,29 +333,44 @@ Class WPOA {
 		echo "<tr valign='top'>";
 		echo "<th scope='row'>Link Another Provider</th>";
 		echo "<td>";
-		echo $this->wpoa_custom_login_form('');
+		echo $this->wpoa_login_form_content('buttons-row');
 		echo "</div>";
 		echo "</td>";
 		echo "</td>";
 		echo "</table>";
 	}
-	
-	// shows a custom login form:
-	function wpoa_custom_login_form( $atts, $content = null ){
-		$atts = shortcode_atts( array(
-			'title' => 'Title',
-			'design' => 'basic',
+
+	// shortcode which allows adding the login form to any post or page:
+	function wpoa_login_form( $atts ){
+		$a = shortcode_atts( array(
+			'layout' => 'links-column',
 		), $atts );
+		$html = wpoa_login_form_content($a['layout']);
+		return $html;
+	}
+	
+	// gets the content to be used for displaying the login form:
+	function wpoa_login_form_content($layout = 'links-column') {
 		$html = "";
-		$html .= "<div class='wpoa_custom_login_form'>";
-		if (get_option('wpoa_google_api_enabled')) {$html .= "<a href='#' onclick='loginGoogle(); return false;'>Google</a><br/>";}
-		if (get_option('wpoa_facebook_api_enabled')) {$html .= "<a href='#' onclick='loginFacebook(); return false;'>Facebook</a><br/>";}
-		if (get_option('wpoa_linkedin_api_enabled')) {$html .= "<a href='#' onclick='loginLinkedIn(); return false;'>LinkedIn</a><br/>";}
-		if (get_option('wpoa_github_api_enabled')) {$html .= "<a href='#' onclick='loginGithub(); return false;'>Github</a><br/>";}
-		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a href='#' onclick='loginReddit(); return false;'>Reddit</a><br/>";}
-		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a href='#' onclick='loginWindowsLive(); return false;'>Windows Live</a><br/>";}
+		$html .= "<div class='wpoa-login-form wpoa-layout-$layout'>";
+		$html .= "<nav>";
+		if (get_option('wpoa_google_api_enabled')) {$html .= "<a href='#' onclick='loginGoogle(); return false;'>Google</a>";}
+		if (get_option('wpoa_facebook_api_enabled')) {$html .= "<a href='#' onclick='loginFacebook(); return false;'>Facebook</a>";}
+		if (get_option('wpoa_linkedin_api_enabled')) {$html .= "<a href='#' onclick='loginLinkedIn(); return false;'>LinkedIn</a>";}
+		if (get_option('wpoa_github_api_enabled')) {$html .= "<a href='#' onclick='loginGithub(); return false;'>Github</a>";}
+		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a href='#' onclick='loginReddit(); return false;'>Reddit</a>";}
+		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a href='#' onclick='loginWindowsLive(); return false;'>Windows Live</a>";}
+		$html .= "</nav>";
 		$html .= "</div>";
 		return $html;
+	}
+	
+	// show the login customizations per the admin's chosen settings:
+	function wpoa_customize_login_screen() {
+		$html = "";
+		$html .= "<p id='wpoa-title'>" . get_option('wpoa_title') . "</p>";
+		$html .= $this->wpoa_login_form_content('buttons-column');
+		echo $html;
 	}
 	
 	// login (or register and login) a wordpress user based on their oauth identity:
@@ -455,7 +456,7 @@ Class WPOA {
 		?>
 		<div class='wrap wpoa-settings'>
 			<h2>WP-OAuth Settings</h2>
-			<p>Manage settings for WP-OAuth here. Most third-party authentication providers will require the developer to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing the third-party API.</p>
+			<p>Manage settings for WP-OAuth here. Third-party authentication providers will require you to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing their API.</p>
 			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----"><input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"><img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"></form>
 			<form method='post' action='options.php'>
 				<?php settings_fields('wpoa_settings'); ?>

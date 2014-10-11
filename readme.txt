@@ -4,7 +4,7 @@ Donate link: http://glassocean.net
 Tags: login, membership, users, registration, oauth, social, social networking, community, security
 Requires at least: 4.0
 Tested up to: 4.0
-Stable tag: 0.1
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,18 +12,22 @@ Allows users to login or register by authenticating with an existing Google, Fac
 
 == Description ==
 
-*Reminder:*
+=BETA Reminder=
+
 WP-OAuth is a brand new plugin that has not been used by a large audience yet. All we're asking is that you submit any issues or bugs you may come across, so we can fix them as soon as possible. Your participation during this initial phase is much appreciated.
 
-*Demo:*
+=Demo=
+
 A working demo of WP-OAuth is available at [www.choiceschances.com](http://www.choiceschances.com). You may try the Login at the top right, or try the customized WordPress login page [here](http://www.choiceschances.com/wp-login.php). Choices & Chances is a choose-your-own-adventure platform currently undergoing development and public beta testing.
 
-*Facts:*
+=Facts=
+
 * With so many sites offering membership now, users may suffer registration fatigue and forget their passwords, or use the same password for several sites, increasing their security risk.
 * [56% of consumers](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords (2013).
 * [40% of consumers](http://www.marketingprofs.com/charts/2012/7060/social-media-users-prefer-social-login-over-traditional) currently utilize social login (2012).
 
-*Features:*
+=Features=
+
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
 * Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled. 
 * Customize the login screen with a logo or background. Hide the default login form if you want. Automatically include login buttons for any providers that are enabled.
@@ -89,6 +93,9 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 == Changelog ==
 
+= 0.1.1 =
+* Fixed an issue where the WordPress media dialog that was implemented for choosing a Logo or Background image for the login screen was conflicting with the default one for Posts and Pages.
+
 = 0.1 =
 * First release.
 
@@ -96,6 +103,7 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 = 0.1 =
 * First release, no upgrades yet.
+* Updated readme again.
 
 == History ==
 
