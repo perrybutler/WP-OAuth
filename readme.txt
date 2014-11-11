@@ -12,17 +12,17 @@ Allows users to login or register by authenticating with an existing Google, Fac
 
 == Description ==
 
-=Demo=
+= Demo =
 
 A live demo of WP-OAuth is available at [www.choiceschances.com](http://www.choiceschances.com). You may try the Login at the top right, or try the customized WordPress login page [here](http://www.choiceschances.com/wp-login.php). Choices & Chances is a choose-your-own-adventure platform currently undergoing development and public beta testing.
 
-=Facts=
+= Facts =
 
 * With so many sites offering membership now, users may suffer registration fatigue and forget their passwords, or use the same password for several sites, increasing their security risk.
 * [56% of consumers](http://www1.janrain.com/rs/janrain/images/Industry-Research-Value-of-Social-Login-2013.pdf) have at least one major social network profile they could be using for membership, registration and login purposes across multiple websites without having to maintain multiple accounts and passwords (2013).
 * [40% of consumers](http://www.marketingprofs.com/charts/2012/7060/social-media-users-prefer-social-login-over-traditional) currently utilize social login (2012).
 
-=Features=
+= Features =
 
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
 * Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled.
@@ -35,19 +35,19 @@ A live demo of WP-OAuth is available at [www.choiceschances.com](http://www.choi
 * The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated, rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
 * Extremely light-weight. Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
 
-=How to Contribute=
+= How to Contribute =
 
 Visit the [GitHub development repository](https://github.com/perrybutler/WP-OAuth).
 
 == Installation ==
 
-**Quick Start**
+= Quick Start =
 
 1. Download and install the WP-OAuth plugin.
 2. Setup your desired authentication providers' API key/secret in the WordPress backend under Settings > WP-OAuth.
 3. Enable the included login buttons, or add login buttons anywhere to your site/theme with the included shortcodes.
 
-**Shortcode Tips**
+= Shortcode Tips =
 
 You may add a login form to any Post or Page using the [wpoa_login_form] shortcode. Choose from 4 different layouts: links-row, links-column, buttons-row, buttons-column. For example:
 
@@ -112,6 +112,9 @@ The latter two technologies are for enterprise-scale apps and environments where
 * First release.
 
 == Upgrade Notice ==
+
+= 0.1.2 =
+* Updated readme.
 
 == History ==
 
