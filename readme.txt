@@ -1,10 +1,10 @@
 === WP-OAuth ===
 Contributors: hectavex
 Donate link: http://glassocean.net
-Tags: login, membership, users, registration, oauth, social, social networking, community, security
+Tags: login, membership, users, registration, oauth, social, social networking, community, security, connect with, authentication, authorization
 Requires at least: 4.0
 Tested up to: 4.0
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -12,13 +12,9 @@ Allows users to login or register by authenticating with an existing Google, Fac
 
 == Description ==
 
-=BETA Reminder=
-
-WP-OAuth is a brand new plugin that has not been used by a large audience yet. All we're asking is that you submit any issues or bugs you may come across, so we can fix them as soon as possible. Your participation during this initial phase is much appreciated.
-
 =Demo=
 
-A working demo of WP-OAuth is available at [www.choiceschances.com](http://www.choiceschances.com). You may try the Login at the top right, or try the customized WordPress login page [here](http://www.choiceschances.com/wp-login.php). Choices & Chances is a choose-your-own-adventure platform currently undergoing development and public beta testing.
+A live demo of WP-OAuth is available at [www.choiceschances.com](http://www.choiceschances.com). You may try the Login at the top right, or try the customized WordPress login page [here](http://www.choiceschances.com/wp-login.php). Choices & Chances is a choose-your-own-adventure platform currently undergoing development and public beta testing.
 
 =Facts=
 
@@ -29,20 +25,33 @@ A working demo of WP-OAuth is available at [www.choiceschances.com](http://www.c
 =Features=
 
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
-* Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled. 
-* Customize the login screen with a logo or background. Hide the default login form if you want. Automatically include login buttons for any providers that are enabled.
-* Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's id/email address only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
+* Supports third-party authentication with Google, Facebook and LinkedIn via OAuth 2.0. Providers can be enabled or disabled.
+* Add a login form to any Post or Page using the [wpoa_login_form] shortcode. Choose from 4 different layouts. See the Installation instructions for more details.
+* Customize the login screen with a logo or background. Point the logo URL to your home page instead of WordPress.org. Hide the default login form if you want. Automatically include login buttons for any providers that are enabled.
+* Authenticated users are automatically registered and/or logged into their WordPress user accounts. We request the minimum amount of user info (currently the user's id number only) for use when linking their third party accounts to their WordPress user account. No other user info is requested or collected.
 * Users can manage their third-party login providers via the standard "Your Profile" WordPress page. They may link more accounts, or unlink existing accounts.
 * Pushes the login result message into the DOM which can be extracted via Javascript for notifying the user. Avoids polluting the response url. This feature can also be disabled.
-* Supports cURL or stream context for the authentication flow.
-* The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated,  rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
-* Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
+* Supports cURL or stream context for the authentication flow, meaning the plugin should be compatible with a wide range of PHP servers.
+* The authentication flow was adapted from code samples provided by Google, Facebook and LinkedIn. It has been updated, rigorously tested and debugged for solid error handling. Provider implementations share much of the same code (very high code re-use) and the differences between the providers have been fully documented.
+* Extremely light-weight. Doesn't require third-party OAuth libraries; everything is built into the plugin first-class. Previously, WP-OpenLogin required LightOpenID and Facebook-PHP-SDK, but this is no longer necessary. Keeps the bloat low and the performance high.
+
+=How to Contribute=
+
+Visit the [GitHub development repository](https://github.com/perrybutler/WP-OAuth).
 
 == Installation ==
+
+**Quick Start**
 
 1. Download and install the WP-OAuth plugin.
 2. Setup your desired authentication providers' API key/secret in the WordPress backend under Settings > WP-OAuth.
 3. Enable the included login buttons, or add login buttons anywhere to your site/theme with the included shortcodes.
+
+**Shortcode Tips**
+
+You may add a login form to any Post or Page using the [wpoa_login_form] shortcode. Choose from 4 different layouts: links-row, links-column, buttons-row, buttons-column. For example:
+
+    [wpoa_login_form layout="buttons-column"]
 
 == Frequently Asked Questions ==
 
@@ -93,6 +102,9 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 == Changelog ==
 
+= 0.1.2 =
+* Fixed [wpoa_login_form] shortcode.
+
 = 0.1.1 =
 * Fixed an issue where the WordPress media dialog that was implemented for choosing a Logo or Background image for the login screen was conflicting with the default one for Posts and Pages.
 
@@ -100,10 +112,6 @@ The latter two technologies are for enterprise-scale apps and environments where
 * First release.
 
 == Upgrade Notice ==
-
-= 0.1 =
-* First release, no upgrades yet.
-* Updated readme again.
 
 == History ==
 
