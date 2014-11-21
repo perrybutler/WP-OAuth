@@ -1,8 +1,5 @@
 <?php
 
-// access the plugin class instance:
-global $wpoa;
-
 // start the user session for maintaining individual user states during the multi-stage authentication flow:
 session_start();
 
@@ -25,19 +22,19 @@ if (!$_SESSION['WPOA']['LAST_URL']) {$_SESSION['WPOA']['LAST_URL'] = strtok($_SE
 # AUTHENTICATION FLOW #
 // the oauth 2.0 authentication flow will start in this script and make several calls to the third-party authentication provider which in turn will make callbacks to this script that we continue to handle until the login completes with a success or failure:
 if (!CLIENT_ENABLED) {
-	$wpoa->wpoa_end_login("This third-party authentication provider has not been enabled. Please notify the admin or try again later.");
+	$this->wpoa_end_login("This third-party authentication provider has not been enabled. Please notify the admin or try again later.");
 }
 elseif (!CLIENT_ID || !CLIENT_SECRET) {
 	// do not proceed if id or secret is null:
-	$wpoa->wpoa_end_login("This third-party authentication provider has not been configured with an API key/secret. Please notify the admin or try again later.");
+	$this->wpoa_end_login("This third-party authentication provider has not been configured with an API key/secret. Please notify the admin or try again later.");
 }
 elseif (isset($_GET['error_description'])) {
 	// do not proceed if an error was detected:
-	$wpoa->wpoa_end_login($_GET['error_description']);
+	$this->wpoa_end_login($_GET['error_description']);
 }
 elseif (isset($_GET['error_message'])) {
 	// do not proceed if an error was detected:
-	$wpoa->wpoa_end_login($_GET['error_message']);
+	$this->wpoa_end_login($_GET['error_message']);
 }
 elseif (isset($_GET['code'])) {
 	// post-auth phase, verify the state:
@@ -46,24 +43,24 @@ elseif (isset($_GET['code'])) {
 		get_oauth_token();
 		// get the user's third-party identity and attempt to login/register a matching wordpress user account:
 		$oauth_identity = get_oauth_identity();
-		$wpoa->wpoa_login_user($oauth_identity);
+		$this->wpoa_login_user($oauth_identity);
 	}
 	else {
 		// possible CSRF attack, end the login with a generic message to the user and a detailed message to the admin/logs in case of abuse:
 		// TODO: report detailed message to admin/logs here...
-		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Please notify the admin or try again later.");
+		$this->wpoa_end_login("Sorry, we couldn't log you in. Please notify the admin or try again later.");
 	}
 }
 else {
 	// pre-auth, start the auth process:
 	if ((empty($_SESSION['WPOA']['EXPIRES_AT'])) || (time() > $_SESSION['WPOA']['EXPIRES_AT'])) {
 		// expired token; clear the state:
-		$wpoa->wpoa_clear_login_state;
+		$this->wpoa_clear_login_state;
 	}
 	get_oauth_code();
 }
 // we shouldn't be here, but just in case...
-$wpoa->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow terminated in an unexpected way. Please notify the admin or try again later.");
+$this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow terminated in an unexpected way. Please notify the admin or try again later.");
 # END OF AUTHENTICATION FLOW #
 
 # AUTHENTICATION FLOW HELPER FUNCTIONS #
@@ -82,7 +79,6 @@ function get_oauth_code() {
 }
 
 function get_oauth_token() {
-	global $wpoa;
 	$params = array(
 		'grant_type' => 'authorization_code',
 		'client_id' => CLIENT_ID,
@@ -128,7 +124,7 @@ function get_oauth_token() {
 	// handle the result:
 	if (!$access_token || !$expires_in) {
 		// malformed access token result detected:
-		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Malformed access token result detected. Please notify the admin or try again later.");
+		$this->wpoa_end_login("Sorry, we couldn't log you in. Malformed access token result detected. Please notify the admin or try again later.");
 	}
 	else {
 		$_SESSION['WPOA']['ACCESS_TOKEN'] = $access_token;
@@ -139,7 +135,6 @@ function get_oauth_token() {
 }
 
 function get_oauth_identity() {
-	global $wpoa;
 	// here we exchange the access token for the user info...
 	// set the access token param:
 	$params = array(

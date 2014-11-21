@@ -4,7 +4,7 @@
 Plugin Name: WP-OAuth
 Plugin URI: http://github.com/perrybutler/wp-oauth
 Description: A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
-Version: 0.1.2
+Version: 0.2
 Author: Perry Butler
 Author URI: http://glassocean.net
 License: GPL2
@@ -13,12 +13,15 @@ License: GPL2
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
 session_start();
 
-// instantiate the login class ONCE and maintain a single instance (singleton):
-global $wpoa;
-$wpoa = WPOA::get_instance();
-
-// main class:
+// plugin class:
 Class WPOA {
+
+	// set a version that we can use for performing plugin updates, this should always match the plugin version:
+	const PLUGIN_VERSION = "0.2";
+
+	// ==============
+	// INITIALIZATION
+	// ==============
 
 	// singleton class pattern:
 	protected static $instance = NULL;
@@ -26,37 +29,66 @@ Class WPOA {
 		NULL === self::$instance and self::$instance = new self;
 		return self::$instance;
 	}
-	
-	// define the settings used by this plugin; these will get registered by wordpress and inserted into the database:
-	public $settings = array(
-		'wpoa_show_login_messages',
-		'wpoa_http_util',
-		'wpoa_title',
-		'wpoa_logo_links_to_site',
-		'wpoa_logo_image',
-		'wpoa_bg_image',
-		'wpoa_show_provider_buttons',
-		'wpoa_hide_login_form',
-		'wpoa_google_api_enabled',
-		'wpoa_google_api_id',
-		'wpoa_google_api_secret',
-		'wpoa_facebook_api_enabled',
-		'wpoa_facebook_api_id',
-		'wpoa_facebook_api_secret',
-		'wpoa_linkedin_api_enabled',
-		'wpoa_linkedin_api_id',
-		'wpoa_linkedin_api_secret',
-		'wpoa_github_api_enabled',
-		'wpoa_github_api_id',
-		'wpoa_github_api_secret',
-		'wpoa_reddit_api_enabled',
-		'wpoa_reddit_api_id',
-		'wpoa_reddit_api_secret',
-		'wpoa_windowslive_api_enabled',
-		'wpoa_windowslive_api_id',
-		'wpoa_windowslive_api_secret',
-		'wpoa_delete_settings_on_uninstall',
+
+	// define the settings used by this plugin; this array will be used for registering settings, applying default values, and deleting them during uninstall:
+	private $settings = array(
+		'wpoa_show_login_messages' => 0,								// 0, 1
+		'wpoa_http_util' => 'curl',										// curl, stream-context
+		'wpoa_login_redirect' => 'home_page',							// home_page, last_page, specific_page, admin_dashboard, profile_page, custom_url
+		'wpoa_login_redirect_page' => 0,								// any whole number (wordpress page id)
+		'wpoa_login_redirect_url' => '',								// any string (url)
+		'wpoa_logout_redirect' => 'home_page',							// home_page, last_page, specific_page, admin_dashboard, profile_page, custom_url, default_handling
+		'wpoa_logout_redirect_page' => 0,								// any whole number (wordpress page id)
+		'wpoa_logout_redirect_url' => '',								// any string (url)
+		'wpoa_show_login_form' => 'default_custom',						// custom, default, default_custom
+		'wpoa_logged_out_title' => 'Please login:',						// any string
+		'wpoa_logged_in_title' => 'You are already logged in.',			// any string
+		'wpoa_logging_in_title' => 'Logging in...',						// any string
+		'wpoa_logging_out_title' => 'Logging out...',					// any string
+		'wpoa_logo_links_to_site' => 0,									// 0, 1
+		'wpoa_logo_image' => '',										// any string (image url)
+		'wpoa_bg_image' => '',											// any string (image url)
+		'wpoa_google_api_enabled' => 0,									// 0, 1
+		'wpoa_google_api_id' => '',										// any string
+		'wpoa_google_api_secret' => '',									// any string
+		'wpoa_facebook_api_enabled' => 0,								// 0, 1
+		'wpoa_facebook_api_id' => '',									// any string
+		'wpoa_facebook_api_secret' => '',								// any string
+		'wpoa_linkedin_api_enabled' => 0,								// 0, 1
+		'wpoa_linkedin_api_id' => '',									// any string
+		'wpoa_linkedin_api_secret' => '',								// any string
+		'wpoa_github_api_enabled' => 0,									// 0, 1
+		'wpoa_github_api_id' => '',										// any string
+		'wpoa_github_api_secret' => '',									// any string
+		'wpoa_reddit_api_enabled' => 0,									// 0, 1
+		'wpoa_reddit_api_id' => '',										// any string
+		'wpoa_reddit_api_secret' => '',									// any string
+		'wpoa_windowslive_api_enabled' => 0,							// 0, 1
+		'wpoa_windowslive_api_id' => '',								// any string
+		'wpoa_windowslive_api_secret' => '',							// any string
+		'wpoa_restore_default_settings' => 0,							// 0, 1
+		'wpoa_delete_settings_on_uninstall' => 0,						// 0, 1
 	);
+	
+	// when the plugin class gets created, fire the initialization:
+	function __construct() {
+		// hook activation and deactivation for the plugin:
+		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
+		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
+		// hook load event to handle any plugin updates:
+		add_action('plugins_loaded', array($this, 'wpoa_update'));
+		// hook init event to handle plugin initialization:
+		add_action('init', array($this, 'init'));
+	}
+	
+	// a wrapper for wordpress' get_option(), this basically feeds get_option() the setting's correct default value as specified at the top of this file:
+	/*
+	function wpoa_option($name) {
+		// TODO: create the option with a default value if it doesn't exist?
+		$val = get_option($name, $settings[$name]);
+		return $val;
+	}
+	*/
 	
 	// do something during plugin activation:
 	function wpoa_activate() {
@@ -65,20 +97,66 @@ Class WPOA {
 	// do something during plugin deactivation:
 	function wpoa_deactivate() {
 	}
-
-	// when the plugin class gets created, fire the initialization:
-	function __construct() {
-		add_action('init', array($this, 'init'));
+	
+	// do something during plugin update:
+	function wpoa_update() {
+		$plugin_version = WPOA::PLUGIN_VERSION;
+		$installed_version = get_option("wpoa_plugin_version");
+		if (!$installed_version || $installed_version <= 0 || $installed_version != $plugin_version) {
+			// version mismatch, run the update logic...
+			// add any missing options and set a default (usable) value:
+			$this->wpoa_add_missing_settings();
+			// set the new version so we don't trigger the update again:
+			update_option("wpoa_plugin_version", $plugin_version);
+			// create an admin notice:
+			add_action('admin_notices', array($this, 'wpoa_update_notice'));
+		}
+	}
+	
+	// indicate to the admin that the plugin has been updated:
+	function wpoa_update_notice() {
+		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings Page</a>"; // CASE SeNsItIvE filename!
+		?>
+		<div class="updated">
+			<p>WP-OAuth has been updated! You may review the <?php echo $settings_link ?>.</p>
+		</div>
+		<?php
+	}
+	
+	// adds any missing settings and their default values:
+	function wpoa_add_missing_settings() {
+		foreach($this->settings as $setting_name => $default_value) {
+			// call add_option() which ensures that we only add NEW options that don't exist:
+			$added = add_option($setting_name, $default_value);
+		}
+	}
+	
+	// restores the default plugin settings:
+	function wpoa_restore_default_settings() {
+		foreach($this->settings as $setting_name => $default_value) {
+			// call update_option() which ensures that we update the setting's value:
+			update_option($setting_name, $default_value);
+		}
+		add_action('admin_notices', array($this, 'wpoa_restore_default_settings_notice'));
+	}
+	
+	// indicate to the admin that the plugin has been updated:
+	function wpoa_restore_default_settings_notice() {
+		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings Page</a>"; // CASE SeNsItIvE filename!
+		?>
+		<div class="updated">
+			<p>The default settings have been restored. You may review the <?php echo $settings_link ?>.</p>
+		</div>
+		<?php
 	}
 
 	// initialize the plugin's functionality by hooking into wordpress:
 	function init() {
+		// restore default settings if necessary; this might get toggled by the admin or forced by a new version of the plugin:
+		if (get_option("wpoa_restore_default_settings")) {$this->wpoa_restore_default_settings();}
 		// hook the query_vars and template_redirect so we can stay within the wordpress context no matter what (avoids having to use wp-load.php)
 		add_filter('query_vars', array($this, 'wpoa_qvar_triggers'));
 		add_action('template_redirect', array($this, 'wpoa_qvar_handlers'));
-		// hook activation and deactivation for the plugin:
-		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
-		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
 		// hook scripts and styles for frontend pages:
 		add_action('wp_enqueue_scripts', array($this, 'wpoa_init_frontend_scripts_styles'));
 		// hook scripts and styles for backend pages:
@@ -93,7 +171,8 @@ Class WPOA {
 		add_filter('login_message', array($this, 'wpoa_customize_login_screen'));
 		// hooks used globally:
 		add_action('show_user_profile', array($this, 'wpoa_linked_accounts'));
-		add_action('wp_ajax_wpoa_logout', array($this, 'wpoa_logout'));
+		add_action('wp_logout', array($this, 'wpoa_end_logout'));
+		add_action('wp_ajax_wpoa_logout', array($this, 'wpoa_logout_user'));
 		add_action('wp_ajax_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
 		add_action('wp_ajax_nopriv_wpoa_unlink_account', array($this, 'wpoa_unlink_account'));
 		add_shortcode('wpoa_login_form', array($this, 'wpoa_login_form'));
@@ -165,7 +244,7 @@ Class WPOA {
 			'plugin_dir_url' => plugin_dir_url(__FILE__),
 			'url' => get_bloginfo('url'),
 			// login specific:
-			'hide_login_form' => get_option('wpoa_hide_login_form'),
+			'show_login_form' => get_option('wpoa_show_login_form'),
 			'logo_image' => get_option('wpoa_logo_image'),
 			'bg_image' => get_option('wpoa_bg_image'),
 			'login_message' => $_SESSION['WPOA']['RESULT'],
@@ -179,6 +258,28 @@ Class WPOA {
 		wp_enqueue_script('wpoa-script', plugin_dir_url( __FILE__ ) . 'wp-oauth.js', array());
 		wp_enqueue_style('wpoa-style', plugin_dir_url( __FILE__ ) . 'wp-oauth.css', array());
 	}
+	
+	// add a settings link to the plugins page:
+	function wpoa_settings_link($links) {
+		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings</a>"; // CASE SeNsItIvE filename!
+		array_unshift($links, $settings_link); 
+		return $links; 
+	}
+	
+	// ===============
+	// GENERIC HELPERS
+	// ===============
+	
+	// adds basic http auth to a given url string:
+	function wpoa_add_basic_auth($url, $username, $password) {
+		$url = str_replace("https://", "", $url);
+		$url = "https://" . $username . ":" . $password . "@" . $url;
+		return $url;
+	}
+	
+	// ===================
+	// LOGIN FLOW HANDLING
+	// ===================
 
 	// define the querystring variables that should trigger an action:
 	function wpoa_qvar_triggers($vars) {
@@ -227,32 +328,10 @@ Class WPOA {
 		}
 	}
 	
-	// logout the wordpress user:
-	function wpoa_logout() {
-		$user = null; 		// nullify the user
-		session_destroy(); 	// destroy the php user session
-		wp_logout(); 		// logout the wordpress user
-	}
-	
-	// add a settings link to the plugins page:
-	function wpoa_settings_link($links) { 
-		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings</a>"; // CASE SeNsItIvE filename!
-		array_unshift($links, $settings_link); 
-		return $links; 
-	}
+	// =======================
+	// LOGIN / LOGOUT HANDLING
+	// =======================
 
-	// force the login screen logo to point to the site instead of wordpress.org:
-	function wpoa_logo_link() {
-		return get_bloginfo('url');
-	}
-	
-	// adds basic http auth to a given url string:
-	function wpoa_add_basic_auth($url, $username, $password) {
-		$url = str_replace("https://", "", $url);
-		$url = "https://" . $username . ":" . $password . "@" . $url;
-		return $url;
-	}
-	
 	// match the oauth identity to an existing wordpress user account:
 	function match_wordpress_user($oauth_identity) {
 		// attempt to get a wordpress user id from the database that matches the $oauth_identity['id'] value:
@@ -265,6 +344,122 @@ Class WPOA {
 		return $user;
 	}
 	
+	// login (or register and login) a wordpress user based on their oauth identity:
+	function wpoa_login_user($oauth_identity) {
+		// store the user info in the user session so we can grab it later if we need to register the user:
+		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
+		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
+		$matched_user = $this->match_wordpress_user($oauth_identity);
+		// handle the matched user if there is one:
+		if ( $matched_user ) {
+			// there was a matching wordpress user account, log it in now:
+			$user_id = $matched_user->ID;
+			$user_login = $matched_user->user_login;
+			wp_set_current_user( $user_id, $user_login );
+			wp_set_auth_cookie( $user_id );
+			do_action( 'wp_login', $user_login );
+			// after login, redirect to the user's last location
+			$this->wpoa_end_login("Logged in successfully!");
+		}
+		// handle the already logged in user if there is one:
+		if ( is_user_logged_in() ) {
+			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
+			global $current_user;
+			get_currentuserinfo();
+			$user_id = $current_user->ID;
+			$this->wpoa_link_account($user_id);
+			// after linking the account, redirect user to their last url
+			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
+		}
+		// handle the logged out user or no matching user (register the user):
+		if ( !is_user_logged_in() && !$matched_user ) {
+			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
+			include 'register.php';
+		}
+		// we shouldn't be here, but just in case...
+		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
+	}
+	
+	// ends the login request by clearing the login state and redirecting the user to the desired page:
+	function wpoa_end_login($msg) {
+		$last_url = $_SESSION["WPOA"]["LAST_URL"];
+		$_SESSION["WPOA"]["RESULT"] = $msg;
+		$this->wpoa_clear_login_state();
+		$redirect_method = get_option("wpoa_login_redirect");
+		$redirect_url = "";
+		switch ($redirect_method) {
+			case "home_page":
+				$redirect_url = site_url();
+				break;
+			case "last_page":
+				$redirect_url = $last_url;
+				break;
+			case "specific_page":
+				$redirect_url = get_permalink(get_option('wpoa_login_redirect_page'));
+				break;
+			case "admin_dashboard":
+				$redirect_url = admin_url();
+				break;
+			case "user_profile":
+				$redirect_url = get_edit_user_link();
+				break;
+			case "custom_url":
+				$redirect_url = get_option('wpoa_login_redirect_url');
+				break;
+		}
+		header("Location: " . $redirect_url);
+		die();
+	}
+	
+	// logout the wordpress user:
+	// TODO: this is usually called from a custom logout button, but we could have the button call /wp-logout.php?action=logout for more consistency...
+	function wpoa_logout_user() {
+		// logout the user:
+		$user = null; 		// nullify the user
+		session_destroy(); 	// destroy the php user session
+		wp_logout(); 		// logout the wordpress user...this gets hooked and diverted to wpoa_end_logout() for final handling
+	}
+	
+	// ends the logout request by redirecting the user to the desired page:
+	function wpoa_end_logout() {
+		if (is_user_logged_in()) {
+			// user is logged in and trying to logout...get their Last Page:
+			$last_url = $_SERVER['HTTP_REFERER'];
+		}
+		else {
+			// user is NOT logged in and trying to logout...get their Last Page minus the querystring so we don't trigger the logout confirmation:
+			$last_url = strtok($_SERVER['HTTP_REFERER'], "?");
+		}
+		$this->wpoa_clear_login_state();
+		$redirect_method = get_option("wpoa_logout_redirect");
+		$redirect_url = "";
+		switch ($redirect_method) {
+			case "default_handling":
+				return false;
+			case "home_page":
+				$redirect_url = site_url();
+				break;
+			case "last_page":
+				$redirect_url = $last_url;
+				break;
+			case "specific_page":
+				$redirect_url = get_permalink(get_option('wpoa_logout_redirect_page'));
+				break;
+			case "admin_dashboard":
+				$redirect_url = admin_url();
+				break;
+			case "user_profile":
+				$redirect_url = get_edit_user_link();
+				break;
+			case "custom_url":
+				$redirect_url = get_option('wpoa_logout_redirect_url');
+				break;
+		}
+		//header("Location: " . $redirect_url);
+		wp_safe_redirect($redirect_url);
+		die();
+	}
+	
 	// links a third-party account to an existing wordpress user account:
 	function wpoa_link_account($user_id) {
 		if ($_SESSION['WPOA']['USER_ID'] != '') {
@@ -275,7 +470,7 @@ Class WPOA {
 	// unlinks a third-party provider from an existing wordpress user account:
 	function wpoa_unlink_account() {
 		// get wpoa_identity row index that the user wishes to unlink:
-		$wpoa_identity_row = $_POST['wpoa_identity_row'];
+		$wpoa_identity_row = $_POST['wpoa_identity_row']; // SANITIZED via $wpdb->prepare()
 		// get the current user:
 		global $current_user;
 		get_currentuserinfo();
@@ -294,6 +489,116 @@ Class WPOA {
 		}
 		// wp-ajax requires death:
 		die();
+	}
+	
+	// pushes login messages into the dom where they can be extracted by javascript:
+	function wpoa_push_login_messages() {
+		$result = $_SESSION['WPOA']['RESULT'];
+		$_SESSION['WPOA']['RESULT'] = '';
+		echo "<div id='wpoa-result'>" . $result . "</div>";
+	}
+	
+	// clears the login state:
+	function wpoa_clear_login_state() {
+		unset($_SESSION["WPOA"]["USER_ID"]);
+		unset($_SESSION["WPOA"]["USER_EMAIL"]);
+		unset($_SESSION["WPOA"]["ACCESS_TOKEN"]);
+		unset($_SESSION["WPOA"]["EXPIRES_IN"]);
+		unset($_SESSION["WPOA"]["EXPIRES_AT"]);
+		unset($_SESSION["WPOA"]["LAST_URL"]);
+	}
+	
+	// ===================================
+	// DEFAULT LOGIN SCREEN CUSTOMIZATIONS
+	// ===================================
+
+	// force the login screen logo to point to the site instead of wordpress.org:
+	function wpoa_logo_link() {
+		return get_bloginfo('url');
+	}
+	
+	// show the login screen customizations per the admin's chosen settings:
+	function wpoa_customize_login_screen() {
+		$html = "";
+		$show_login_form = get_option('wpoa_show_login_form');
+		if ($show_login_form == 'custom' || $show_login_form == 'default_custom') {
+			$html .= $this->wpoa_login_form_content('buttons-column', 'center', 'conditional', 'conditional', get_option('wpoa_logged_out_title'), get_option('wpoa_logged_in_title'), get_option('wpoa_logging_in_title'), get_option('wpoa_logging_out_title'));
+		}
+		echo $html;
+	}
+
+	// =========================
+	// LOGIN / LOGOUT COMPONENTS
+	// =========================
+	
+	// shortcode which allows adding the wpoa login form to any post or page:
+	function wpoa_login_form( $atts ){
+		$a = shortcode_atts( array(
+			'layout' => 'links-column',
+			'align' => 'left',
+			'show_login' => 'conditional',
+			'show_logout' => 'conditional',
+			'logged_out_title' => 'Please login:',
+			'logged_in_title' => 'You are already logged in.',
+			'logging_in_title' => 'Logging in...',
+			'logging_out_title' => 'Logging out...',
+			'style' => '',
+			'class' => '',
+		), $atts );
+		// convert attribute strings to proper data types:
+		//$a['show_login'] = filter_var($a['show_login'], FILTER_VALIDATE_BOOLEAN);
+		//$a['show_logout'] = filter_var($a['show_logout'], FILTER_VALIDATE_BOOLEAN);
+		// get the shortcode content:
+		$html = $this->wpoa_login_form_content($a['layout'], $a['align'], $a['show_login'], $a['show_logout'], $a['logged_out_title'], $a['logged_in_title'], $a['logging_in_title'], $a['logging_out_title'], $a['style'], $a['class']);
+		return $html;
+	}
+	
+	// gets the content to be used for displaying the login/logout form:
+	function wpoa_login_form_content($layout = 'links-column', $align = 'left', $show_login = 'conditional', $show_logout = 'conditional', $logged_out_title = 'Please login:', $logged_in_title = 'You are already logged in.', $logging_in_title = 'Logging in...', $logging_out_title = 'Logging out...', $style = '', $class = '') { // even though wpoa_login_form() will pass a default, we might call this function from another method so it's important to re-specify the default values
+		$html = "";
+		$html .= "<div class='wpoa-login-form wpoa-layout-$layout wpoa-layout-align-$align $class' style='$style' data-logging-in-title='$logging_in_title' data-logging-out-title='$logging_out_title'>";
+		$html .= "<nav>";
+		if (is_user_logged_in()) {
+			if ($logged_in_title) {
+				$html .= "<p id='wpoa-title'>" . $logged_in_title . "</p>";
+			}
+			if ($show_login == 'always') {
+				$html .= $this->wpoa_login_buttons();
+			}
+			if ($show_logout == 'always' || $show_logout == 'conditional') {
+				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
+			}
+		}
+		else {
+			if ($logged_out_title) {
+				$html .= "<p id='wpoa-title'>" . $logged_out_title . "</p>";
+			}
+			if ($show_login == 'always' || $show_login == 'conditional') {
+				$html .= $this->wpoa_login_buttons();
+			}
+			if ($show_logout == 'always') {
+				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
+			}
+		}
+		$html .= "</nav>";
+		$html .= "</div>";
+		return $html;
+	}
+	
+	// get the login buttons content depending on available providers:
+	function wpoa_login_buttons() {
+		$html = "";
+		$url = get_bloginfo('url');
+		$redirect_to = urlencode($_GET['redirect_to']);
+		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
+		//if (get_option('wpoa_google_api_enabled')) {$html .= "<a id='wpoa-login-google' class='wpoa-login-button' href='$url?connect=google$redirect_to' onclick='wpoa.loginGoogle(); return false;'>Google</a>";}
+		if (get_option('wpoa_google_api_enabled')) {$html .= "<a id='wpoa-login-google' class='wpoa-login-button' href='$url?connect=google$redirect_to'>Google</a>";}
+		if (get_option('wpoa_facebook_api_enabled')) {$html .= "<a id='wpoa-login-facebook' class='wpoa-login-button' href='$url?connect=facebook$redirect_to'>Facebook</a>";}
+		if (get_option('wpoa_linkedin_api_enabled')) {$html .= "<a id='wpoa-login-linkedin' class='wpoa-login-button' href='$url?connect=linkedin$redirect_to'>LinkedIn</a>";}
+		if (get_option('wpoa_github_api_enabled')) {$html .= "<a id='wpoa-login-github' class='wpoa-login-button' href='$url?connect=github$redirect_to'>Github</a>";}
+		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a id='wpoa-login-reddit' class='wpoa-login-button' href='$url?connect=reddit$redirect_to'>Reddit</a>";}
+		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a id='wpoa-login-windowslive' class='wpoa-login-button' href='$url?connect=windowslive$redirect_to'>Windows Live</a>";}
+		return $html;
 	}
 	
 	// shows the user's linked providers on the 'Your Profile' page where they may be managed:
@@ -333,111 +638,20 @@ Class WPOA {
 		echo "<tr valign='top'>";
 		echo "<th scope='row'>Link Another Provider</th>";
 		echo "<td>";
-		echo $this->wpoa_login_form_content('buttons-row');
+		echo $this->wpoa_login_form_content('buttons-row', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
 		echo "</div>";
 		echo "</td>";
 		echo "</td>";
 		echo "</table>";
 	}
-
-	// shortcode which allows adding the login form to any post or page:
-	function wpoa_login_form( $atts ){
-		$a = shortcode_atts( array(
-			'layout' => 'links-column',
-		), $atts );
-		$html = $this->wpoa_login_form_content($a['layout']);
-		return $html;
-	}
 	
-	// gets the content to be used for displaying the login form:
-	function wpoa_login_form_content($layout = 'links-column') {
-		$html = "";
-		$html .= "<div class='wpoa-login-form wpoa-layout-$layout'>";
-		$html .= "<nav>";
-		if (get_option('wpoa_google_api_enabled')) {$html .= "<a href='#' onclick='loginGoogle(); return false;'>Google</a>";}
-		if (get_option('wpoa_facebook_api_enabled')) {$html .= "<a href='#' onclick='loginFacebook(); return false;'>Facebook</a>";}
-		if (get_option('wpoa_linkedin_api_enabled')) {$html .= "<a href='#' onclick='loginLinkedIn(); return false;'>LinkedIn</a>";}
-		if (get_option('wpoa_github_api_enabled')) {$html .= "<a href='#' onclick='loginGithub(); return false;'>Github</a>";}
-		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a href='#' onclick='loginReddit(); return false;'>Reddit</a>";}
-		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a href='#' onclick='loginWindowsLive(); return false;'>Windows Live</a>";}
-		$html .= "</nav>";
-		$html .= "</div>";
-		return $html;
-	}
-	
-	// show the login customizations per the admin's chosen settings:
-	function wpoa_customize_login_screen() {
-		$html = "";
-		$html .= "<p id='wpoa-title'>" . get_option('wpoa_title') . "</p>";
-		$html .= $this->wpoa_login_form_content('buttons-column');
-		echo $html;
-	}
-	
-	// login (or register and login) a wordpress user based on their oauth identity:
-	function wpoa_login_user($oauth_identity) {
-		// store the user info in the user session so we can grab it later if we need to register the user:
-		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
-		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
-		$matched_user = $this->match_wordpress_user($oauth_identity);
-		// handle the matched user if there is one:
-		if ( $matched_user ) {
-			// there was a matching wordpress user account, log it in now:
-			$user_id = $matched_user->ID;
-			$user_login = $matched_user->user_login;
-			wp_set_current_user( $user_id, $user_login );
-			wp_set_auth_cookie( $user_id );
-			do_action( 'wp_login', $user_login );
-			// after login, redirect to the user's last location
-			$this->wpoa_end_login("Logged in successfully!");
-		}
-		// handle the already logged in user if there is one:
-		if ( is_user_logged_in() ) {
-			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
-			global $current_user;
-			get_currentuserinfo();
-			$user_id = $current_user->ID;
-			$this->wpoa_link_account($user_id);
-			// after linking the account, redirect user to their last url
-			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
-		}
-		// handle the logged out user or no matching user (register the user):
-		if ( !is_user_logged_in() && !$matched_user ) {
-			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
-			include 'register.php';
-		}
-		// we shouldn't be here, but just in case...
-		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
-	}
-	
-	// ends the login request by clearing the login state and redirecting the user back to their last page:
-	function wpoa_end_login($msg) {
-		$last_url = $_SESSION["WPOA"]["LAST_URL"];
-		$_SESSION["WPOA"]["RESULT"] = $msg;
-		$this->wpoa_clear_login_state();
-		header("Location: " . $last_url);
-		exit;
-	}
-	
-	// pushes login messages into the dom where they can be extracted by javascript:
-	function wpoa_push_login_messages() {
-		$result = $_SESSION['WPOA']['RESULT'];
-		$_SESSION['WPOA']['RESULT'] = '';
-		echo "<div id='wpoa-result'>" . $result . "</div>";
-	}
-	
-	// clears the login state:
-	function wpoa_clear_login_state() {
-		unset($_SESSION["WPOA"]["USER_ID"]);
-		unset($_SESSION["WPOA"]["USER_EMAIL"]);
-		unset($_SESSION["WPOA"]["ACCESS_TOKEN"]);
-		unset($_SESSION["WPOA"]["EXPIRES_IN"]);
-		unset($_SESSION["WPOA"]["EXPIRES_AT"]);
-		unset($_SESSION["WPOA"]["LAST_URL"]);
-	}
+	// ====================
+	// PLUGIN SETTINGS PAGE
+	// ====================
 	
 	// registers all settings that have been defined at the top of the plugin:
 	function wpoa_register_settings() {
-		foreach ($this->settings as $setting_name) {
+		foreach ($this->settings as $setting_name => $default_value) {
 			register_setting('wpoa_settings', $setting_name);
 		}
 	}
@@ -453,236 +667,10 @@ Class WPOA {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
 		$blog_url = "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/";
-		?>
-		<div class='wrap wpoa-settings'>
-			<h2>WP-OAuth Settings</h2>
-			<p>Manage settings for WP-OAuth here. Third-party authentication providers will require you to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing their API.</p>
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----"><input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"><img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"></form>
-			<form method='post' action='options.php'>
-				<?php settings_fields('wpoa_settings'); ?>
-				<?php do_settings_sections('wpoa_settings'); ?>
-				<h3>General Settings</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Show Login Messages</th>
-					<td><input type='checkbox' name='wpoa_show_login_messages' value='1' <?php checked(get_option('wpoa_show_login_messages') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>HTTP Utility</th>
-					<td><select name='wpoa_http_util'><option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option><option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option></td>
-					</tr>
-				</table>
-				<h3>Login Screen Customization</h3>
-				<p>Here you may customize the default WordPress login screen.</p>
-				<table class='form-table'>
-				<tr valign='top'>
-					<tr valign='top'>
-					<th scope='row'>Title</th>
-					<td>
-					<input id='wpoa_title' type='text' size='36' name='wpoa_title' value="<?php echo get_option('wpoa_title'); ?>" />
-					</td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Logo links to site</th>
-					<td><input type='checkbox' name='wpoa_logo_links_to_site' value='1' <?php checked(get_option('wpoa_logo_links_to_site') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Logo image</th>
-					<td>
-					<input id='wpoa_logo_image' type='text' size='36' name='wpoa_logo_image' value="<?php echo get_option('wpoa_logo_image'); ?>" />
-					<input id='wpoa_logo_image_button' type='button' value='Select' />
-					</td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Background image</th>
-					<td>
-					<input id='wpoa_bg_image' type='text' size='36' name='wpoa_bg_image' value="<?php echo get_option('wpoa_bg_image'); ?>" />
-					<input id='wpoa_bg_image_button' type='button' value='Select' />
-					</td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Show provider buttons</th>
-					<td><input type='checkbox' name='wpoa_show_provider_buttons' value='1' <?php checked(get_option('wpoa_show_provider_buttons') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Hide login form</th>
-					<td><input type='checkbox' name='wpoa_hide_login_form' value='1' <?php checked(get_option('wpoa_hide_login_form') == 1); ?> /></td>
-					</tr>
-				</table>
-				<h3>Login with Google+</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_google_api_enabled' value='1' <?php checked(get_option('wpoa_google_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Client ID</th>
-					<td><input type='text' name='wpoa_google_api_id' value='<?php echo get_option('wpoa_google_api_id'); ?>' /></td>
-					</tr>
-
-					<tr valign='top'>
-					<th scope='row'>Client Secret</th>
-					<td><input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Visit the Google website for developers <a href='https://console.developers.google.com/project'>console.developers.google.com</a>.</li>
-						<li>At Google, create a new Project and enable the Google+ API. This will enable your site to access the Google+ API.</li>
-						<li>At Google, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new Project's Redirect URI. Don't forget the trailing slash!</li>
-						<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when they are asked to grant access to your site/app.</li>
-						<li>Paste your Client ID/Secret provided by Google into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Login with Facebook</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_facebook_api_enabled' value='1' <?php checked(get_option('wpoa_facebook_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>App ID</th>
-					<td><input type='text' name='wpoa_facebook_api_id' value='<?php echo get_option('wpoa_facebook_api_id'); ?>' /></td>
-					</tr>
-					 
-					<tr valign='top'>
-					<th scope='row'>App Secret</th>
-					<td><input type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Register as a Facebook Developer at <a href='https://developers.facebook.com/'>developers.facebook.com</a>.</li>
-						<li>At Facebook, create a new App. This will enable your site to access the Facebook API.</li>
-						<li>At Facebook, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-						<li>Paste your App ID/Secret provided by Facebook into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Login with LinkedIn</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_linkedin_api_enabled' value='1' <?php checked(get_option('wpoa_linkedin_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>API Key</th>
-					<td><input type='text' name='wpoa_linkedin_api_id' value='<?php echo get_option('wpoa_linkedin_api_id'); ?>' /></td>
-					</tr>
-					 
-					<tr valign='top'>
-					<th scope='row'>Secret Key</th>
-					<td><input type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Register as a LinkedIn Developer at <a href='https://developers.linkedin.com/'>developers.linkedin.com</a>.</li>
-						<li>At LinkedIn, create a new App. This will enable your site to access the LinkedIn API.</li>
-						<li>At LinkedIn, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-						<li>Paste your API Key/Secret provided by LinkedIn into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Login with Github</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_github_api_enabled' value='1' <?php checked(get_option('wpoa_github_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Client ID</th>
-					<td><input type='text' name='wpoa_github_api_id' value='<?php echo get_option('wpoa_github_api_id'); ?>' /></td>
-					</tr>
-					 
-					<tr valign='top'>
-					<th scope='row'>Client Secret</th>
-					<td><input type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Register as a Github Developer at <a href='https://developers.github.com/'>developers.github.com</a>.</li>
-						<li>At Github, create a new App. This will enable your site to access the Github API.</li>
-						<li>At Github, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-						<li>Paste your API Key/Secret provided by Github into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Login with Reddit</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_reddit_api_enabled' value='1' <?php checked(get_option('wpoa_reddit_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Client ID</th>
-					<td><input type='text' name='wpoa_reddit_api_id' value='<?php echo get_option('wpoa_reddit_api_id'); ?>' /></td>
-					</tr>
-					 
-					<tr valign='top'>
-					<th scope='row'>Client Secret</th>
-					<td><input type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Register as a Reddit Developer at <a href='https://ssl.reddit.com/prefs/apps'>ssl.reddit.com/prefs/apps</a>.</li>
-						<li>At Reddit, create a new App. This will enable your site to access the Reddit API.</li>
-						<li>At Reddit, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-						<li>Paste your Client ID/Secret provided by Reddit into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Login with Windows Live</h3>
-				<table class='form-table'>
-					<tr valign='top'>
-					<th scope='row'>Enabled</th>
-					<td><input type='checkbox' name='wpoa_windowslive_api_enabled' value='1' <?php checked(get_option('wpoa_windowslive_api_enabled') == 1); ?> /></td>
-					</tr>
-					
-					<tr valign='top'>
-					<th scope='row'>Client ID</th>
-					<td><input type='text' name='wpoa_windowslive_api_id' value='<?php echo get_option('wpoa_windowslive_api_id'); ?>' /></td>
-					</tr>
-					 
-					<tr valign='top'>
-					<th scope='row'>Client Secret</th>
-					<td><input type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' /></td>
-					</tr>
-				</table>
-				<p>
-					<strong>Instructions:</strong>
-					<ol>
-						<li>Register as a Windows Live Developer at <a href='https://manage.dev.live.com'>manage.dev.live.com</a>.</li>
-						<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
-						<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-						<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click Save Changes at the bottom of this page.</li>
-					</ol>
-				</p>
-				<h3>Maintenance & Troubleshooting</h3>
-				<table class='form-table'>				
-					<tr valign='top'>
-					<th scope='row'>Delete settings on uninstall</th>
-					<td><p><input type='checkbox' name='wpoa_delete_settings_on_uninstall' value='1' <?php checked(get_option('wpoa_delete_settings_on_uninstall') == 1); ?> /><hr/><strong>Warning:</strong> This will delete all settings that may have been created in your database by this plugin, including all linked third-party login providers. This will not delete any WordPress user accounts, but users who may have registered with or relied upon their third-party login providers may have trouble logging into your site. Make absolutely sure you won't need the values on this page any time in the future, because they will be deleted permanently.<hr/><strong>Instructions:</strong> Check the box above, click the Save Changes button, then uninstall this plugin as normal from the Plugins page.</p></td>
-					</tr>
-				</table>
-				<?php submit_button(); ?>
-			</form>
-		</div>
-		<?php
+		include 'wp-oauth-settings.php';
 	}
 } // END OF WPOA CLASS
+
+// instantiate the plugin class ONCE and maintain a single instance (singleton):
+WPOA::get_instance();
 ?>
