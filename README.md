@@ -29,10 +29,11 @@ FAQ
 
 Roadmap
 -------
-* Full compabitility with WordPress Multisite & BuddyPress.
+* Full compabitility with WordPress Multisite and BuddyPress.
+* Icon sets for the login provider buttons.
 * Advanced options for account merging.
 * Advanced options for account recovery.
-* More login screen customization options.
+* More custom login forms, layouts and login screen customization options.
 
 History
 -------
