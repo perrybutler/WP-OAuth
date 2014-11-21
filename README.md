@@ -29,9 +29,10 @@ FAQ
 
 Roadmap
 -------
+* Full compabitility with WordPress Multisite & BuddyPress.
 * Advanced options for account merging.
+* Advanced options for account recovery.
 * More login screen customization options.
-* Commit, publish first release and submit it to the WordPress Plugin Directory.
 
 History
 -------
