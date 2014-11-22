@@ -215,7 +215,7 @@
 				<li>At Google, create a new Project and enable the Google+ API. This will enable your site to access the Google+ API.</li>
 				<li>At Google, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new Project's Redirect URI. Don't forget the trailing slash!</li>
 				<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when they are asked to grant access to your site/app.</li>
-				<li>Paste your Client ID/Secret provided by Google into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your Client ID/Secret provided by Google into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
@@ -255,7 +255,7 @@
 				<li>Register as a Facebook Developer at <a href='https://developers.facebook.com/' target="_blank">developers.facebook.com</a>.</li>
 				<li>At Facebook, create a new App. This will enable your site to access the Facebook API.</li>
 				<li>At Facebook, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-				<li>Paste your App ID/Secret provided by Facebook into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your App ID/Secret provided by Facebook into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
@@ -295,7 +295,7 @@
 				<li>Register as a LinkedIn Developer at <a href='https://developers.linkedin.com/' target="_blank">developers.linkedin.com</a>.</li>
 				<li>At LinkedIn, create a new App. This will enable your site to access the LinkedIn API.</li>
 				<li>At LinkedIn, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-				<li>Paste your API Key/Secret provided by LinkedIn into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your API Key/Secret provided by LinkedIn into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
@@ -335,7 +335,7 @@
 				<li>Register as a Github Developer at <a href='https://developers.github.com/' target="_blank">developers.github.com</a>.</li>
 				<li>At Github, create a new App. This will enable your site to access the Github API.</li>
 				<li>At Github, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-				<li>Paste your API Key/Secret provided by Github into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your API Key/Secret provided by Github into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
@@ -375,7 +375,7 @@
 				<li>Register as a Reddit Developer at <a href='https://ssl.reddit.com/prefs/apps' target="_blank">ssl.reddit.com/prefs/apps</a>.</li>
 				<li>At Reddit, create a new App. This will enable your site to access the Reddit API.</li>
 				<li>At Reddit, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-				<li>Paste your Client ID/Secret provided by Reddit into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your Client ID/Secret provided by Reddit into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
@@ -415,13 +415,63 @@
 				<li>Register as a Windows Live Developer at <a href='https://manage.dev.live.com' target="_blank">manage.dev.live.com</a>.</li>
 				<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
 				<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
-				<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click Save Changes at the bottom of this page.</li>
+				<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click the Save all settings button.</li>
 			</ol>
 		</p>
 		<?php submit_button('Save all settings'); ?>
 		</div> <!-- .form-padding -->
 		</div> <!-- .wpoa-settings-section -->
 		<!-- END Login with Windows Live section -->
+
+		<!-- START Login with PayPal section -->
+		<div class="wpoa-settings-section">
+		<h3 id="bookmark-login-with-paypal">Login with PayPal</h3>
+		<div class='form-padding'>
+		<table class='form-table'>
+			<tr valign='top'>
+			<th scope='row'>Enabled:</th>
+			<td>
+				<input type='checkbox' name='wpoa_paypal_api_enabled' value='1' <?php checked(get_option('wpoa_paypal_api_enabled') == 1); ?> />
+			</td>
+			</tr>
+			
+			<tr valign='top'>
+			<th scope='row'>Sandbox mode:</th>
+			<td>
+				<input type='checkbox' name='wpoa_paypal_api_sandbox_mode' value='1' <?php checked(get_option('wpoa_paypal_api_sandbox_mode') == 1); ?> />
+				<p class="tip-message">PayPal offers a sandbox mode for developers who wish to setup and test PayPal Login with their site before going live.</p>
+			</td>
+			</tr>
+			
+			<tr valign='top'>
+			<th scope='row'>Client ID:</th>
+			<td>
+				<input type='text' name='wpoa_paypal_api_id' value='<?php echo get_option('wpoa_paypal_api_id'); ?>' />
+			</td>
+			</tr>
+			 
+			<tr valign='top'>
+			<th scope='row'>Client Secret:</th>
+			<td>
+				<input type='text' name='wpoa_paypal_api_secret' value='<?php echo get_option('wpoa_paypal_api_secret'); ?>' />
+			</td>
+			</tr>
+		</table> <!-- .form-table -->
+		<p>
+			<strong>Instructions:</strong>
+			<ol>
+				<li>Register as a PayPal Developer at <a href='https://developer.paypal.com' target="_blank">developer.paypal.com</a>.</li>
+				<li>At PayPal, create a new App. This will enable your site to access the PayPal API. Your PayPal App will begin in <em>sandbox mode</em> for testing.</li>
+				<li>At PayPal, provide your site's homepage URL (<?php echo $blog_url; ?>) for the <em>App redirect URLs</em>. Don't forget the trailing slash!</li>
+				<li>At PayPal, in the APP CAPABILITIES section, enable <em>Log In with PayPal</em>.</li>
+				<li>Paste your Client ID/Secret provided by PayPal into the fields above, then click the Save all settings button.</li>
+				<li>After testing PayPal login in <em>sandbox mode</em> with your site, you'll eventually want to switch the App over to <em>live mode</em> at PayPal, and turn off the Sandbox mode above.</li>
+			</ol>
+		</p>
+		<?php submit_button('Save all settings'); ?>
+		</div> <!-- .form-padding -->
+		</div> <!-- .wpoa-settings-section -->
+		<!-- END Login with PayPal section -->
 		
 		<!-- START Maintenance & Troubleshooting section -->
 		<div class="wpoa-settings-section">
@@ -440,7 +490,7 @@
 			<th scope='row'>Delete settings on uninstall: <a href="#" class="tip-button">[?]</a></th>
 			<td>
 				<p><input type='checkbox' name='wpoa_delete_settings_on_uninstall' value='1' <?php checked(get_option('wpoa_delete_settings_on_uninstall') == 1); ?> /></p>				
-				<p class="tip-message"><strong>Instructions:</strong> Check the box above, click the Save Changes button, then uninstall this plugin as normal from the Plugins page.</p>
+				<p class="tip-message"><strong>Instructions:</strong> Check the box above, click the Save all settings button, then uninstall this plugin as normal from the Plugins page.</p>
 				<p class="tip-message tip-warning"><strong>Warning:</strong> This will delete all settings that may have been created in your database by this plugin, including all linked third-party login providers. This will not delete any WordPress user accounts, but users who may have registered with or relied upon their third-party login providers may have trouble logging into your site. Make absolutely sure you won't need the values on this page any time in the future, because they will be deleted permanently.</p>
 			</td>
 			</tr>

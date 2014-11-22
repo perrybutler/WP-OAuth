@@ -4,16 +4,16 @@
 session_start();
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-$_SESSION['WPOA']['PROVIDER'] = 'Google';
+$_SESSION['WPOA']['PROVIDER'] = 'PayPal';
 define('HTTP_UTIL', get_option('wpoa_http_util'));
-define('CLIENT_ENABLED', get_option('wpoa_google_api_enabled'));
-define('CLIENT_ID', get_option('wpoa_google_api_id'));
-define('CLIENT_SECRET', get_option('wpoa_google_api_secret'));
+define('CLIENT_ENABLED', get_option('wpoa_paypal_api_enabled'));
+define('CLIENT_ID', get_option('wpoa_paypal_api_id'));
+define('CLIENT_SECRET', get_option('wpoa_paypal_api_secret'));
 define('REDIRECT_URI', "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/");
-define('SCOPE', 'profile'); // PROVIDER SPECIFIC: 'profile' is the minimum scope required to get the user's id from Google
-define('URL_AUTH', "https://accounts.google.com/o/oauth2/auth?");
-define('URL_TOKEN', "https://accounts.google.com/o/oauth2/token?");
-define('URL_USER', "https://www.googleapis.com/plus/v1/people/me?");
+define('SCOPE', 'openid'); // PROVIDER SPECIFIC: 'openid' is the minimum scope required to get the user's id from paypal
+define('URL_AUTH', "https://www." . (get_option('wpoa_paypal_api_sandbox_mode') ? "sandbox." : "") . "paypal.com/webapps/auth/protocol/openidconnect/v1/authorize?");
+define('URL_TOKEN', "https://api." . (get_option('wpoa_paypal_api_sandbox_mode') ? "sandbox." : "") . "paypal.com/v1/identity/openidconnect/tokenservice?");
+define('URL_USER', "https://api." . (get_option('wpoa_paypal_api_sandbox_mode') ? "sandbox." : "") . "paypal.com/v1/identity/openidconnect/userinfo/?schema=openid");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
@@ -70,6 +70,7 @@ else {
 	}
 	get_oauth_code($this);
 }
+
 // we shouldn't be here, but just in case...
 $this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow terminated in an unexpected way. Please notify the admin or try again later.");
 # END OF AUTHENTICATION FLOW #
@@ -92,8 +93,8 @@ function get_oauth_code($wpoa) {
 function get_oauth_token($wpoa) {
 	$params = array(
 		'grant_type' => 'authorization_code',
-		'client_id' => CLIENT_ID,
-		'client_secret' => CLIENT_SECRET,
+		/*'client_id' => CLIENT_ID,
+		'client_secret' => CLIENT_SECRET,*/
 		'code' => $_GET['code'],
 		'redirect_uri' => REDIRECT_URI,
 	);
@@ -107,12 +108,13 @@ function get_oauth_token($wpoa) {
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
 			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
-			// PROVIDER NORMALIZATION: Reddit requires sending the client id/secret via http basic authentication
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Accept: application/json", "Accept-Language: en_US"));
+			curl_setopt($curl, CURLOPT_USERPWD, CLIENT_ID . ":" . CLIENT_SECRET); // PROVIDER SPECIFIC: Reddit/Paypal require basic authentication with this request
 			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // TODO: not sure if we actually need this...
 			$result = curl_exec($curl);
 			break;
 		case 'stream-context':
-			$url = rtrim(URL_TOKEN, "?");
+			$url = $wpoa->wpoa_add_basic_auth(rtrim(URL_TOKEN, "?"), CLIENT_ID, CLIENT_SECRET); // PROVIDER SPECIFIC: Reddit/PayPal requires basic authentication with the request
 			$opts = array('http' =>
 				array(
 					'method'  => 'POST',
@@ -155,10 +157,11 @@ function get_oauth_identity($wpoa) {
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
+			$url = URL_USER; // . $url_params; // TODO: we probably want to send this using a curl_setopt...
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
 			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer " . $_SESSION['WPOA']['ACCESS_TOKEN'])); // PROVIDER SPECIFIC: Paypal requires Content-Type and Authorization Bearer headers
 			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
 			// PROVIDER NORMALIZATION: LinkedIn requires an x-li-format: json header...
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -185,7 +188,7 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Google returns the user's unique id
+	$oauth_identity['id'] = $result_obj['user_id']; // PROVIDER SPECIFIC: this is how Paypal returns the user's unique id
 	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");

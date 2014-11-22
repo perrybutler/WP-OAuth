@@ -4,7 +4,7 @@
 Plugin Name: WP-OAuth
 Plugin URI: http://github.com/perrybutler/wp-oauth
 Description: A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
-Version: 0.2
+Version: 0.2.1
 Author: Perry Butler
 Author URI: http://glassocean.net
 License: GPL2
@@ -16,13 +16,13 @@ session_start();
 // plugin class:
 Class WPOA {
 
-	// set a version that we can use for performing plugin updates, this should always match the plugin version:
-	const PLUGIN_VERSION = "0.2";
-
 	// ==============
 	// INITIALIZATION
 	// ==============
 
+	// set a version that we can use for performing plugin updates, this should always match the plugin version:
+	const PLUGIN_VERSION = "0.2.1";
+	
 	// singleton class pattern:
 	protected static $instance = NULL;
 	public static function get_instance() {
@@ -66,6 +66,10 @@ Class WPOA {
 		'wpoa_windowslive_api_enabled' => 0,							// 0, 1
 		'wpoa_windowslive_api_id' => '',								// any string
 		'wpoa_windowslive_api_secret' => '',							// any string
+		'wpoa_paypal_api_enabled' => 0,									// 0, 1
+		'wpoa_paypal_api_id' => '',										// any string
+		'wpoa_paypal_api_secret' => '',									// any string
+		'wpoa_paypal_api_sandbox_mode' => 1,							// 0, 1
 		'wpoa_restore_default_settings' => 0,							// 0, 1
 		'wpoa_delete_settings_on_uninstall' => 0,						// 0, 1
 	);
@@ -285,6 +289,8 @@ Class WPOA {
 	function wpoa_qvar_triggers($vars) {
 		$vars[] = 'connect';
 		$vars[] = 'code';
+		$vars[] = 'error_description';
+		$vars[] = 'error_message';
 		return $vars;
 	}
 	
@@ -295,6 +301,10 @@ Class WPOA {
 			$this->wpoa_include_connector($provider);
 		}
 		elseif (get_query_var('code')) {
+			$provider = $_SESSION['WPOA']['PROVIDER'];
+			$this->wpoa_include_connector($provider);
+		}
+		elseif (get_query_var('error_description') || get_query_var('error_message')) {
 			$provider = $_SESSION['WPOA']['PROVIDER'];
 			$this->wpoa_include_connector($provider);
 		}
@@ -325,6 +335,9 @@ Class WPOA {
 			case 'windowslive':
 				include 'login-windowslive.php';
 				break;
+			case 'paypal':
+				include 'login-paypal.php';
+				break;
 		}
 	}
 	
@@ -333,7 +346,7 @@ Class WPOA {
 	// =======================
 
 	// match the oauth identity to an existing wordpress user account:
-	function match_wordpress_user($oauth_identity) {
+	function wpoa_match_wordpress_user($oauth_identity) {
 		// attempt to get a wordpress user id from the database that matches the $oauth_identity['id'] value:
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
@@ -349,7 +362,7 @@ Class WPOA {
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
-		$matched_user = $this->match_wordpress_user($oauth_identity);
+		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
 			// there was a matching wordpress user account, log it in now:
@@ -383,6 +396,7 @@ Class WPOA {
 	// ends the login request by clearing the login state and redirecting the user to the desired page:
 	function wpoa_end_login($msg) {
 		$last_url = $_SESSION["WPOA"]["LAST_URL"];
+		unset($_SESSION["WPOA"]["LAST_URL"]);
 		$_SESSION["WPOA"]["RESULT"] = $msg;
 		$this->wpoa_clear_login_state();
 		$redirect_method = get_option("wpoa_login_redirect");
@@ -422,6 +436,7 @@ Class WPOA {
 	
 	// ends the logout request by redirecting the user to the desired page:
 	function wpoa_end_logout() {
+		$_SESSION["WPOA"]["RESULT"] = 'Logged out successfully.';
 		if (is_user_logged_in()) {
 			// user is logged in and trying to logout...get their Last Page:
 			$last_url = $_SERVER['HTTP_REFERER'];
@@ -430,6 +445,7 @@ Class WPOA {
 			// user is NOT logged in and trying to logout...get their Last Page minus the querystring so we don't trigger the logout confirmation:
 			$last_url = strtok($_SERVER['HTTP_REFERER'], "?");
 		}
+		unset($_SESSION["WPOA"]["LAST_URL"]);
 		$this->wpoa_clear_login_state();
 		$redirect_method = get_option("wpoa_logout_redirect");
 		$redirect_url = "";
@@ -505,7 +521,7 @@ Class WPOA {
 		unset($_SESSION["WPOA"]["ACCESS_TOKEN"]);
 		unset($_SESSION["WPOA"]["EXPIRES_IN"]);
 		unset($_SESSION["WPOA"]["EXPIRES_AT"]);
-		unset($_SESSION["WPOA"]["LAST_URL"]);
+		//unset($_SESSION["WPOA"]["LAST_URL"]);
 	}
 	
 	// ===================================
@@ -598,6 +614,7 @@ Class WPOA {
 		if (get_option('wpoa_github_api_enabled')) {$html .= "<a id='wpoa-login-github' class='wpoa-login-button' href='$url?connect=github$redirect_to'>Github</a>";}
 		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a id='wpoa-login-reddit' class='wpoa-login-button' href='$url?connect=reddit$redirect_to'>Reddit</a>";}
 		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a id='wpoa-login-windowslive' class='wpoa-login-button' href='$url?connect=windowslive$redirect_to'>Windows Live</a>";}
+		if (get_option('wpoa_paypal_api_enabled')) {$html .= "<a id='wpoa-login-paypal' class='wpoa-login-button' href='$url?connect=paypal$redirect_to'>Paypal</a>";}
 		return $html;
 	}
 	
@@ -613,7 +630,7 @@ Class WPOA {
 		$query_string = "SELECT * FROM $usermeta_table WHERE $user_id = $usermeta_table.user_id AND $usermeta_table.meta_key = 'wpoa_identity'";
 		$query_result = $wpdb->get_results($query_string);
 		// list the wpoa_identity records:
-		echo "<div id='wpoa-linked-accounts' class='wpoa-settings'>";
+		echo "<div id='wpoa-linked-accounts'>";
 		echo "<h3>Linked Accounts</h3>";
 		echo "<p>Manage the linked accounts which you have previously authorized to be used for logging into this website.</p>";
 		echo "<table class='form-table'>";
