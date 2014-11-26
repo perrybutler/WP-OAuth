@@ -7,9 +7,13 @@
 			<nav>Plugin author: <ul><li><a href="mailto:perry@glassocean.net" target="_blank">Perry Butler</a></li><li><a href="http://glassocean.net" target="_blank">Website</a></li><li><form id="paypal-button" target="_blank" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top"><input type="hidden" name="cmd" value="_s-xclick"><input type="hidden" name="encrypted" value="-----BEGIN PKCS7-----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-----END PKCS7-----"><input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!"><img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1"></form></li></ul></nav>
 			<nav>Plugin links: <ul><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
 		</div>
-		<p>Manage settings for WP-OAuth here. Third-party authentication providers will require you to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing their API.</p>
-		<nav>Jump to: <ul><li><a href="#bookmark-login-with-google">Google</a></li><li><a href="#bookmark-login-with-facebook">Facebook</a></li><li><a href="#bookmark-login-with-linkedin">LinkedIn</a></li><li><a href="#bookmark-login-with-github">Github</a></li><li><a href="#bookmark-login-with-reddit">Reddit</a></li><li><a href="#bookmark-login-with-windowslive">Windows Live</a></li></ul></nav>
-		<nav>Toggle all help tips: <ul><li><a id="wpoa-settings-tips-on" href="#">On</a></li><li><a id="wpoa-settings-tips-off" href="#">Off</a></li></ul><div class="nav-splitter"></div>Toggle all sections: <ul><li><a id="wpoa-settings-sections-on" href="#">On</a></li><li><a id="wpoa-settings-sections-off" href="#">Off</a></li></ul></nav>
+		<div id="wpoa-settings-intro" class="wpoa-settings-section">
+		<div class="form-padding">
+			<p>Manage settings for WP-OAuth here. Third-party authentication providers will require you to set up an "App" which in turn will provide an "ID" and "Secret" that can be used for securely accessing their API.</p>
+			<nav><strong>Jump to: </strong><ul><li><a href="#bookmark-general-settings">General Settings</a></li><li><a href="#bookmark-login-page-form-customization">Login Page & Form Customization</a></li><li><a href="#bookmark-login-with-google">Google</a></li><li><a href="#bookmark-login-with-facebook">Facebook</a></li><li><a href="#bookmark-login-with-linkedin">LinkedIn</a></li><li><a href="#bookmark-login-with-github">Github</a></li><li><a href="#bookmark-login-with-reddit">Reddit</a></li><li><a href="#bookmark-login-with-windowslive">Windows Live</a></li><li><a href="#bookmark-login-with-paypal">PayPal</a></li><li><a href="#bookmark-login-with-instagram">Instagram</a></li><li><a href="#bookmark-back-channel-configuration">Back Channel Configuration</a></li><li><a href="#bookmark-maintenance-troubleshooting">Maintenance & Troubleshooting</a></li></ul></nav>
+			<nav><strong>Toggle all help tips: </strong><ul><li><a id="wpoa-settings-tips-on" href="#">On</a></li><li><a id="wpoa-settings-tips-off" href="#">Off</a></li></ul><div class="nav-splitter"></div><strong>Toggle all sections: </strong><ul><li><a id="wpoa-settings-sections-on" href="#">On</a></li><li><a id="wpoa-settings-sections-off" href="#">Off</a></li></ul></nav>
+		</div>
+		</div>
 	</div>
 	<!-- END Settings Header -->
 	
@@ -19,7 +23,7 @@
 		<?php settings_fields('wpoa_settings'); ?>
 		<?php do_settings_sections('wpoa_settings'); ?>
 		<div class="wpoa-settings-section">
-		<h3>General Settings</h3>
+		<h3 id="bookmark-general-settings">General Settings</h3>
 		<div class='form-padding'>
 		<table class='form-table'>
 			<tr valign='top'>
@@ -27,19 +31,6 @@
 			<td>
 				<p><input type='checkbox' name='wpoa_show_login_messages' value='1' <?php checked(get_option('wpoa_show_login_messages') == 1); ?> /></p>
 				<p class="tip-message">Shows a short-lived notification message to the user which indicates whether or not the login was successful, and if there was an error.</p>
-			</td>
-			</tr>
-			
-			<tr valign='top'>
-			<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
-			<td>
-				<p>
-				<select name='wpoa_http_util'>
-					<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option>
-					<option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option>
-				</select>
-				</p>
-				<p class="tip-message">The method used by the web server for performing HTTP requests to the third-party providers. Most servers support cURL, but some servers may require Stream Context instead.</p>
 			</td>
 			</tr>
 			
@@ -85,7 +76,7 @@
 		
 		<!-- START Login Page & Form Customization section -->
 		<div class="wpoa-settings-section">
-		<h3>Login Page & Form Customization</h3>
+		<h3 id="bookmark-login-page-form-customization">Login Page & Form Customization</h3>
 		<div class='form-padding'>
 		<p>Here you may customize WordPress' default login page and login form.</p>
 		<table class='form-table'>
@@ -472,10 +463,138 @@
 		</div> <!-- .form-padding -->
 		</div> <!-- .wpoa-settings-section -->
 		<!-- END Login with PayPal section -->
+
+		<!-- START Login with Instagram section -->
+		<div class="wpoa-settings-section">
+		<h3 id="bookmark-login-with-instagram">Login with Instagram</h3>
+		<div class='form-padding'>
+		<table class='form-table'>
+			<tr valign='top'>
+			<th scope='row'>Enabled:</th>
+			<td>
+				<input type='checkbox' name='wpoa_instagram_api_enabled' value='1' <?php checked(get_option('wpoa_instagram_api_enabled') == 1); ?> />
+			</td>
+			</tr>
+			
+			<tr valign='top'>
+			<th scope='row'>Client ID:</th>
+			<td>
+				<input type='text' name='wpoa_instagram_api_id' value='<?php echo get_option('wpoa_instagram_api_id'); ?>' />
+			</td>
+			</tr>
+			 
+			<tr valign='top'>
+			<th scope='row'>Client Secret:</th>
+			<td>
+				<input type='text' name='wpoa_instagram_api_secret' value='<?php echo get_option('wpoa_instagram_api_secret'); ?>' />
+			</td>
+			</tr>
+		</table> <!-- .form-table -->
+		<p>
+			<strong>Instructions:</strong>
+			<ol>
+				<li>NOTE: Instagram's developer signup requires a valid cell phone number.</li>
+				<li>At Instagram, register as an <a href='http://instagram.com/developer/authentication/' target="_blank">Instagram Developer</a>.</li>
+				<li>At Instagram, after signing up/in, click <a href='http://instagram.com/developer/clients/manage/'>Manage Clients</a>.</li>
+				<li>At Instagram, click <a href="http://instagram.com/developer/clients/register/">Register a New Client</a>. This will enable your site to access the Instagram API.</li>
+				<li>At Instagram, provide your site's homepage URL (<?php echo $blog_url; ?>) for the <em>OAuth redirect_uri</em>. Don't forget the trailing slash!</li>
+				<li>At Instagram, copy the <em>Client ID/Client Secret</em> provided by Instagram and paste them into the fields above, then click the Save all settings button.</li>
+			</ol>
+			<strong>References:</strong>
+			<ul>
+				<li><a href='http://instagram.com/developer/authentication/'>Instagram Developer Reference - Authentication</a></li>
+			</ul>
+		</p>
+		<?php submit_button('Save all settings'); ?>
+		</div> <!-- .form-padding -->
+		</div> <!-- .wpoa-settings-section -->
+		<!-- END Login with Instagram section -->
+
+		<?php /* EXCLUDED WIP:
+		<!-- START Login with Battle.net section -->
+		<div class="wpoa-settings-section">
+		<h3 id="bookmark-login-with-battlenet">Login with Battle.net</h3>
+		<div class='form-padding'>
+		<table class='form-table'>
+			<tr valign='top'>
+			<th scope='row'>Enabled:</th>
+			<td>
+				<input type='checkbox' name='wpoa_battlenet_api_enabled' value='1' <?php checked(get_option('wpoa_battlenet_api_enabled') == 1); ?> />
+			</td>
+			</tr>
+			
+			<tr valign='top'>
+			<th scope='row'>Client ID:</th>
+			<td>
+				<input type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
+			</td>
+			</tr>
+			 
+			<tr valign='top'>
+			<th scope='row'>Client Secret:</th>
+			<td>
+				<input type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
+			</td>
+			</tr>
+		</table> <!-- .form-table -->
+		
+		<p>
+			<strong>Instructions:</strong>
+			<ol>
+				<li>NOTE: Instagram's developer signup requires a valid cell phone number.</li>
+				<li>At Instagram, register as an <a href='http://instagram.com/developer/authentication/' target="_blank">Instagram Developer</a>.</li>
+				<li>At Instagram, after signing up/in, click <a href='http://instagram.com/developer/clients/manage/'>Manage Clients</a>.</li>
+				<li>At Instagram, click <a href="http://instagram.com/developer/clients/register/">Register a New Client</a>. This will enable your site to access the Instagram API.</li>
+				<li>At Instagram, provide your site's homepage URL (<?php echo $blog_url; ?>) for the <em>OAuth redirect_uri</em>. Don't forget the trailing slash!</li>
+				<li>At Instagram, copy the <em>Client ID/Client Secret</em> provided by Instagram and paste them into the fields above, then click the Save all settings button.</li>
+			</ol>
+			<strong>References:</strong>
+			<ul>
+				<li><a href='https://dev.battle.net/docs/read/oauth'>Battle.net OAuth Reference</a></li>
+			</ul>
+		</p>
+		<?php submit_button('Save all settings'); ?>
+		</div> <!-- .form-padding -->
+		</div> <!-- .wpoa-settings-section -->
+		<!-- END Login with Battle.net section -->
+		*/ ?>
+		
+		<!-- START Back Channel Configuration section -->
+		<div class="wpoa-settings-section">
+		<h3 id="bookmark-back-channel-configuration">Back Channel Configuration</h3>
+		<div class='form-padding'>
+		<p>These settings are for troubleshooting and/or fine tuning the back channel communication this plugin utilizes between your server and the third-party providers.</p>
+		<table class='form-table'>
+			<tr valign='top'>
+			<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
+			<td>
+				<p>
+				<select name='wpoa_http_util'>
+					<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option>
+					<option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option>
+				</select>
+				</p>
+				<p class="tip-message">The method used by the web server for performing HTTP requests to the third-party providers. Most servers support cURL, but some servers may require Stream Context instead.</p>
+			</td>
+			</tr>
+			
+			<tr valign='top'>
+			<th scope='row'>Verify Peer/Host SSL Certificates: <a href="#" class="tip-button">[?]</a></th>
+			<td>
+				<p><input type='checkbox' name='wpoa_http_util_verify_ssl' value='1' <?php checked(get_option('wpoa_http_util_verify_ssl') == 1); ?> /></p>
+				<p class="tip-message">Determines whether or not to validate peer/host SSL certificates during back channel HTTP calls to the third-party login providers. If your server has an incorrect SSL configuration or doesn't support SSL, you may try disabling this setting as a workaround.</p>
+				<p class="tip-message tip-warning"><strong>Warning:</strong> Disabling this is not recommended. For maximum security it would be a good idea to get your server's SSL configuration fixed and keep this setting enabled.</p>
+			</td>
+			</tr>
+		</table> <!-- .form-table -->
+		<?php submit_button('Save all settings'); ?>
+		</div> <!-- .form-padding -->
+		</div> <!-- .wpoa-settings-section -->
+		<!-- END Back Channel Configuration section -->
 		
 		<!-- START Maintenance & Troubleshooting section -->
 		<div class="wpoa-settings-section">
-		<h3>Maintenance & Troubleshooting</h3>
+		<h3 id="bookmark-maintenance-troubleshooting">Maintenance & Troubleshooting</h3>
 		<div class='form-padding'>
 		<table class='form-table'>
 			<tr valign='top'>

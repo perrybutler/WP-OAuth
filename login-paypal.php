@@ -18,8 +18,6 @@ define('URL_USER', "https://api." . (get_option('wpoa_paypal_api_sandbox_mode') 
 
 // remember the user's last url so we can redirect them back to there after the login ends:
 if (!$_SESSION['WPOA']['LAST_URL']) {
-	//$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");
-
 	// try to obtain the redirect_url from the default login page:
 	$redirect_url = esc_url($_GET['redirect_to']);
 	// if no redirect_url was found, set it to the user's last page:
@@ -70,7 +68,6 @@ else {
 	}
 	get_oauth_code($this);
 }
-
 // we shouldn't be here, but just in case...
 $this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow terminated in an unexpected way. Please notify the admin or try again later.");
 # END OF AUTHENTICATION FLOW #
@@ -93,8 +90,8 @@ function get_oauth_code($wpoa) {
 function get_oauth_token($wpoa) {
 	$params = array(
 		'grant_type' => 'authorization_code',
-		/*'client_id' => CLIENT_ID,
-		'client_secret' => CLIENT_SECRET,*/
+		// PROVIDER NORMALIZATION: Google passes the client_id via POST parameter
+		// PROVIDER NORMALIZATION: Google passes the client_secret via POST parameter
 		'code' => $_GET['code'],
 		'redirect_uri' => REDIRECT_URI,
 	);
@@ -107,10 +104,10 @@ function get_oauth_token($wpoa) {
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
-			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Accept: application/json", "Accept-Language: en_US"));
-			curl_setopt($curl, CURLOPT_USERPWD, CLIENT_ID . ":" . CLIENT_SECRET); // PROVIDER SPECIFIC: Reddit/Paypal require basic authentication with this request
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // TODO: not sure if we actually need this...
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Accept: application/json", "Accept-Language: en_US")); // PROVIDER SPECIFIC: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
+			curl_setopt($curl, CURLOPT_USERPWD, CLIENT_ID . ":" . CLIENT_SECRET); // PROVIDER SPECIFIC: PayPal/Reddit requires sending the client id/secret via http basic authentication
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
+			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
 			$result = curl_exec($curl);
 			break;
 		case 'stream-context':
@@ -151,19 +148,17 @@ function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
 	$params = array(
-		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access token is passed to Google using this key name
+		// PROVIDER NORMALIZATION: the access_token is passed to Google via POST param
 	);
 	$url_params = http_build_query($params);
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_USER; // . $url_params; // TODO: we probably want to send this using a curl_setopt...
+			$url = URL_USER . $url_params;
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
-			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer " . $_SESSION['WPOA']['ACCESS_TOKEN'])); // PROVIDER SPECIFIC: Paypal requires Content-Type and Authorization Bearer headers
-			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
-			// PROVIDER NORMALIZATION: LinkedIn requires an x-li-format: json header...
+			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Content-Type: application/json", "Authorization: Bearer " . $_SESSION['WPOA']['ACCESS_TOKEN'])); // PROVIDER SPECIFIC: PayPal/Reddit require that we send the access token via a bearer header, PayPal requires a Content-Type: application/json header, LinkedIn requires an x-li-format: json header
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			$result = curl_exec($curl);
 			$result_obj = json_decode($result, true);
@@ -188,7 +183,7 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['user_id']; // PROVIDER SPECIFIC: this is how Paypal returns the user's unique id
+	$oauth_identity['id'] = $result_obj['user_id']; // PROVIDER SPECIFIC: PayPal returns the user's OAuth identity as user_id
 	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");

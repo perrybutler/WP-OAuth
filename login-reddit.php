@@ -97,7 +97,8 @@ function get_oauth_token($wpoa) {
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
 			curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // PROVIDER SPECIFIC: Reddit requires a User-Agent
 			curl_setopt($curl, CURLOPT_USERPWD, CLIENT_ID . ":" . CLIENT_SECRET); // PROVIDER SPECIFIC: Reddit requires basic authentication with this request
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // TODO: not sure if we actually need this...
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
+			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
 			$result = curl_exec($curl);
 			break;
 		case 'stream-context':

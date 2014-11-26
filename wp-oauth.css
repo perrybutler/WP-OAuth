@@ -7,8 +7,7 @@
 /*  SETTINGS PAGE
 =================*/
 #wpoa-settings-header {margin-top:1em;}
-#wpoa-settings-header nav {margin-top:1em; margin-bottom:1em;}
-#wpoa-settings-header nav ul {display:inline;}
+#wpoa-settings-header nav ul {display:inline; margin-left:0;}
 #wpoa-settings-header nav li {display:inline; margin-bottom:-1px;}
 #wpoa-settings-header nav li:after {content:' | ';}
 #wpoa-settings-header nav li:first-child {margin-top:0.5em;}
@@ -24,14 +23,21 @@
 	#wpoa-settings-header .nav-splitter {display:none;}
 }
 
-#wpoa-plugin-info {background-color:#fff9d8; padding-left:1em; padding-right:1em; border-radius:1em; border:1px solid #e7dca4;}
+#wpoa-plugin-info {margin-bottom:1em; background-color:#fff9d8; padding-left:1em; padding-right:1em; border-radius:1em; border:1px solid #e7dca4;}
+#wpoa-plugin-info nav {margin-top:0.5em; margin-bottom:0.25em;}
+#wpoa-plugin-info nav + nav {margin-top:0.25em; margin-bottom:0.5em;}
 #wpoa-plugin-info #paypal-button {display:inline-block; vertical-align:middle;}
 #wpoa-plugin-info #paypal-button input {padding:0;}
 
-.wpoa-settings .submit {padding:0;}
 .wpoa-settings-section {background-color:#fff; margin-bottom:1.5em; border:1px solid #ddd;}
+#wpoa-settings-intro {border-radius:15px; text-align:center;}
+#wpoa-settings-intro nav {margin-top:0.5em; margin-bottom:0.5em;}
+#wpoa-settings-intro nav + nav {padding-top:0.5em; margin-bottom:0.5em; border-top:1px solid #eee;}
+
+.wpoa-settings .submit {padding:0;}
 .wpoa-settings .form-table {margin-top:0;}
 .wpoa-settings .form-padding {padding:1em;}
+.wpoa-settings ul {list-style:inherit; margin-left:2em;}
 .wpoa-settings h3 {margin:0; cursor:pointer; color:#999; padding:0.5em; font-style:italic; text-transform:uppercase; border-bottom:1px solid #eee; font-size:1.5em; -webkit-transition:all 0.5s ease;}
 .wpoa-settings h3:hover {color:#000;}
 .wpoa-settings h4 {margin:0; color:#999; font-style:italic; text-transform:uppercase; border-bottom:1px dotted #eee; padding-bottom:5px;}

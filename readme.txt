@@ -4,11 +4,11 @@ Donate link: http://glassocean.net
 Tags: login, membership, users, registration, oauth, social, social networking, community, security, connect with, authentication, authorization
 Requires at least: 4.0
 Tested up to: 4.0.1
-Stable tag: 0.2.1
+Stable tag: 0.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit (and more!) via OAuth 2.0.
+Allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit (and more!) account via OAuth 2.0.
 
 == Description ==
 
@@ -29,7 +29,7 @@ A live demo of WP-OAuth is available at [www.choiceschances.com](http://www.choi
 * Free, unlimited, unbranded and white-labeled from the beginning. No upselling, no payment plans, no SaaS, no proxy authentication! WP-OAuth communicates from your WordPress site *directly* with the *trusted* third-party login providers, bypassing any *untrusted* middleman or proxies.
 * WP-OAuth collects and stores ONLY the user's *OAuth identity* in the WordPress database for future logins; no other user information is collected or stored.
 * Fully integrates with WordPress. Drops into existing WordPress sites and integrates with existing WordPress users.
-* Supports third-party authentication with Google, Facebook, LinkedIn, Github, Reddit, Windows Live and PayPal via OAuth 2.0 / OpenID Connect. Providers can be enabled or disabled.
+* Supports third-party authentication with Google, Facebook, LinkedIn, Github, Reddit, Windows Live, PayPal and Instagram via OAuth 2.0 / OpenID Connect. Providers can be enabled or disabled.
 * Automatic user registration if *Anyone can register* has been enabled under Settings > General > Membership.
 * Users can manage their third-party login providers via the standard "Your Profile" WordPress page. They may link more providers, or unlink existing providers.
 * Displays a message via Javascript to the user when they login or logout. This feature can also be disabled.
@@ -120,7 +120,7 @@ For more information, see:
 
 = How is OAuth different than OpenID, OpenID Connect and OpenID Authorization 2.0? =
 
-OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers.
+OpenID functions on the assumption that each person will have their own unique identity that can be validated by a third party. However, most people don't have an OpenID and probably don't care for one, which makes OAuth a better choice for non-enterprise login systems because most people *do* have a Google, Facebook or LinkedIn account and should already be familiar with the authentication process of those providers. OpenID Connect is just OAuth 2.0 tailored for user authentication, and WP-OAuth aims to support providers that use either one.
 
 = How is OAuth different than SAML or Single Sign-On? =
 
@@ -133,6 +133,12 @@ The latter two technologies are for enterprise-scale apps and environments where
 3. The Login page can easily be customized.
 
 == Changelog ==
+
+= 0.2.2 =
+= New features / enhancements =
+* New login provider: Instagram.
+* New setting: *Verify Peer/Host SSL Certificates*. Disable this if you start to notice issues.
+* Improved Settings page layout.
 
 = 0.2.1 =
 = Fixes =

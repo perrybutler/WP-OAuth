@@ -4,7 +4,7 @@
 Plugin Name: WP-OAuth
 Plugin URI: http://github.com/perrybutler/wp-oauth
 Description: A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
-Version: 0.2.1
+Version: 0.2.2
 Author: Perry Butler
 Author URI: http://glassocean.net
 License: GPL2
@@ -21,7 +21,7 @@ Class WPOA {
 	// ==============
 
 	// set a version that we can use for performing plugin updates, this should always match the plugin version:
-	const PLUGIN_VERSION = "0.2.1";
+	const PLUGIN_VERSION = "0.2.2";
 	
 	// singleton class pattern:
 	protected static $instance = NULL;
@@ -34,6 +34,7 @@ Class WPOA {
 	private $settings = array(
 		'wpoa_show_login_messages' => 0,								// 0, 1
 		'wpoa_http_util' => 'curl',										// curl, stream-context
+		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_login_redirect' => 'home_page',							// home_page, last_page, specific_page, admin_dashboard, profile_page, custom_url
 		'wpoa_login_redirect_page' => 0,								// any whole number (wordpress page id)
 		'wpoa_login_redirect_url' => '',								// any string (url)
@@ -70,6 +71,12 @@ Class WPOA {
 		'wpoa_paypal_api_id' => '',										// any string
 		'wpoa_paypal_api_secret' => '',									// any string
 		'wpoa_paypal_api_sandbox_mode' => 1,							// 0, 1
+		'wpoa_instagram_api_enabled' => 0,								// 0, 1
+		'wpoa_instagram_api_id' => '',									// any string
+		'wpoa_instagram_api_secret' => '',								// any string
+		'wpoa_battlenet_api_enabled' => 0,								// 0, 1
+		'wpoa_battlenet_api_id' => '',									// any string
+		'wpoa_battlenet_api_secret' => '',								// any string
 		'wpoa_restore_default_settings' => 0,							// 0, 1
 		'wpoa_delete_settings_on_uninstall' => 0,						// 0, 1
 	);
@@ -199,6 +206,7 @@ Class WPOA {
 			'plugins_url' => plugins_url(),
 			'plugin_dir_url' => plugin_dir_url(__FILE__),
 			'url' => get_bloginfo('url'),
+			'logout_url' => wp_logout_url(),
 			// other:
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
 		);
@@ -315,6 +323,7 @@ Class WPOA {
 		// normalize the provider name (no caps, no spaces):
 		$provider = strtolower($provider);
 		$provider = str_replace(" ", "", $provider);
+		$provider = str_replace(".", "", $provider);
 		// include the provider script:
 		switch ($provider) {
 			case 'google':
@@ -337,6 +346,12 @@ Class WPOA {
 				break;
 			case 'paypal':
 				include 'login-paypal.php';
+				break;
+			case 'instagram':
+				include 'login-instagram.php';
+				break;
+			case 'battlenet':
+				include 'login-battlenet.php';
 				break;
 		}
 	}
@@ -615,6 +630,8 @@ Class WPOA {
 		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a id='wpoa-login-reddit' class='wpoa-login-button' href='$url?connect=reddit$redirect_to'>Reddit</a>";}
 		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a id='wpoa-login-windowslive' class='wpoa-login-button' href='$url?connect=windowslive$redirect_to'>Windows Live</a>";}
 		if (get_option('wpoa_paypal_api_enabled')) {$html .= "<a id='wpoa-login-paypal' class='wpoa-login-button' href='$url?connect=paypal$redirect_to'>Paypal</a>";}
+		if (get_option('wpoa_instagram_api_enabled')) {$html .= "<a id='wpoa-login-instagram' class='wpoa-login-button' href='$url?connect=instagram$redirect_to'>Instagram</a>";}
+		if (get_option('wpoa_battlenet_api_enabled')) {$html .= "<a id='wpoa-login-battlenet' class='wpoa-login-button' href='$url?connect=battlenet$redirect_to'>Battle.net</a>";}
 		return $html;
 	}
 	

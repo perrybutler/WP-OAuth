@@ -18,8 +18,6 @@ define('URL_USER', "https://www.googleapis.com/plus/v1/people/me?");
 
 // remember the user's last url so we can redirect them back to there after the login ends:
 if (!$_SESSION['WPOA']['LAST_URL']) {
-	//$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");
-
 	// try to obtain the redirect_url from the default login page:
 	$redirect_url = esc_url($_GET['redirect_to']);
 	// if no redirect_url was found, set it to the user's last page:
@@ -106,9 +104,10 @@ function get_oauth_token($wpoa) {
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
-			// PROVIDER NORMALIZATION: Reddit requires sending the client id/secret via http basic authentication
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // TODO: not sure if we actually need this...
+			// PROVIDER NORMALIZATION: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
+			// PROVIDER NORMALIZATION: PayPal/Reddit requires sending the client id/secret via http basic authentication
+			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
+			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
 			$result = curl_exec($curl);
 			break;
 		case 'stream-context':
@@ -149,7 +148,7 @@ function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
 	$params = array(
-		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access token is passed to Google using this key name
+		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access_token is passed to Google via POST param
 	);
 	$url_params = http_build_query($params);
 	// perform the http request:
@@ -158,9 +157,8 @@ function get_oauth_identity($wpoa) {
 			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
-			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
-			// PROVIDER NORMALIZATION: LinkedIn requires an x-li-format: json header...
+			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
+			// PROVIDER NORMALIZATION: PayPal/Reddit require that we send the access token via a bearer header, PayPal also requires a Content-Type: application/json header...
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			$result = curl_exec($curl);
 			$result_obj = json_decode($result, true);
@@ -185,7 +183,7 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Google returns the user's unique id
+	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
 	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
