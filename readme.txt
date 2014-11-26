@@ -137,7 +137,7 @@ The latter two technologies are for enterprise-scale apps and environments where
 = 0.2.2 =
 = New features / enhancements =
 * New login provider: Instagram.
-* New setting: *Verify Peer/Host SSL Certificates*. Disable this if you start to notice issues.
+* New setting: *Verify Peer/Host SSL Certificates*. Disable this if you have SSL errors, and make sure to read the warning message about disabling this!
 * Improved Settings page layout.
 
 = 0.2.1 =
