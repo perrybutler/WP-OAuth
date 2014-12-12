@@ -9,7 +9,7 @@ define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_github_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_github_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_github_api_secret'));
-define('REDIRECT_URI', "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/");
+define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', 'user'); // PROVIDER SPECIFIC: "user" is the minimum scope required to get the user's id from Github
 define('URL_AUTH', "https://github.com/login/oauth/authorize?");
 define('URL_TOKEN', "https://github.com/login/oauth/access_token?");
