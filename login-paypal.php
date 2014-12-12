@@ -9,7 +9,7 @@ define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_paypal_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_paypal_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_paypal_api_secret'));
-define('REDIRECT_URI', "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/");
+define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', 'openid'); // PROVIDER SPECIFIC: 'openid' is the minimum scope required to get the user's id from paypal
 define('URL_AUTH', "https://www." . (get_option('wpoa_paypal_api_sandbox_mode') ? "sandbox." : "") . "paypal.com/webapps/auth/protocol/openidconnect/v1/authorize?");
 define('URL_TOKEN', "https://api." . (get_option('wpoa_paypal_api_sandbox_mode') ? "sandbox." : "") . "paypal.com/v1/identity/openidconnect/tokenservice?");
