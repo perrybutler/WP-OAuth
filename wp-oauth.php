@@ -700,7 +700,7 @@ Class WPOA {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
-		$blog_url = "http://" . rtrim($_SERVER['SERVER_NAME'], "/") . "/";
+		$blog_url = site_url();
 		include 'wp-oauth-settings.php';
 	}
 } // END OF WPOA CLASS
