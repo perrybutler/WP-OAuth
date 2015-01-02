@@ -1,11 +1,32 @@
 /*  GENERAL
 ===========*/
+body.wpoa-lightbox-visible {overflow:hidden;}
+#wpoa-lightbox {display:none; position:fixed; z-index:99999; width:100%; height:100%; background:rgba(0,0,0,0.8); overflow:scroll; padding:10% 20%; box-sizing:border-box;}
+#wpoa-login-form-design-form {display:none;}
+
 #wpoa-result {display:none;}
 .wpoa-login-message{text-align:center; left:0; right:0; top:5px; position:absolute; font-size:1em; z-index:999999;}
 .wpoa-login-message span {padding:4px 6px; background:#fff; color:#000; border-radius:5px; display:inline-block;}
 
 /*  SETTINGS PAGE
 =================*/
+
+#wpoa_login_redirect_page {display:none;}
+#wpoa_logout_redirect_page {display:none;}
+
+#wpoa-settings-meta {float:right; text-align:right; color:#999; padding-top:9px;}
+#wpoa-settings-meta ul {display:inline; margin-left:0;}
+#wpoa-settings-meta li {display:inline; margin-left:0.5em;}
+
+#wpoa-rate-5stars {}
+#wpoa-rate-5stars:hover {}
+
+#wpoa-logo {margin-left:0.5em; margin-bottom:0.5em; width:64px; height:64px; float:right; background-image:url(http://ps.w.org/wp-oauth/assets/icon-128x128.png);}
+#wpoa-logo:hover {background-image:url(http://ps.w.org/wp-oauth/assets/thepb.jpg);}
+
+#wpoa-settings-col1 {width:68%; float:left;}
+#wpoa-settings-col2 {width:30%; float:right;}
+
 #wpoa-settings-header {margin-top:1em;}
 #wpoa-settings-header nav ul {display:inline; margin-left:0;}
 #wpoa-settings-header nav li {display:inline; margin-bottom:-1px;}
@@ -13,7 +34,7 @@
 #wpoa-settings-header nav li:first-child {margin-top:0.5em;}
 #wpoa-settings-header nav li:last-child:after {content:none;}
 #wpoa-settings-header .nav-splitter {display:inline; margin-left:1em;}
-@media all and (max-width:480px) {
+@media all and (max-width:720px) {
 	#wpoa-settings-header nav {margin-top:0.5em;}
 	#wpoa-settings-header nav ul {display:block; margin-top:0; border:0 solid rgba(0,0,0,0.1); border-width:0 0 1px 1px;}
 	#wpoa-settings-header nav li {display:block; text-align:center; border:0 solid rgba(0,0,0,0.1); border-width:1px 1px 0 0; box-sizing:border-box;}
@@ -21,6 +42,8 @@
 	#wpoa-settings-header nav a {display:block; text-align:center; padding:0.25em; text-decoration:none;}
 	#wpoa-settings-header nav li:hover {background:rgba(0,0,0,0.05);}
 	#wpoa-settings-header .nav-splitter {display:none;}
+	#wpoa-settings-col1 {width:auto; float:none;}
+	#wpoa-settings-col2 {width:auto; float:none;}
 }
 
 #wpoa-plugin-info {margin-bottom:1em; background-color:#fff9d8; padding-left:1em; padding-right:1em; border-radius:1em; border:1px solid #e7dca4;}
@@ -28,26 +51,39 @@
 #wpoa-plugin-info nav + nav {margin-top:0.25em; margin-bottom:0.5em;}
 #wpoa-plugin-info #paypal-button {display:inline-block; vertical-align:middle;}
 #wpoa-plugin-info #paypal-button input {padding:0;}
+#wpoa-paypal-button {float:right;}
 
 .wpoa-settings-section {background-color:#fff; margin-bottom:1.5em; border:1px solid #ddd;}
 #wpoa-settings-intro {border-radius:15px; text-align:center;}
 #wpoa-settings-intro nav {margin-top:0.5em; margin-bottom:0.5em;}
 #wpoa-settings-intro nav + nav {padding-top:0.5em; margin-bottom:0.5em; border-top:1px solid #eee;}
 
+.wpoa-settings div {box-sizing:border-box;}
 .wpoa-settings .submit {padding:0;}
 .wpoa-settings .form-table {margin-top:0;}
-.wpoa-settings .form-padding {padding:1em;}
+.wpoa-settings .form-padding {padding:0 1em 1em 1em;}
 .wpoa-settings ul {list-style:inherit; margin-left:2em;}
 .wpoa-settings h3 {margin:0; cursor:pointer; color:#999; padding:0.5em; font-style:italic; text-transform:uppercase; border-bottom:1px solid #eee; font-size:1.5em; -webkit-transition:all 0.5s ease;}
 .wpoa-settings h3:hover {color:#000;}
-.wpoa-settings h4 {margin:0; color:#999; font-style:italic; text-transform:uppercase; border-bottom:1px dotted #eee; padding-bottom:5px;}
+.wpoa-settings h4 {margin:0; color:#999; font-size:1.1em; font-style:italic; text-transform:uppercase; border-bottom:1px solid #eee; padding-bottom:5px;}
 .wpoa-settings hr {border:0; margin-bottom:1em;}
-.wpoa-settings input[type=text] {width:300px;}
+.wpoa-settings input[type=text],
+.wpoa-settings input[type=checkbox],
+.wpoa-settings input[type=radio],
+.wpoa-settings select,
+.wpoa-settings textarea {margin:0;}
+.wpoa-settings select {min-width:150px;}
 .wpoa-settings .tip-button {text-decoration:none; opacity:0; transition:all 0.5s ease;}
 .wpoa-settings tr:hover .tip-button {opacity:1;}
 .wpoa-settings .form-table td {vertical-align:top;}
+.wpoa-settings .form-table th {padding-top:1em; padding-bottom:0.25em;}
+.wpoa-settings .form-table th .heading {}
+.wpoa-settings .form-table td {padding-top:1em; padding-bottom:0.25em;}
 .wpoa-settings .tip-message {display:none; font-size:0.8em; color:#aaa; border-radius:3px;}
 .wpoa-settings .tip-message.tip-warning {padding:1em; background:#fffd6c; color:#000;}
+.wpoa-settings .tip-message.tip-info {padding:1em; background:#ddeeff; color:#000;}
+
+.wpoa-settings .validation-warning {font-size:0.8em; padding:1em; background:#ff0000; color:#fff;}
 
 /*  LOGIN FORM STYLES
 =====================*/
@@ -55,6 +91,7 @@
 .wpoa-login-form {margin-bottom:1em;}
 .wpoa-login-button:focus {outline:0; background-color:#ddd;}
 .wpoa-logout-button:focus {outline:0; background-color:#ddd;}
+.wpoa-login-button .icon {vertical-align:middle; margin-left:0.25em; margin-right:0.25em; height:32px;}
 
 /* title / button alignment */
 .wpoa-layout-align-left {}
@@ -87,6 +124,7 @@
 .wpoa-layout-buttons-column {}
 .wpoa-layout-buttons-column a {border:2px solid transparent; box-sizing:border-box; display:block; text-decoration:none; text-align:center; font-size:1em; padding:10px; background:#1e8cbe; color:#fff; margin-bottom:1px; -webkit-transition:all 0.5s ease; cursor:pointer;}
 .wpoa-layout-buttons-column a:hover {background:#c5c5c5;}
+.wpoa-layout-buttons-column a:hover .icon {}
 .wpoa-layout-buttons-column a.loading{background:transparent !important; color:#999; cursor:default; border:2px solid #000;}
 .wpoa-layout-buttons-column a.loading-other{background:rgba(255,255,255,0) !important; color:#999; cursor:default;}
 

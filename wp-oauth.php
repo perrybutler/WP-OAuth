@@ -33,22 +33,52 @@ Class WPOA {
 	// define the settings used by this plugin; this array will be used for registering settings, applying default values, and deleting them during uninstall:
 	private $settings = array(
 		'wpoa_show_login_messages' => 0,								// 0, 1
-		'wpoa_http_util' => 'curl',										// curl, stream-context
-		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_login_redirect' => 'home_page',							// home_page, last_page, specific_page, admin_dashboard, profile_page, custom_url
 		'wpoa_login_redirect_page' => 0,								// any whole number (wordpress page id)
 		'wpoa_login_redirect_url' => '',								// any string (url)
 		'wpoa_logout_redirect' => 'home_page',							// home_page, last_page, specific_page, admin_dashboard, profile_page, custom_url, default_handling
 		'wpoa_logout_redirect_page' => 0,								// any whole number (wordpress page id)
 		'wpoa_logout_redirect_url' => '',								// any string (url)
-		'wpoa_show_login_form' => 'default_custom',						// custom, default, default_custom
-		'wpoa_logged_out_title' => 'Please login:',						// any string
-		'wpoa_logged_in_title' => 'You are already logged in.',			// any string
-		'wpoa_logging_in_title' => 'Logging in...',						// any string
-		'wpoa_logging_out_title' => 'Logging out...',					// any string
+		'wpoa_logout_inactive_users' => 0,								// any whole number (minutes)
+		'wpoa_hide_wordpress_login_form' => 0,							// 0, 1
 		'wpoa_logo_links_to_site' => 0,									// 0, 1
 		'wpoa_logo_image' => '',										// any string (image url)
 		'wpoa_bg_image' => '',											// any string (image url)
+		'wpoa_login_form_show_login_screen' => 'Login Screen',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_profile_page' => 'Profile Page',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_comments_section' => 'Login Screen',		// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_designs' => array(								// array of shortcode designs to be included by default; same array signature as the shortcode function uses
+			'Login Screen' => array(
+				'icon_set' => 'none',
+				'layout' => 'buttons-column',
+				'align' => 'center',
+				'show_login' => 'conditional',
+				'show_logout' => 'conditional',
+				'button_prefix' => 'Login with',
+				'logged_out_title' => 'Please login:',
+				'logged_in_title' => 'You are already logged in.',
+				'logging_in_title' => 'Logging in...',
+				'logging_out_title' => 'Logging out...',
+				'style' => '',
+				'class' => '',
+				),
+			'Profile Page' => array(
+				'icon_set' => 'none',
+				'layout' => 'buttons-row',
+				'align' => 'left',
+				'show_login' => 'always',
+				'show_logout' => 'never',
+				'button_prefix' => 'Link',
+				'logged_out_title' => 'Select a provider:',
+				'logged_in_title' => 'Select a provider:',
+				'logging_in_title' => 'Authenticating...',
+				'logging_out_title' => 'Logging out...',
+				'style' => '',
+				'class' => '',
+				),
+			),
+		'wpoa_suppress_welcome_email' => 0,								// 0, 1
+		'wpoa_new_user_role' => 'contributor',							// role
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
 		'wpoa_google_api_secret' => '',									// any string
@@ -70,13 +100,15 @@ Class WPOA {
 		'wpoa_paypal_api_enabled' => 0,									// 0, 1
 		'wpoa_paypal_api_id' => '',										// any string
 		'wpoa_paypal_api_secret' => '',									// any string
-		'wpoa_paypal_api_sandbox_mode' => 1,							// 0, 1
+		'wpoa_paypal_api_sandbox_mode' => 0,							// 0, 1
 		'wpoa_instagram_api_enabled' => 0,								// 0, 1
 		'wpoa_instagram_api_id' => '',									// any string
 		'wpoa_instagram_api_secret' => '',								// any string
 		'wpoa_battlenet_api_enabled' => 0,								// 0, 1
 		'wpoa_battlenet_api_id' => '',									// any string
 		'wpoa_battlenet_api_secret' => '',								// any string
+		'wpoa_http_util' => 'curl',										// curl, stream-context
+		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_restore_default_settings' => 0,							// 0, 1
 		'wpoa_delete_settings_on_uninstall' => 0,						// 0, 1
 	);
@@ -129,7 +161,7 @@ Class WPOA {
 		$settings_link = "<a href='options-general.php?page=WP-OAuth.php'>Settings Page</a>"; // CASE SeNsItIvE filename!
 		?>
 		<div class="updated">
-			<p>WP-OAuth has been updated! You may review the <?php echo $settings_link ?>.</p>
+			<p>WP-OAuth has been updated! Please review the <?php echo $settings_link ?>.</p>
 		</div>
 		<?php
 	}
@@ -138,6 +170,9 @@ Class WPOA {
 	function wpoa_add_missing_settings() {
 		foreach($this->settings as $setting_name => $default_value) {
 			// call add_option() which ensures that we only add NEW options that don't exist:
+			if (is_array($this->settings[$setting_name])) {
+				$default_value = json_encode($default_value);
+			}
 			$added = add_option($setting_name, $default_value);
 		}
 	}
@@ -146,6 +181,9 @@ Class WPOA {
 	function wpoa_restore_default_settings() {
 		foreach($this->settings as $setting_name => $default_value) {
 			// call update_option() which ensures that we update the setting's value:
+			if (is_array($this->settings[$setting_name])) {
+				$default_value = json_encode($default_value);
+			}
 			update_option($setting_name, $default_value);
 		}
 		add_action('admin_notices', array($this, 'wpoa_restore_default_settings_notice'));
@@ -209,6 +247,8 @@ Class WPOA {
 			'logout_url' => wp_logout_url(),
 			// other:
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
+			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
+			'logged_in' => is_user_logged_in(),
 		);
 		wp_enqueue_script('wpoa-cvars', plugins_url('/cvars.js', __FILE__));
 		wp_localize_script('wpoa-cvars', 'wpoa_cvars', $wpoa_cvars);
@@ -232,6 +272,8 @@ Class WPOA {
 			'url' => get_bloginfo('url'),
 			// other:
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
+			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
+			'logged_in' => is_user_logged_in(),
 		);
 		wp_enqueue_script('wpoa-cvars', plugins_url('/cvars.js', __FILE__));
 		wp_localize_script('wpoa-cvars', 'wpoa_cvars', $wpoa_cvars);
@@ -256,11 +298,13 @@ Class WPOA {
 			'plugin_dir_url' => plugin_dir_url(__FILE__),
 			'url' => get_bloginfo('url'),
 			// login specific:
-			'show_login_form' => get_option('wpoa_show_login_form'),
+			'hide_login_form' => get_option('wpoa_hide_wordpress_login_form'),
 			'logo_image' => get_option('wpoa_logo_image'),
 			'bg_image' => get_option('wpoa_bg_image'),
 			'login_message' => $_SESSION['WPOA']['RESULT'],
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
+			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
+			'logged_in' => is_user_logged_in(),
 		);
 		wp_enqueue_script('wpoa-cvars', plugins_url('/cvars.js', __FILE__));
 		wp_localize_script('wpoa-cvars', 'wpoa_cvars', $wpoa_cvars);
@@ -325,35 +369,7 @@ Class WPOA {
 		$provider = str_replace(" ", "", $provider);
 		$provider = str_replace(".", "", $provider);
 		// include the provider script:
-		switch ($provider) {
-			case 'google':
-				include 'login-google.php';
-				break;
-			case 'facebook':
-				include 'login-facebook.php';
-				break;
-			case 'linkedin':
-				include 'login-linkedin.php';
-				break;
-			case 'github':
-				include 'login-github.php';
-				break;
-			case 'reddit':
-				include 'login-reddit.php';
-				break;
-			case 'windowslive':
-				include 'login-windowslive.php';
-				break;
-			case 'paypal':
-				include 'login-paypal.php';
-				break;
-			case 'instagram':
-				include 'login-instagram.php';
-				break;
-			case 'battlenet':
-				include 'login-battlenet.php';
-				break;
-		}
+		include 'login-' . $provider . '.php';
 	}
 	
 	// =======================
@@ -436,7 +452,8 @@ Class WPOA {
 				$redirect_url = get_option('wpoa_login_redirect_url');
 				break;
 		}
-		header("Location: " . $redirect_url);
+		//header("Location: " . $redirect_url);
+		wp_safe_redirect($redirect_url);
 		die();
 	}
 	
@@ -551,9 +568,10 @@ Class WPOA {
 	// show the login screen customizations per the admin's chosen settings:
 	function wpoa_customize_login_screen() {
 		$html = "";
-		$show_login_form = get_option('wpoa_show_login_form');
-		if ($show_login_form == 'custom' || $show_login_form == 'default_custom') {
-			$html .= $this->wpoa_login_form_content('buttons-column', 'center', 'conditional', 'conditional', get_option('wpoa_logged_out_title'), get_option('wpoa_logged_in_title'), get_option('wpoa_logging_in_title'), get_option('wpoa_logging_out_title'));
+		if (get_option('wpoa_login_form_show_login_screen') != "None") {
+			$design = get_option('wpoa_login_form_show_login_screen');
+			// TODO: we need to use $settings defaults here, not hard-coded defaults...
+			$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
 		}
 		echo $html;
 	}
@@ -565,6 +583,9 @@ Class WPOA {
 	// shortcode which allows adding the wpoa login form to any post or page:
 	function wpoa_login_form( $atts ){
 		$a = shortcode_atts( array(
+			'design' => '',
+			'icon_set' => 'none',
+			'button_prefix' => '',
 			'layout' => 'links-column',
 			'align' => 'left',
 			'show_login' => 'conditional',
@@ -580,12 +601,29 @@ Class WPOA {
 		//$a['show_login'] = filter_var($a['show_login'], FILTER_VALIDATE_BOOLEAN);
 		//$a['show_logout'] = filter_var($a['show_logout'], FILTER_VALIDATE_BOOLEAN);
 		// get the shortcode content:
-		$html = $this->wpoa_login_form_content($a['layout'], $a['align'], $a['show_login'], $a['show_logout'], $a['logged_out_title'], $a['logged_in_title'], $a['logging_in_title'], $a['logging_out_title'], $a['style'], $a['class']);
+		$html = $this->wpoa_login_form_content($a['design'], $a['icon_set'], $a['layout'], $a['button_prefix'], $a['align'], $a['show_login'], $a['show_logout'], $a['logged_out_title'], $a['logged_in_title'], $a['logging_in_title'], $a['logging_out_title'], $a['style'], $a['class']);
 		return $html;
 	}
 	
 	// gets the content to be used for displaying the login/logout form:
-	function wpoa_login_form_content($layout = 'links-column', $align = 'left', $show_login = 'conditional', $show_logout = 'conditional', $logged_out_title = 'Please login:', $logged_in_title = 'You are already logged in.', $logging_in_title = 'Logging in...', $logging_out_title = 'Logging out...', $style = '', $class = '') { // even though wpoa_login_form() will pass a default, we might call this function from another method so it's important to re-specify the default values
+	function wpoa_login_form_content($design = '', $icon_set = 'icon_set', $layout = 'links-column', $button_prefix = '', $align = 'left', $show_login = 'conditional', $show_logout = 'conditional', $logged_out_title = 'Please login:', $logged_in_title = 'You are already logged in.', $logging_in_title = 'Logging in...', $logging_out_title = 'Logging out...', $style = '', $class = '') { // even though wpoa_login_form() will pass a default, we might call this function from another method so it's important to re-specify the default values
+		// if a design was specified and that design exists, load the shortcode attributes from that design:
+		if ($design != '' && WPOA::wpoa_login_form_design_exists($design)) { // TODO: remove first condition not needed
+			$a = WPOA::wpoa_get_login_form_design($design);
+			$icon_set = $a['icon_set'];
+			$layout = $a['layout'];
+			$button_prefix = $a['button_prefix'];
+			$align = $a['align'];
+			$show_login = $a['show_login'];
+			$show_logout = $a['show_logout'];
+			$logged_out_title = $a['logged_out_title'];
+			$logged_in_title = $a['logged_in_title'];
+			$logging_in_title = $a['logging_in_title'];
+			$logging_out_title = $a['logging_out_title'];
+			$style = $a['style'];
+			$class = $a['class'];
+		}
+		// build the shortcode markup:
 		$html = "";
 		$html .= "<div class='wpoa-login-form wpoa-layout-$layout wpoa-layout-align-$align $class' style='$style' data-logging-in-title='$logging_in_title' data-logging-out-title='$logging_out_title'>";
 		$html .= "<nav>";
@@ -594,7 +632,7 @@ Class WPOA {
 				$html .= "<p id='wpoa-title'>" . $logged_in_title . "</p>";
 			}
 			if ($show_login == 'always') {
-				$html .= $this->wpoa_login_buttons();
+				$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
 			}
 			if ($show_logout == 'always' || $show_logout == 'conditional') {
 				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
@@ -605,7 +643,7 @@ Class WPOA {
 				$html .= "<p id='wpoa-title'>" . $logged_out_title . "</p>";
 			}
 			if ($show_login == 'always' || $show_login == 'conditional') {
-				$html .= $this->wpoa_login_buttons();
+				$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
 			}
 			if ($show_logout == 'always') {
 				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
@@ -616,23 +654,114 @@ Class WPOA {
 		return $html;
 	}
 	
-	// get the login buttons content depending on available providers:
-	function wpoa_login_buttons() {
-		$html = "";
-		$url = get_bloginfo('url');
+	// generate and return the login buttons, depending on available providers:
+	function wpoa_login_buttons($icon_set, $button_prefix) {
+		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
+		$site_url = get_bloginfo('url');
 		$redirect_to = urlencode($_GET['redirect_to']);
 		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
-		//if (get_option('wpoa_google_api_enabled')) {$html .= "<a id='wpoa-login-google' class='wpoa-login-button' href='$url?connect=google$redirect_to' onclick='wpoa.loginGoogle(); return false;'>Google</a>";}
-		if (get_option('wpoa_google_api_enabled')) {$html .= "<a id='wpoa-login-google' class='wpoa-login-button' href='$url?connect=google$redirect_to'>Google</a>";}
-		if (get_option('wpoa_facebook_api_enabled')) {$html .= "<a id='wpoa-login-facebook' class='wpoa-login-button' href='$url?connect=facebook$redirect_to'>Facebook</a>";}
-		if (get_option('wpoa_linkedin_api_enabled')) {$html .= "<a id='wpoa-login-linkedin' class='wpoa-login-button' href='$url?connect=linkedin$redirect_to'>LinkedIn</a>";}
-		if (get_option('wpoa_github_api_enabled')) {$html .= "<a id='wpoa-login-github' class='wpoa-login-button' href='$url?connect=github$redirect_to'>Github</a>";}
-		if (get_option('wpoa_reddit_api_enabled')) {$html .= "<a id='wpoa-login-reddit' class='wpoa-login-button' href='$url?connect=reddit$redirect_to'>Reddit</a>";}
-		if (get_option('wpoa_windowslive_api_enabled')) {$html .= "<a id='wpoa-login-windowslive' class='wpoa-login-button' href='$url?connect=windowslive$redirect_to'>Windows Live</a>";}
-		if (get_option('wpoa_paypal_api_enabled')) {$html .= "<a id='wpoa-login-paypal' class='wpoa-login-button' href='$url?connect=paypal$redirect_to'>Paypal</a>";}
-		if (get_option('wpoa_instagram_api_enabled')) {$html .= "<a id='wpoa-login-instagram' class='wpoa-login-button' href='$url?connect=instagram$redirect_to'>Instagram</a>";}
-		if (get_option('wpoa_battlenet_api_enabled')) {$html .= "<a id='wpoa-login-battlenet' class='wpoa-login-button' href='$url?connect=battlenet$redirect_to'>Battle.net</a>";}
+		// get shortcode atts that determine how we should build these buttons:
+		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
+		$atts = array(
+			'site_url' => $site_url,
+			'redirect_to' => $redirect_to,
+			'icon_set' => $icon_set,
+			'icon_set_path' => $icon_set_path,
+			'button_prefix' => $button_prefix,
+		);
+		// generate the login buttons for available providers:
+		// TODO: don't hard-code the buttons/providers here, we want to be able to add more providers without having to update this function...
+		$html = "";
+		$html .= $this->wpoa_login_button("google", "Google", $atts);
+		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
+		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
+		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
+		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
+		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
+		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
+		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
+		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
+		if ($html == '') {
+			$html .= 'Sorry, no login providers have been enabled.';
+		}
 		return $html;
+	}
+
+	// generates and returns a login button for a specific provider:
+	function wpoa_login_button($provider, $display_name, $atts) {
+		$html = "";
+		if (get_option("wpoa_" . $provider . "_api_enabled")) {
+			$html .= "<a id='wpoa-login-" . $provider . "' class='wpoa-login-button' href='" . $atts['site_url'] . "?connect=" . $provider . $atts['redirect_to'] . "'>";
+			if ($atts['icon_set'] != 'none') {
+				$html .= "<img src='" . $atts['icon_set_path'] . $provider . ".png' alt='" . $display_name . "' class='icon'></img>";
+			}
+			$html .= $atts['button_prefix'] . " " . $display_name;
+			$html .= "</a>";
+		}
+		return $html;
+	}
+	
+	// output the custom login form design selector:
+	function wpoa_login_form_designs_selector($id = '', $master = false) {
+		$html = "";
+		$designs_json = get_option('wpoa_login_form_designs');
+		$designs_array = json_decode($designs_json);
+		$name = str_replace('-', '_', $id);
+		$html .= "<select id='" . $id . "' name='" . $name . "'>";
+		if ($master == true) {
+			foreach($designs_array as $key => $val) {
+				$html .= "<option value=''>" . $key . "</option>";
+			}
+			$html .= "</select>";
+			$html .= "<input type='hidden' id='wpoa-login-form-designs' name='wpoa_login_form_designs' value='" . $designs_json . "'>";
+		}
+		else {
+			foreach($designs_array as $key => $val) {
+				$html .= "<option value='" . $key . "' " . selected(get_option($name), $key, false) . ">" . $key . "</option>";
+			}
+			$html .= "</select>";
+		}
+		return $html;
+	}
+	
+	// returns a saved login form design as a shortcode atts string or array for direct use via the shortcode
+	function wpoa_get_login_form_design($design_name, $as_string = false) {
+		$designs_json = get_option('wpoa_login_form_designs');
+		$designs_array = json_decode($designs_json, true);
+		foreach($designs_array as $key => $val) {
+			if ($design_name == $key) {
+				$found = $val;
+				break;
+			}
+		}
+		$atts;
+		//echo print_r($found);
+		if ($found) {
+			if ($as_string) {
+				$atts = json_encode($found);
+			}
+			else {
+				$atts = $found;
+			}
+		}
+		return $atts;
+	}
+	
+	function wpoa_login_form_design_exists($design_name) {
+		$designs_json = get_option('wpoa_login_form_designs');
+		$designs_array = json_decode($designs_json, true);
+		foreach($designs_array as $key => $val) {
+			if ($design_name == $key) {
+				$found = $val;
+				break;
+			}
+		}
+		if ($found) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 	
 	// shows the user's linked providers on the 'Your Profile' page where they may be managed:
@@ -672,7 +801,9 @@ Class WPOA {
 		echo "<tr valign='top'>";
 		echo "<th scope='row'>Link Another Provider</th>";
 		echo "<td>";
-		echo $this->wpoa_login_form_content('buttons-row', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
+		$design = get_option('wpoa_login_form_show_profile_page');
+		// TODO: we need to use $settings defaults here, not hard-coded defaults...
+		echo $this->wpoa_login_form_content($design, 'none', 'buttons-row', 'Link', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
 		echo "</div>";
 		echo "</td>";
 		echo "</td>";
@@ -700,7 +831,7 @@ Class WPOA {
 		if ( !current_user_can( 'manage_options' ) )  {
 			wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 		}
-		$blog_url = site_url();
+		$blog_url = rtrim(site_url(), "/") . "/";
 		include 'wp-oauth-settings.php';
 	}
 } // END OF WPOA CLASS
