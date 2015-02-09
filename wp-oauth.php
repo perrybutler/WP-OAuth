@@ -44,9 +44,9 @@ Class WPOA {
 		'wpoa_logo_links_to_site' => 0,									// 0, 1
 		'wpoa_logo_image' => '',										// any string (image url)
 		'wpoa_bg_image' => '',											// any string (image url)
-		'wpoa_login_form_show_login_screen' => 'None',			// any string (name of a custom login form shortcode design)
-		'wpoa_login_form_show_profile_page' => 'None',			// any string (name of a custom login form shortcode design)
-		'wpoa_login_form_show_comments_section' => 'None',		// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_login_screen' => 'Login Screen',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_profile_page' => 'Profile Page',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_comments_section' => 'None',				// any string (name of a custom login form shortcode design)
 		'wpoa_login_form_designs' => array(								// array of shortcode designs to be included by default; same array signature as the shortcode function uses
 			'Login Screen' => array(
 				'icon_set' => 'none',

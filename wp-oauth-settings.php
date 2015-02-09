@@ -24,9 +24,9 @@
 		<div id="" class="wpoa-settings-section">
 			<h3 id="bookmark-login-page-form-customization">Donate</h3>
 			<div class='form-padding'>
-				<p>Do you enjoy using this plugin? Do you want to help improve it? Consider donating via <strong>PayPal</strong>!</p><p>My promise to you is that WP-OAuth will always remain free of restrictions, advertisements, branding, etc. <em>Your donations help make this possible.</em></p>
+				<p>Do you enjoy using this plugin? Do you want to help improve it? Consider donating via <strong>PayPal</strong>!</p><p>WP-OAuth remains free of restrictions, advertisements, branding, etc. <em>Your donations help make this possible.</em></p>
 				<form action="https://www.paypal.com/cgi-bin/webscr" target="_blank" method="post">
-					$ <input type="text" style="width: 50px" name="amount" value="10">
+					$ <input type="text" style="width: 50px" name="amount" value="5">
 					<span>USD</span>
 					<input type="hidden" value="_xclick" name="cmd">
 					<input type="hidden" value="hectavex@gmail.com" name="business">
@@ -49,7 +49,6 @@
 			<h3 id="bookmark-login-page-form-customization">Support</h3>
 			<div class='form-padding'>
 				<p>Your general questions can be asked in the plugin <a href="https://wordpress.org/support/plugin/wp-oauth" target="_blank">support forum</a>.</p>
-				<p>Need advanced plugin customizations or special features, installation and setup assistance, or hands-on / one-on-one technical support? <a href="mailto:perry@glassocean.net">Contact me</a>.</p>
 			</div>
 		</div>
 	</div>
