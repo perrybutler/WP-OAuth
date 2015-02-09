@@ -340,63 +340,6 @@
 				</td>
 				</tr>
 				
-				<?php /*
-				<tr valign='top'>
-				<th scope='row'>Show provider icons: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<input type='checkbox' name='wpoa_login_form_show_icons' value='1' />
-					<p class="tip-message">Specifies whether or not to show provider icons on the login buttons.</p>
-				</td>
-				</tr>
-				
-				<tr valign='top'>
-				<th scope='row'>Show prefix text: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<input type='checkbox' name='wpoa_login_buttons_show_prefix' value='1' />
-					<p class="tip-message">Specifies whether or not to show provider icons on the login buttons.</p>
-				</td>
-				</tr>
-				
-				<tr valign='top'>
-				<th scope='row'>Show provider names: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<input type='checkbox' name='wpoa_login_buttons_show_names' value='1' />
-					<p class="tip-message">Specifies whether or not to show provider names on the login buttons.</p>
-				</td>
-				</tr>
-				
-				<tr valign='top'>
-				<th scope='row'>Background style: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<input type='text' name='wpoa_login_buttons_background_style' value='<?php get_option('wpoa_login_buttons_background_style') == 1; ?>' />
-					<p class="tip-message">Specifies the background style (CSS) for the buttons.</p>
-				</td>
-				</tr>
-				
-				<tr valign='top'>
-				<th scope='row'>Background style (hover): <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<input type='text' name='wpoa_login_buttons_background_style_hover' value='<?php get_option('wpoa_login_buttons_background_style_hover') == 1; ?>' />
-					<p class="tip-message">Specifies the background style (CSS) on hover for the buttons.</p>
-				</td>
-				</tr>
-				
-				<tr valign='top'>
-				<th scope='row'>Icon size: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<select name='wpoa_login_buttons_icon_size'>
-						<option value='auto' <?php selected(get_option('wpoa_login_buttons_icon_size'), 'auto'); ?>>Auto</option>
-						<option value='16' <?php selected(get_option('wpoa_login_buttons_icon_size'), '16'); ?>>16x16</option>
-						<option value='32' <?php selected(get_option('wpoa_login_buttons_icon_size'), '32'); ?>>32x32</option>
-						<option value='64' <?php selected(get_option('wpoa_login_buttons_icon_size'), '64'); ?>>64x64</option>
-						<option value='custom' <?php selected(get_option('wpoa_login_buttons_icon_size'), 'custom'); ?>>Custom</option>
-					</select>
-					<input type="text" name="wpoa_login_buttons_icon_size" value="<?php echo get_option('wpoa_login_buttons_icon_size'); ?>" />
-					<p class="tip-message">The size of the provider icons.</p>
-				</td>
-				</tr>
-				*/ ?>
-				
 				<tr valign='top' id='wpoa-login-form-actions'>
 				<th scope='row'>
 					<input type="button" id="wpoa-login-form-ok" name="wpoa_login_form_ok" class="button" value="OK">

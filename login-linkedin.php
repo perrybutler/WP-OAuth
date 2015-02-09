@@ -17,7 +17,16 @@ define('URL_USER', "https://api.linkedin.com/v1/people/~:(id,email-address)?");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
-if (!$_SESSION['WPOA']['LAST_URL']) {$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");}
+if (!$_SESSION['WPOA']['LAST_URL']) {
+	// try to obtain the redirect_url from the default login page:
+	$redirect_url = esc_url($_GET['redirect_to']);
+	// if no redirect_url was found, set it to the user's last page:
+	if (!$redirect_url) {
+		$redirect_url = strtok($_SERVER['HTTP_REFERER'], "?");
+	}
+	// set the user's last page so we can return that user there after they login:
+	$_SESSION['WPOA']['LAST_URL'] = $redirect_url;
+}
 
 # AUTHENTICATION FLOW #
 // the oauth 2.0 authentication flow will start in this script and make several calls to the third-party authentication provider which in turn will make callbacks to this script that we continue to handle until the login completes with a success or failure:
@@ -148,9 +157,8 @@ function get_oauth_identity($wpoa) {
 			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
-			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
-			curl_setopt($curl, CURLOPT_HTTPHEADER, array('x-li-format: json')); // PROVIDER SPECIFIC: we must specify json or else LinkedIn will encode the result as xml by default
+			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array('x-li-format: json')); // PROVIDER SPECIFIC: we must specify json or else LinkedIn will encode the result as xml by default // PROVIDER NORMALIZATION: PayPal/Reddit require that we send the access token via a bearer header, PayPal also requires a Content-Type: application/json header...
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			$result = curl_exec($curl);
 			$result_obj = json_decode($result, true);

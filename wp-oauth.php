@@ -4,7 +4,7 @@
 Plugin Name: WP-OAuth
 Plugin URI: http://github.com/perrybutler/wp-oauth
 Description: A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
-Version: 0.2.2
+Version: 0.3
 Author: Perry Butler
 Author URI: http://glassocean.net
 License: GPL2
@@ -21,7 +21,7 @@ Class WPOA {
 	// ==============
 
 	// set a version that we can use for performing plugin updates, this should always match the plugin version:
-	const PLUGIN_VERSION = "0.2.2";
+	const PLUGIN_VERSION = "0.3";
 	
 	// singleton class pattern:
 	protected static $instance = NULL;
@@ -44,9 +44,9 @@ Class WPOA {
 		'wpoa_logo_links_to_site' => 0,									// 0, 1
 		'wpoa_logo_image' => '',										// any string (image url)
 		'wpoa_bg_image' => '',											// any string (image url)
-		'wpoa_login_form_show_login_screen' => 'Login Screen',			// any string (name of a custom login form shortcode design)
-		'wpoa_login_form_show_profile_page' => 'Profile Page',			// any string (name of a custom login form shortcode design)
-		'wpoa_login_form_show_comments_section' => 'Login Screen',		// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_login_screen' => 'None',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_profile_page' => 'None',			// any string (name of a custom login form shortcode design)
+		'wpoa_login_form_show_comments_section' => 'None',		// any string (name of a custom login form shortcode design)
 		'wpoa_login_form_designs' => array(								// array of shortcode designs to be included by default; same array signature as the shortcode function uses
 			'Login Screen' => array(
 				'icon_set' => 'none',
@@ -219,6 +219,8 @@ Class WPOA {
 		if (get_option('wpoa_logo_links_to_site') == true) {add_filter('login_headerurl', array($this, 'wpoa_logo_link'));}
 		add_filter('login_message', array($this, 'wpoa_customize_login_screen'));
 		// hooks used globally:
+		add_filter('comment_form_defaults', array($this, 'wpoa_customize_comment_form_fields'));
+		//add_action('comment_form_top', array($this, 'wpoa_customize_comment_form'));
 		add_action('show_user_profile', array($this, 'wpoa_linked_accounts'));
 		add_action('wp_logout', array($this, 'wpoa_end_logout'));
 		add_action('wp_ajax_wpoa_logout', array($this, 'wpoa_logout_user'));
@@ -565,11 +567,38 @@ Class WPOA {
 		return get_bloginfo('url');
 	}
 	
-	// show the login screen customizations per the admin's chosen settings:
+	// show a custom login form on the default login screen:
 	function wpoa_customize_login_screen() {
 		$html = "";
-		if (get_option('wpoa_login_form_show_login_screen') != "None") {
-			$design = get_option('wpoa_login_form_show_login_screen');
+		$design = get_option('wpoa_login_form_show_login_screen');
+		if ($design != "None") {
+			// TODO: we need to use $settings defaults here, not hard-coded defaults...
+			$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
+		}
+		echo $html;
+	}
+
+	// ===================================
+	// DEFAULT COMMENT FORM CUSTOMIZATIONS
+	// ===================================
+	
+	// show a custom login form at the top of the default comment form:
+	function wpoa_customize_comment_form_fields($fields) {
+		$html = "";
+		$design = get_option('wpoa_login_form_show_comments_section');
+		if ($design != "None") {
+			// TODO: we need to use $settings defaults here, not hard-coded defaults...
+			$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
+			$fields['logged_in_as'] = $html;
+		}
+		return $fields;
+	}
+	
+	// show a custom login form at the top of the default comment form:
+	function wpoa_customize_comment_form() {
+		$html = "";
+		$design = get_option('wpoa_login_form_show_comments_section');
+		if ($design != "None") {
 			// TODO: we need to use $settings defaults here, not hard-coded defaults...
 			$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
 		}
@@ -716,6 +745,7 @@ Class WPOA {
 			$html .= "<input type='hidden' id='wpoa-login-form-designs' name='wpoa_login_form_designs' value='" . $designs_json . "'>";
 		}
 		else {
+			$html .= "<option value='None'>" . 'None' . "</option>";
 			foreach($designs_array as $key => $val) {
 				$html .= "<option value='" . $key . "' " . selected(get_option($name), $key, false) . ">" . $key . "</option>";
 			}
@@ -764,7 +794,7 @@ Class WPOA {
 		}
 	}
 	
-	// shows the user's linked providers on the 'Your Profile' page where they may be managed:
+	// shows the user's linked providers, used on the 'Your Profile' page:
 	function wpoa_linked_accounts() {
 		// get the current user:
 		global $current_user;
@@ -802,8 +832,10 @@ Class WPOA {
 		echo "<th scope='row'>Link Another Provider</th>";
 		echo "<td>";
 		$design = get_option('wpoa_login_form_show_profile_page');
-		// TODO: we need to use $settings defaults here, not hard-coded defaults...
-		echo $this->wpoa_login_form_content($design, 'none', 'buttons-row', 'Link', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
+		if ($design != "None") {
+			// TODO: we need to use $settings defaults here, not hard-coded defaults...
+			echo $this->wpoa_login_form_content($design, 'none', 'buttons-row', 'Link', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
+		}
 		echo "</div>";
 		echo "</td>";
 		echo "</td>";
