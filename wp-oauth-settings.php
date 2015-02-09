@@ -2,11 +2,7 @@
 	<div id="wpoa-settings-meta">Toggle tips: <ul><li><a id="wpoa-settings-tips-on" href="#">On</a></li><li><a id="wpoa-settings-tips-off" href="#">Off</a></li></ul><div class="nav-splitter"></div>Toggle sections: <ul><li><a id="wpoa-settings-sections-on" href="#">On</a></li><li><a id="wpoa-settings-sections-off" href="#">Off</a></li></ul></div>
 	<h2>WP-OAuth Settings</h2>
 	<!-- START Settings Header -->
-	<div id="wpoa-settings-header">
-		<?php 
-			//echo WPOA::wpoa_get_login_form_design('Login Screen', true);
-		?>
-	</div>
+	<div id="wpoa-settings-header"></div>
 	<!-- END Settings Header -->
 	<!-- START Settings Body -->
 	<div id="wpoa-settings-body">
@@ -16,9 +12,9 @@
 			<h3 id="bookmark-login-page-form-customization">About</h3>
 			<div class='form-padding'>
 				<div id="wpoa-logo" style="width:64px; height:64px; float:right; background-size:100% 100%;"></div>
-				<p><span style="font-size:1.1em;"><strong>WP-OAuth <?php echo WPOA::PLUGIN_VERSION; ?></strong></span><br/>by <strong>Perry Butler</strong></p>
+				<p><span style="font-size:1.1em;"><strong>WP-OAuth <?php echo WPOA::PLUGIN_VERSION; ?></strong></span><br/>by <a href="http://glassocean.net" target="_blank"><strong>Perry Butler</strong></a></p>
 				<p>Rate it 5 stars: <a id="wpoa-rate-5stars" href="https://wordpress.org/support/view/plugin-reviews/wp-oauth?rate=5" target="_blank"><img src="http://ps.w.org/wp-oauth/assets/5stars.png" style="vertical-align:text-top;"></img></a></p>
-				<nav><ul><li><a href="mailto:perry@glassocean.net">Contact me</a></li><li><a href="http://glassocean.net" target="_blank">Visit my website</a></li><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
+				<nav><ul><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
 			</div>
 		</div>
 		<div id="" class="wpoa-settings-section">
@@ -42,7 +38,7 @@
 		<div id="" class="wpoa-settings-section">
 			<h3 id="bookmark-login-page-form-customization">Live Demo</h3>
 			<div class='form-padding'>
-				<p>A live demo is available at <a href="http://choiceschances.com">choiceschances.com</a>.</p>
+				<p>A live demo is available at <a href="http://choiceschances.com" target="_blank">choiceschances.com</a>.</p>
 			</div>
 		</div>
 		<div id="" class="wpoa-settings-section">
