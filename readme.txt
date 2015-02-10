@@ -3,8 +3,8 @@ Contributors: hectavex
 Donate link: http://glassocean.net
 Tags: login, membership, users, registration, oauth, social, social networking, community, security, connect with, authentication, authorization
 Requires at least: 4.0
-Tested up to: 4.0.1
-Stable tag: 0.3
+Tested up to: 4.1
+Stable tag: 0.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -133,6 +133,15 @@ The latter two technologies are for enterprise-scale apps and environments where
 3. The Login page can easily be customized.
 
 == Changelog ==
+
+= 0.3.1 =
+= Fixes =
+* The wp_login action now properly passes the $user for improved compatibility with other plugins such as Simple History.
+
+= 0.3 =
+= Fixes =
+* Now uses site_url instead of SERVER_NAME which should reflect a more accurate redirect_url.
+* Settings page improvements.
 
 = 0.2.2 =
 = New features / enhancements =
