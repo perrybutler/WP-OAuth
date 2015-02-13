@@ -14,6 +14,8 @@ Allows users to login or register by authenticating with an existing Google, Fac
 
 New providers and features are being added regularly! See the [Changelog](https://wordpress.org/plugins/wp-oauth/changelog/) for details.
 
+As a reminder, WP-OAuth is a still a pre-v1.0 release, which means some features may not work as intended or might change over time. Please report any bugs/issues to the support forum so they can be fixed as soon as possible. Thank you!
+
 = Demo =
 
 A live demo of WP-OAuth is available at [www.choiceschances.com](http://www.choiceschances.com). You may try the Login at the top right, or try the customized WordPress login page [here](http://www.choiceschances.com/wp-login.php). Choices & Chances is a choose-your-own-adventure platform currently undergoing development and public beta testing.

@@ -713,7 +713,6 @@
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Instagram section -->
 
-			<?php /* EXCLUDED WIP:
 			<!-- START Login with Battle.net section -->
 			<div class="wpoa-settings-section">
 			<h3 id="bookmark-login-with-battlenet">Login with Battle.net</h3>
@@ -727,14 +726,14 @@
 				</tr>
 				
 				<tr valign='top'>
-				<th scope='row'>Client ID:</th>
+				<th scope='row'>Key:</th>
 				<td>
 					<input type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
 				</td>
 				</tr>
 				 
 				<tr valign='top'>
-				<th scope='row'>Client Secret:</th>
+				<th scope='row'>Secret:</th>
 				<td>
 					<input type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
 				</td>
@@ -744,23 +743,22 @@
 			<p>
 				<strong>Instructions:</strong>
 				<ol>
-					<li>NOTE: Instagram's developer signup requires a valid cell phone number.</li>
-					<li>At Instagram, register as an <a href='http://instagram.com/developer/authentication/' target="_blank">Instagram Developer</a>.</li>
-					<li>At Instagram, after signing up/in, click <a href='http://instagram.com/developer/clients/manage/'>Manage Clients</a>.</li>
-					<li>At Instagram, click <a href="http://instagram.com/developer/clients/register/">Register a New Client</a>. This will enable your site to access the Instagram API.</li>
-					<li>At Instagram, provide your site's homepage URL (<?php echo $blog_url; ?>) for the <em>OAuth redirect_uri</em>. Don't forget the trailing slash!</li>
-					<li>At Instagram, copy the <em>Client ID/Client Secret</em> provided by Instagram and paste them into the fields above, then click the Save all settings button.</li>
+					<li>Visit the <a href='http://dev.battle.net/' target="_blank">Battle.net API</a> home page and <a href='https://dev.battle.net/member/register' target="_blank">Create a Mashery Account</a>.
+					<li>After creating your account and signing in, visit the <a href='https://dev.battle.net/apps/myapps'>My Applications</a> page.</li>
+					<li><a href="https://dev.battle.net/apps/register">Create a New Application</a> and fill out the details.</li>
+					<li>Provide your site URL (<?php echo site_url('', 'https'); ?>) for the <em>Register Callback URL</em>. Don't forget the trailing slash!</li>
+					<li>After registering the application, locate the <em>Key/Secret</em> provided by Battle.net and paste them into the fields above, then click the Save all settings button.</li>
 				</ol>
 				<strong>References:</strong>
 				<ul>
-					<li><a href='https://dev.battle.net/docs/read/oauth'>Battle.net OAuth Reference</a></li>
+					<li><a href='https://dev.battle.net/docs/read/oauth' target='_blank'>Battle.net OAuth Reference</a></li>
+					<li><a href='https://dev.battle.net/apps/tos' target='_blank'>Battle.net API Terms of Service</a></li>
 				</ul>
 			</p>
 			<?php submit_button('Save all settings'); ?>
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Battle.net section -->
-			*/ ?>
 			
 			<!-- START Back Channel Configuration section -->
 			<div class="wpoa-settings-section">
