@@ -4,7 +4,7 @@ Donate link: http://glassocean.net
 Tags: login, membership, users, registration, oauth, social, social networking, community, security, connect with, authentication, authorization
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 0.3.1
+Stable tag: 0.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -135,6 +135,10 @@ The latter two technologies are for enterprise-scale apps and environments where
 3. The Login page can easily be customized.
 
 == Changelog ==
+
+= 0.4 =
+= New features / enhancements =
+* Added basic Battle.net support.
 
 = 0.3.1 =
 = Fixes =
