@@ -33,17 +33,17 @@ jQuery(document).ready(function() {
 		// handle help tip buttons:
 		jQuery(".tip-button").click(function(e) {
 			e.preventDefault();
-			console.log(jQuery(this).parents("tr").find(".tip-message").get(0));
-			jQuery(this).parents("tr").find(".tip-message").fadeToggle();
+			jQuery(this).parents(".has-tip").find(".tip-message").fadeToggle();
 		});
 		
 		// automatically show warning tips when the user enters a sensitive form field:
 		jQuery(".wpoa-settings input, .wpoa-settings select").focus(function(e) {
-			var tip_warning = jQuery(this).parents("tr").find(".tip-warning, .tip-info");
+			e.preventDefault();
+			var tip_warning = jQuery(this).parents(".has-tip").find(".tip-warning, .tip-info");
 			//var tip_info = jQuery(this).parents("tr").find(".tip-info");
 			if (tip_warning.length > 0) {
 				tip_warning.fadeIn();
-				jQuery(this).parents("tr").find(".tip-message").fadeIn();
+				jQuery(this).parents(".has-tip").find(".tip-message").fadeIn();
 			}
 		});
 		
@@ -269,6 +269,14 @@ jQuery(document).ready(function() {
 			e.preventDefault();
 			wp_media_dialog_field = jQuery('#wpoa_bg_image');
 			wpoa.selectMedia();
+		});
+		
+		jQuery("#wpoa-paypal-button").hover(
+		function() {
+			jQuery("#wpoa-heart").css("opacity", "1");
+		},
+		function() {
+			jQuery("#wpoa-heart").css("opacity", "0");
 		});
 		
 		// END of Settings Page functionality

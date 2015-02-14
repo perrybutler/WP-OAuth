@@ -138,16 +138,21 @@ The latter two technologies are for enterprise-scale apps and environments where
 
 = 0.4 =
 = New features / enhancements =
-* Added basic Battle.net support.
+* Added basic Battle.net support. Requires SSL.
+* Now compatible with CloudFlare Flexible SSL.
+* Settings page improvements.
 
 = 0.3.1 =
 = Fixes =
 * The wp_login action now properly passes the $user for improved compatibility with other plugins such as Simple History.
 
 = 0.3 =
+= New features / enhancements =
+* Settings page improvements.
+
 = Fixes =
 * Now uses site_url instead of SERVER_NAME which should reflect a more accurate redirect_url.
-* Settings page improvements.
+* Now compatible with Heroku cloud hosting.
 
 = 0.2.2 =
 = New features / enhancements =

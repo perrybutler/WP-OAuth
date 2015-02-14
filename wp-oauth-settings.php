@@ -1,3 +1,58 @@
+<?php
+	// config check security
+	function wpoa_cc_security() {
+		$points = 0;
+		if (strpos(site_url(), "https://")) {
+			$points += 2;
+		}
+		if (get_option('wpoa_hide_wordpress_login_form') == 1) {
+			$points += 1;
+		}
+		if (get_option('wpoa_logout_inactive_users') > 0) {
+			$points += 1;
+		}
+		if (get_option('wpoa_http_util_verify_ssl') == 1) {
+			$points += 1;
+		}
+		if (get_option('wpoa_http_util') == 'curl') {
+			$points += 1;
+		}
+		$points_max = 6;
+		return floor(($points / $points_max) * 100);
+	}
+	
+	// config check privacy
+	function wpoa_cc_privacy() {
+		$points = 0;
+		if (get_option('wpoa_logout_inactive_users') > 0) {
+			$points += 1;
+		}
+		// TODO: +1 for NOT using email address matching
+		$points_max = 1;
+		return floor(($points / $points_max) * 100);
+	}
+	
+	// config check user experience
+	function wpoa_cc_ux() {
+		$points = 0;
+		if (get_option('wpoa_logo_links_to_site') == 1) {
+			$points += 1;
+		}
+		if (get_option('wpoa_show_login_messages') == 1) {
+			$points += 1;
+		}
+		$points_max = 2;
+		return floor(($points / $points_max) * 100);
+	}
+	
+	// cache the config check ratings:
+	$cc_security = wpoa_cc_security();
+	$cc_privacy = wpoa_cc_privacy();
+	$cc_ux = wpoa_cc_ux();
+?>
+
+
+
 <div class='wrap wpoa-settings'>
 	<div id="wpoa-settings-meta">Toggle tips: <ul><li><a id="wpoa-settings-tips-on" href="#">On</a></li><li><a id="wpoa-settings-tips-off" href="#">Off</a></li></ul><div class="nav-splitter"></div>Toggle sections: <ul><li><a id="wpoa-settings-sections-on" href="#">On</a></li><li><a id="wpoa-settings-sections-off" href="#">Off</a></li></ul></div>
 	<h2>WP-OAuth Settings</h2>
@@ -8,8 +63,8 @@
 	<div id="wpoa-settings-body">
 	<!-- START Settings Column 2 -->
 	<div id="wpoa-settings-col2" class="wpoa-settings-column">
-		<div id="" class="wpoa-settings-section">
-			<h3 id="bookmark-login-page-form-customization">About</h3>
+		<div id="wpoa-settings-section-about" class="wpoa-settings-section">
+			<h3>About</h3>
 			<div class='form-padding'>
 				<div id="wpoa-logo" style="width:64px; height:64px; float:right; background-size:100% 100%;"></div>
 				<p><span style="font-size:1.1em;"><strong>WP-OAuth <?php echo WPOA::PLUGIN_VERSION; ?></strong></span><br/>by <a href="http://glassocean.net" target="_blank"><strong>Perry Butler</strong></a></p>
@@ -17,9 +72,71 @@
 				<nav><ul><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
 			</div>
 		</div>
-		<div id="" class="wpoa-settings-section">
-			<h3 id="bookmark-login-page-form-customization">Donate</h3>
+		<div id="wpoa-settings-section-news" class="wpoa-settings-section">
+			<h3>News</h3>
 			<div class='form-padding'>
+				<?php 
+				$rss = fetch_feed("http://glassocean.net/tag/wp-oauth/feed/");
+				if (!is_wp_error($rss)) {
+					$maxitems = $rss->get_item_quantity(5); 
+					$rss_items = $rss->get_items(0, $maxitems);
+				}
+				?>
+				<?php if ($maxitems == 0) : ?>
+					<p><?php _e("Sorry, news was inaccessible or does not exist.", 'my-text-domain' ); ?></p>
+				<?php else : ?>
+				<ul>
+					<?php foreach ($rss_items as $item) : ?>
+						<li>
+							<a href="<?php echo esc_url($item->get_permalink()); ?>"
+								title="<?php printf( __('Posted %s', 'my-text-domain'), $item->get_date('j F Y | g:i a') ); ?>"
+								target="_blank">
+								<?php echo esc_html($item->get_title()); ?>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+				<?php endif; ?>
+			</div>
+		</div>
+		<div id="wpoa-settings-section-config-check" class="wpoa-settings-section">
+		<h3>Config Check</h3>
+			<div class='form-padding'>
+				<p>These ratings are an estimate of <em>this plugin's current configuration</em> when compared to an optimum configuration.</p>
+				<div id='wpoa-measurements'>
+					<div class="has-tip">
+						<div class="wpoa-measurement-label">Security: <?php echo $cc_security; ?>% <a href="#" class="tip-button">[?]</a></div>
+						<div class="wpoa-measurement"><div class="wpoa-measurement-rating" style="width:<?php echo $cc_security; ?>%;"></div></div>
+						<p class="tip-message">
+							+2 if site is secured with an SSL certificate<br/>
+							+1 if Verify Peer/Host SSL Certificates = True<br/>
+							+1 if Hide the WordPress login form = True<br/>
+							+1 if Automatically logout inactive users = True<br/>
+							+1 if HTTP Utility = cURL<br/>
+						</p>
+					</div>
+					<div class="has-tip">
+						<div class="wpoa-measurement-label">Privacy: <?php echo $cc_privacy; ?>% <a href="#" class="tip-button">[?]</a></div>
+						<div class="wpoa-measurement"><div class="wpoa-measurement-rating" style="width:<?php echo $cc_privacy; ?>%;"></div></div>
+						<p class="tip-message">
+							+1 if Automatically logout inactive users = True<br/>
+						</p>
+					</div>
+					<div class="has-tip">
+						<div class="wpoa-measurement-label">User Experience: <?php echo $cc_ux; ?>% <a href="#" class="tip-button">[?]</a></div>
+						<div class="wpoa-measurement"><div class="wpoa-measurement-rating" style="width:<?php echo $cc_ux; ?>%;"></div></div>
+						<p class="tip-message">
+							+1 if Logo links to site = True<br/>
+							+1 if Show login messages = True<br/>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="wpoa-settings-section-donate" class="wpoa-settings-section">
+			<h3>Donate</h3>
+			<div class='form-padding'>
+				<div id="wpoa-heart"></div>
 				<p>Do you enjoy using this plugin? Do you want to help improve it? Consider donating via <strong>PayPal</strong>!</p><p>WP-OAuth remains free of restrictions, advertisements, branding, etc. <em>Your donations help make this possible.</em></p>
 				<form action="https://www.paypal.com/cgi-bin/webscr" target="_blank" method="post">
 					$ <input type="text" style="width: 50px" name="amount" value="5">
@@ -35,13 +152,13 @@
 				</form>
 			</div>
 		</div>
-		<div id="" class="wpoa-settings-section">
-			<h3 id="bookmark-login-page-form-customization">Live Demo</h3>
+		<div id="wpoa-settings-section-live-demo" class="wpoa-settings-section">
+			<h3 id="bookmark-live-demo">Live Demo</h3>
 			<div class='form-padding'>
 				<p>A live demo is available at <a href="http://choiceschances.com" target="_blank">choiceschances.com</a>.</p>
 			</div>
 		</div>
-		<div id="" class="wpoa-settings-section">
+		<div id="wpoa-settings-section-support" class="wpoa-settings-section">
 			<h3 id="bookmark-login-page-form-customization">Support</h3>
 			<div class='form-padding'>
 				<p>Your general questions can be asked in the plugin <a href="https://wordpress.org/support/plugin/wp-oauth" target="_blank">support forum</a>.</p>
@@ -55,11 +172,11 @@
 			<?php settings_fields('wpoa_settings'); ?>
 			<?php do_settings_sections('wpoa_settings'); ?>
 			<!-- START General Settings section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-general-settings">General Settings</h3>
+			<div id="wpoa-settings-section-general-settings" class="wpoa-settings-section">
+			<h3>General Settings</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
-				<tr valign='top'>
+				<tr valign='top' class='has-tip' class="has-tip">
 				<th scope='row'>Show login messages: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_show_login_messages' value='1' <?php checked(get_option('wpoa_show_login_messages') == 1); ?> />
@@ -67,7 +184,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Login redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_login_redirect'>
@@ -84,7 +201,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logout redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_logout_redirect'>
@@ -102,7 +219,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Automatically logout inactive users: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_logout_inactive_users'>
@@ -126,8 +243,8 @@
 			<!-- END General Settings section -->
 			
 			<!-- START Login Page & Form Customization section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-page-form-customization">Login Forms</h3>
+			<div id="wpoa-settings-section-login-forms" class="wpoa-settings-section">
+			<h3>Login Forms</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				
@@ -137,7 +254,7 @@
 				</th>
 				</td>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Hide the WordPress login form: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_hide_wordpress_login_form' value='1' <?php checked(get_option('wpoa_hide_wordpress_login_form') == 1); ?> />
@@ -146,7 +263,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logo links to site: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_logo_links_to_site' value='1' <?php checked(get_option('wpoa_logo_links_to_site') == 1); ?> />
@@ -154,7 +271,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logo image: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<p>
@@ -165,7 +282,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Background image: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<p>
@@ -182,7 +299,7 @@
 				</th>
 				</td>
 			
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show on the login screen: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<?php echo WPOA::wpoa_login_form_designs_selector('wpoa-login-form-show-login-screen'); ?>
@@ -190,7 +307,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show on the user's profile page: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<?php echo WPOA::wpoa_login_form_designs_selector('wpoa-login-form-show-profile-page'); ?>
@@ -198,7 +315,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show in the comments section: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<?php echo WPOA::wpoa_login_form_designs_selector('wpoa-login-form-show-comments-section'); ?>
@@ -212,12 +329,12 @@
 			<!-- END Login Page & Form Customization section -->
 
 			<!-- START Custom Login Form Designs section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-buttons-customization">Custom Login Form Designs</h3>
+			<div id="wpoa-settings-section-custom-login-form-designs" class="wpoa-settings-section">
+			<h3>Custom Login Form Designs</h3>
 			<div class='form-padding'>
 			<p>You may create multiple login form <strong><em>designs</em></strong> and use them throughout your site. A design is essentially a re-usable <em>shortcode preset</em>. Instead of writing out the login form shortcode ad-hoc each time you want to use it, you can build a design here, save it, and then specify that design in the shortcode's <em>design</em> attribute. For example: <pre><code>[wpoa_login_form design='CustomDesign1']</code></pre></p>
 			<table class='form-table'>
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Design: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<?php echo WPOA::wpoa_login_form_designs_selector('wpoa-login-form-design', true); ?>
@@ -239,7 +356,7 @@
 				</th>
 				</td>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Design name: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa-login-form-design-name' type='text' size='36' name='wpoa_login_form_design_name' value="" />
@@ -247,7 +364,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Icon set: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_login_form_icon_set'>
@@ -258,7 +375,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Show login buttons: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_login_form_show_login'>
@@ -270,7 +387,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Show logout button: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_login_form_show_logout'>
@@ -282,7 +399,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Layout: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_login_form_layout'>
@@ -295,7 +412,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Login button prefix: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa_login_form_button_prefix' type='text' size='36' name='wpoa_login_form_button_prefix' value="" />
@@ -303,7 +420,7 @@
 				</td>
 				</tr>
 			
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logged out title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa_login_form_logged_out_title' type='text' size='36' name='wpoa_login_form_logged_out_title' value="" />
@@ -311,7 +428,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logged in title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa_login_form_logged_in_title' type='text' size='36' name='wpoa_login_form_logged_in_title' value="" />
@@ -319,7 +436,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logging in title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa_login_form_logging_in_title' type='text' size='36' name='wpoa_login_form_logging_in_title' value="" />
@@ -327,7 +444,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Logging out title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input id='wpoa_login_form_logging_out_title' type='text' size='36' name='wpoa_login_form_logging_out_title' value="" />
@@ -351,11 +468,11 @@
 			<!-- END Login Buttons section -->
 			
 			<!-- START User Registration section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-user-registration">User Registration</h3>
+			<div id="wpoa-settings-section-user-registration" class="wpoa-settings-section">
+			<h3>User Registration</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Suppress default welcome email: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_suppress_welcome_email' value='1' <?php checked(get_option('wpoa_suppress_welcome_email') == 1); ?> />
@@ -363,7 +480,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Assign new users to the following role: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name="wpoa_new_user_role"><?php wp_dropdown_roles(get_option('wpoa_new_user_role')); ?></select>
@@ -377,8 +494,8 @@
 			<!-- END User Registration section -->
 			
 			<!-- START Login with Google section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-google">Login with Google</h3>
+			<div id="wpoa-settings-section-login-with-google" class="wpoa-settings-section">
+			<h3>Login with Google</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -418,8 +535,8 @@
 			<!-- END Login with Google section -->
 			
 			<!-- START Login with Facebook section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-facebook">Login with Facebook</h3>
+			<div id="wpoa-settings-section-login-with-facebook" class="wpoa-settings-section">
+			<h3>Login with Facebook</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -458,8 +575,8 @@
 			<!-- END Login with Facebook section -->
 			
 			<!-- START Login with LinkedIn section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-linkedin">Login with LinkedIn</h3>
+			<div id="wpoa-settings-section-login-with-linkedin" class="wpoa-settings-section">
+			<h3>Login with LinkedIn</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -498,8 +615,8 @@
 			<!-- END Login with LinkedIn section -->
 			
 			<!-- START Login with Github section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-github">Login with Github</h3>
+			<div id="wpoa-settings-section-login-with-github" class="wpoa-settings-section">
+			<h3>Login with Github</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -538,8 +655,8 @@
 			<!-- END Login with Github section -->
 			
 			<!-- START Login with Reddit section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-reddit">Login with Reddit</h3>
+			<div id="wpoa-settings-section-login-with-reddit" class="wpoa-settings-section">
+			<h3>Login with Reddit</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -578,8 +695,8 @@
 			<!-- END Login with Reddit section -->
 			
 			<!-- START Login with Windows Live section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-windowslive">Login with Windows Live</h3>
+			<div id="wpoa-settings-section-login-with-windowslive" class="wpoa-settings-section">
+			<h3>Login with Windows Live</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -618,8 +735,8 @@
 			<!-- END Login with Windows Live section -->
 
 			<!-- START Login with PayPal section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-paypal">Login with PayPal</h3>
+			<div id="wpoa-settings-section-login-with-paypal" class="wpoa-settings-section">
+			<h3>Login with PayPal</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -668,8 +785,8 @@
 			<!-- END Login with PayPal section -->
 
 			<!-- START Login with Instagram section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-instagram">Login with Instagram</h3>
+			<div id="wpoa-settings-section-login-with-instagram" class="wpoa-settings-section">
+			<h3>Login with Instagram</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -714,8 +831,8 @@
 			<!-- END Login with Instagram section -->
 
 			<!-- START Login with Battle.net section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-login-with-battlenet">Login with Battle.net</h3>
+			<div id="wpoa-settings-section-login-with-battlenet" class="wpoa-settings-section">
+			<h3>Login with Battle.net</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top'>
@@ -743,10 +860,11 @@
 			<p>
 				<strong>Instructions:</strong>
 				<ol>
+					<li>NOTE: Battle.net API <em>requires</em> your site to be secured with an SSL certificate; the site URL should start with <u>https://</u>.</li>
 					<li>Visit the <a href='http://dev.battle.net/' target="_blank">Battle.net API</a> home page and <a href='https://dev.battle.net/member/register' target="_blank">Create a Mashery Account</a>.
 					<li>After creating your account and signing in, visit the <a href='https://dev.battle.net/apps/myapps'>My Applications</a> page.</li>
 					<li><a href="https://dev.battle.net/apps/register">Create a New Application</a> and fill out the details.</li>
-					<li>Provide your site URL (<?php echo site_url('', 'https'); ?>) for the <em>Register Callback URL</em>. Don't forget the trailing slash!</li>
+					<li>Provide your site URL (<?php echo site_url('', 'https'); ?>/) for the <em>Register Callback URL</em>. Don't forget the trailing slash!</li>
 					<li>After registering the application, locate the <em>Key/Secret</em> provided by Battle.net and paste them into the fields above, then click the Save all settings button.</li>
 				</ol>
 				<strong>References:</strong>
@@ -761,12 +879,12 @@
 			<!-- END Login with Battle.net section -->
 			
 			<!-- START Back Channel Configuration section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-back-channel-configuration">Back Channel Configuration</h3>
+			<div id="wpoa-settings-section-back-channel=configuration" class="wpoa-settings-section">
+			<h3>Back Channel Configuration</h3>
 			<div class='form-padding'>
 			<p>These settings are for troubleshooting and/or fine tuning the back channel communication this plugin utilizes between your server and the third-party providers.</p>
 			<table class='form-table'>
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_http_util'>
@@ -777,7 +895,7 @@
 				</td>
 				</tr>
 				
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Verify Peer/Host SSL Certificates: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_http_util_verify_ssl' value='1' <?php checked(get_option('wpoa_http_util_verify_ssl') == 1); ?> />
@@ -792,11 +910,11 @@
 			<!-- END Back Channel Configuration section -->
 			
 			<!-- START Maintenance & Troubleshooting section -->
-			<div class="wpoa-settings-section">
-			<h3 id="bookmark-maintenance-troubleshooting">Maintenance & Troubleshooting</h3>
+			<div id="wpoa-settings-section-maintenance-troubleshooting" class="wpoa-settings-section">
+			<h3>Maintenance & Troubleshooting</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Restore default settings: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_restore_default_settings' value='1' <?php checked(get_option('wpoa_restore_default_settings') == 1); ?> />
@@ -804,7 +922,7 @@
 					<p class="tip-message tip-warning"><strong>Warning:</strong> This will restore the default settings, erasing any API keys/secrets that you may have entered above.</p>
 				</td>
 				</tr>		
-				<tr valign='top'>
+				<tr valign='top' class="has-tip">
 				<th scope='row'>Delete settings on uninstall: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<input type='checkbox' name='wpoa_delete_settings_on_uninstall' value='1' <?php checked(get_option('wpoa_delete_settings_on_uninstall') == 1); ?> />

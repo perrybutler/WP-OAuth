@@ -10,6 +10,10 @@ body.wpoa-lightbox-visible {overflow:hidden;}
 
 /*  SETTINGS PAGE
 =================*/
+#wpoa-measurements {margin-bottom:5px;}
+.wpoa-measurement {background:#ccc; border-radius:5px;}
+.wpoa-measurement-label {margin-top:1em; margin-bottom:0.25em;}
+.wpoa-measurement-rating {padding:3px; background:#2EA2CC; border-radius:5px; -webkit-transition:all 1s ease;}
 
 #wpoa_login_redirect_page {display:none;}
 #wpoa_logout_redirect_page {display:none;}
@@ -61,7 +65,7 @@ body.wpoa-lightbox-visible {overflow:hidden;}
 .wpoa-settings div {box-sizing:border-box;}
 .wpoa-settings .submit {padding:0;}
 .wpoa-settings .form-table {margin-top:0;}
-.wpoa-settings .form-padding {padding:0 1em 1em 1em;}
+.wpoa-settings .form-padding {padding:0 1em 1em 1em; position:relative; z-index:1;}
 .wpoa-settings ul {list-style:inherit; margin-left:2em;}
 .wpoa-settings h3 {margin:0; cursor:pointer; color:#999; padding:0.5em; font-style:italic; text-transform:uppercase; border-bottom:1px solid #eee; font-size:1.5em; -webkit-transition:all 0.5s ease;}
 .wpoa-settings h3:hover {color:#000;}
@@ -75,6 +79,7 @@ body.wpoa-lightbox-visible {overflow:hidden;}
 .wpoa-settings select {min-width:150px;}
 .wpoa-settings .tip-button {text-decoration:none; opacity:0; transition:all 0.5s ease;}
 .wpoa-settings tr:hover .tip-button {opacity:1;}
+.wpoa-settings .has-tip:hover .tip-button {opacity:1;}
 .wpoa-settings .form-table td {vertical-align:top;}
 .wpoa-settings .form-table th {padding-top:1em; padding-bottom:0.25em;}
 .wpoa-settings .form-table th .heading {}
@@ -84,6 +89,55 @@ body.wpoa-lightbox-visible {overflow:hidden;}
 .wpoa-settings .tip-message.tip-info {padding:1em; background:#ddeeff; color:#000;}
 
 .wpoa-settings .validation-warning {font-size:0.8em; padding:1em; background:#ff0000; color:#fff;}
+
+/* inspired by a css-tricks article: */
+#wpoa-heart {
+	position:absolute;
+	left:0;
+	margin-left:50%;
+	-webkit-transform:translate(-50%,-50%);
+	width:100px;
+	height:90px;
+	top:40%;
+	opacity:0;
+	-webkit-transition:all 5s ease;
+	z-index:-1;
+}
+#wpoa-heart:before,
+#wpoa-heart:after {
+    position: absolute;
+    content: "";
+    left: 50px;
+    top: 0;
+    width: 50px;
+    height: 80px;
+    background: red;
+    -moz-border-radius: 50px 50px 0 0;
+    border-radius: 50px 50px 0 0;
+    -webkit-transform: rotate(-45deg);
+       -moz-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+         -o-transform: rotate(-45deg);
+            transform: rotate(-45deg);
+    -webkit-transform-origin: 0 100%;
+       -moz-transform-origin: 0 100%;
+        -ms-transform-origin: 0 100%;
+         -o-transform-origin: 0 100%;
+            transform-origin: 0 100%;
+}
+#wpoa-heart:after {
+    left: 0;
+    -webkit-transform: rotate(45deg);
+       -moz-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+         -o-transform: rotate(45deg);
+            transform: rotate(45deg);
+    -webkit-transform-origin: 100% 100%;
+       -moz-transform-origin: 100% 100%;
+        -ms-transform-origin: 100% 100%;
+         -o-transform-origin: 100% 100%;
+            transform-origin :100% 100%;
+}
 
 /*  LOGIN FORM STYLES
 =====================*/
