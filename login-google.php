@@ -1,7 +1,15 @@
 <?php
 
 // start the user session for maintaining individual user states during the multi-stage authentication flow:
-session_start();
+if ( version_compare(phpversion(), '5.4.0', '>=') ) {
+	if (session_status() == PHP_SESSION_NONE) {
+	    session_start();
+	}
+} else {
+	if(session_id() == '') {
+	    session_start();
+	}
+}
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 $_SESSION['WPOA']['PROVIDER'] = 'Google';
@@ -17,9 +25,9 @@ define('URL_USER', "https://www.googleapis.com/plus/v1/people/me?");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
-if (!$_SESSION['WPOA']['LAST_URL']) {
+if (empty($_SESSION['WPOA']['LAST_URL']) || !$_SESSION['WPOA']['LAST_URL']) {
 	// try to obtain the redirect_url from the default login page:
-	$redirect_url = esc_url($_GET['redirect_to']);
+	$redirect_url = empty($_GET['redirect_to']) ? '' : esc_url($_GET['redirect_to']);
 	// if no redirect_url was found, set it to the user's last page:
 	if (!$redirect_url) {
 		$redirect_url = strtok($_SERVER['HTTP_REFERER'], "?");
@@ -180,6 +188,12 @@ function get_oauth_identity($wpoa) {
 			$result_obj = json_decode($result, true);
 			break;
 	}
+
+	if( !empty( $result_obj['error'] ) ){
+		$error_msg = empty($result_obj['error']['errors'][0]['message']) ? "Sorry, we couldn't log you in." : $result_obj['error']['errors'][0]['message'];
+		$wpoa->wpoa_end_login( $error_msg );
+	}
+
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
