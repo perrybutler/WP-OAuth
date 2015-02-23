@@ -9,7 +9,7 @@ define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_battlenet_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_battlenet_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_battlenet_api_secret'));
-define('REDIRECT_URI', rtrim(site_url('', 'https'), '/') . '/'); // PROVIDER SPECIFIC: Battle.net requires HTTPS
+define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', ''); // PROVIDER SPECIFIC: Battle.net states that an empty scope will give us the user account ID
 define('URL_AUTH', "https://us.battle.net/oauth/authorize?");
 define('URL_TOKEN', "https://us.battle.net/oauth/token?");
