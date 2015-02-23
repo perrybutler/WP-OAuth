@@ -11,7 +11,7 @@ define('CLIENT_ID', get_option('wpoa_github_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_github_api_secret'));
 define('RESTRICT_ORGANISATION', get_option('wpoa_github_api_organisation'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'user'); // PROVIDER SPECIFIC: "user" is the minimum scope required to get the user's id from Github
+define('SCOPE', ''); // PROVIDER SPECIFIC: Empty string gives us everything we need and is read only.
 define('URL_AUTH', "https://github.com/login/oauth/authorize?");
 define('URL_TOKEN', "https://github.com/login/oauth/access_token?");
 define('URL_USER', "https://api.github.com/user?");
@@ -210,6 +210,11 @@ function get_oauth_identity($wpoa) {
 		if(!$has_membership){
 			$wpoa->wpoa_end_login("Sorry, you need to be a member of the <a href='https://github.com/".RESTRICT_ORGANISATION."' target='_blank'>".RESTRICT_ORGANISATION."</a> GitHub organisation to log into this site.");
 		}
+	}
+
+	// Check that we have the user ID
+	if(!isset($result_obj['id']) or strlen($result_obj['id']) == 0){
+		$wpoa->wpoa_end_login("Error - could not find the user ID from GitHub.");
 	}
 
 	// parse and return the user's oauth identity:
