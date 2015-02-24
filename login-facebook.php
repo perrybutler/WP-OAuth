@@ -10,7 +10,11 @@ define('CLIENT_ENABLED', get_option('wpoa_facebook_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_facebook_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_facebook_api_secret'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'email'); // PROVIDER SPECIFIC: 'email' is the minimum scope required to get the user's id from Facebook
+
+// PROVIDER SPECIFIC: 'email' is the minimum scope required to get the user's id from Facebook
+// but we also get other infos in order to fill as many infos on profile as possible
+define('SCOPE', 'email,public_profile,user_hometown,user_location,user_website');
+
 define('URL_AUTH', "https://www.facebook.com/dialog/oauth?");
 define('URL_TOKEN', "https://graph.facebook.com/oauth/access_token?");
 define('URL_USER', "https://graph.facebook.com/me?");
@@ -118,6 +122,7 @@ function get_oauth_token($wpoa) {
 			break;
 	}
 	// parse the result:
+
 	parse_str($result, $result_obj); // PROVIDER SPECIFIC: Facebook encodes the access token result as a querystring by default
 	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Facebook returns the access token KEEP THIS PROTECTED!
 	$expires_in = $result_obj['expires']; // PROVIDER SPECIFIC: this is how Facebook returns the access token's expiration
@@ -135,6 +140,9 @@ function get_oauth_token($wpoa) {
 	}
 }
 
+function oath_identity_fail( $wpoa ){
+	$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Could not retrieve user identity via stream context. Please notify the admin or try again later.");
+}
 function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
@@ -142,36 +150,18 @@ function get_oauth_identity($wpoa) {
 		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access token is passed to Facebook using this key name
 	);
 	$url_params = http_build_query($params);
+
 	// perform the http request:
-	switch (strtolower(HTTP_UTIL)) {
-		case 'curl':
-			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
-			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
-			//curl_setopt($curl, CURLOPT_HTTPHEADER, array('x-li-format: json')); // PROVIDER SPECIFIC: I think this is only for LinkedIn...
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($curl);
-			$result_obj = json_decode($result, true);
-			break;
-		case 'stream-context':
-			$url = rtrim(URL_USER, "?");
-			$opts = array('http' =>
-				array(
-					'method'  => 'GET',
-					// PROVIDER NORMALIZATION: Reddit/Github User-Agent
-					'header'  => "Authorization: Bearer " . $_SESSION['WPOA']['ACCESS_TOKEN'] . "\r\n" . "x-li-format: json\r\n", // PROVIDER SPECIFIC: i think only LinkedIn uses x-li-format...
-				)
-			);
-			$context = $context  = stream_context_create($opts);
-			$result = @file_get_contents($url, false, $context);
-			if ($result === false) {
-				$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Could not retrieve user identity via stream context. Please notify the admin or try again later.");
-			}
-			$result_obj = json_decode($result, true);
-			break;
+	$remote_call = wp_remote_get( URL_USER . $url_params , $url_params );
+	if( is_wp_error( $remote_call ) ){
+		oath_identity_fail( $wpoa );
 	}
+	$result = wp_remote_retrieve_body( $remote_call );
+	if( is_wp_error( $result ) ){
+		oath_identity_fail( $wpoa );
+	}
+	$result_obj = json_decode($result, true);
+
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
