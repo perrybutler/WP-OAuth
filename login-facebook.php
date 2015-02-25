@@ -21,7 +21,7 @@ define('URL_USER', "https://graph.facebook.com/me?");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
-if (!$_SESSION['WPOA']['LAST_URL']) {$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");}
+if ( empty( $_SESSION['WPOA']['LAST_URL'] ) ) {$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");}
 
 # AUTHENTICATION FLOW #
 // the oauth 2.0 authentication flow will start in this script and make several calls to the third-party authentication provider which in turn will make callbacks to this script that we continue to handle until the login completes with a success or failure:
@@ -91,37 +91,18 @@ function get_oauth_token($wpoa) {
 		'redirect_uri' => REDIRECT_URI,
 	);
 	$url_params = http_build_query($params);
-	switch (strtolower(HTTP_UTIL)) {
-		case 'curl':
-			$url = URL_TOKEN . $url_params;
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_URL, $url);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
-			// PROVIDER NORMALIZATION: Reddit requires sending the client id/secret via http basic authentication
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
-			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
-			$result = curl_exec($curl);
-			break;
-		case 'stream-context':
-			$url = rtrim(URL_TOKEN, "?");
-			$opts = array('http' =>
-				array(
-					'method'  => 'POST',
-					'header'  => 'Content-type: application/x-www-form-urlencoded',
-					'content' => $url_params,
-				)
-			);
-			$context = $context  = stream_context_create($opts);
-			$result = @file_get_contents($url, false, $context);
-			if ($result === false) {
-				$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Could not retrieve access token via stream context. Please notify the admin or try again later.");
-			}
-			break;
+
+	$remote_call = wp_remote_get( URL_TOKEN . $url_params );
+
+	if( is_wp_error( $remote_call ) ){
+		oath_identity_fail( $wpoa );
 	}
-	// parse the result:
+
+	$result = wp_remote_retrieve_body( $remote_call );
+	if( is_wp_error( $result ) ){
+		oath_identity_fail( $wpoa );
+	}
+
 
 	parse_str($result, $result_obj); // PROVIDER SPECIFIC: Facebook encodes the access token result as a querystring by default
 	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Facebook returns the access token KEEP THIS PROTECTED!
@@ -152,7 +133,7 @@ function get_oauth_identity($wpoa) {
 	$url_params = http_build_query($params);
 
 	// perform the http request:
-	$remote_call = wp_remote_get( URL_USER . $url_params , $url_params );
+	$remote_call = wp_remote_get( URL_USER . $url_params );
 	if( is_wp_error( $remote_call ) ){
 		oath_identity_fail( $wpoa );
 	}
@@ -160,6 +141,8 @@ function get_oauth_identity($wpoa) {
 	if( is_wp_error( $result ) ){
 		oath_identity_fail( $wpoa );
 	}
+
+
 	$result_obj = json_decode($result, true);
 
 	// parse and return the user's oauth identity:
@@ -170,6 +153,8 @@ function get_oauth_identity($wpoa) {
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
+
+	$_SESSION['WPOA']['NEW_USER'] = $result_obj;
 	return $oauth_identity;
 }
 # END OF AUTHENTICATION FLOW HELPER FUNCTIONS #

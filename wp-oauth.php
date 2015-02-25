@@ -304,7 +304,7 @@ Class WPOA {
 			'hide_login_form' => get_option('wpoa_hide_wordpress_login_form'),
 			'logo_image' => get_option('wpoa_logo_image'),
 			'bg_image' => get_option('wpoa_bg_image'),
-			'login_message' => $_SESSION['WPOA']['RESULT'],
+			'login_message' => isset( $_SESSION['WPOA']['RESULT'] ) ? $_SESSION['WPOA']['RESULT'] : '',
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
 			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
 			'logged_in' => is_user_logged_in(),
@@ -689,8 +689,11 @@ Class WPOA {
 	function wpoa_login_buttons($icon_set, $button_prefix) {
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
-		$redirect_to = urlencode($_GET['redirect_to']);
-		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
+		$redirect_to = '';
+
+		if( isset( $_GET['redirect_to'] ) ){
+			$redirect_to = "&redirect_to=" . urlencode( $_GET['redirect_to'] );
+		}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
 		$atts = array(
