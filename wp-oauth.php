@@ -12,7 +12,7 @@ License: GPL2
 
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
 session_start();
-require_once( 'register.php' );
+require_once( 'WP_OauthRegister.php' );
 
 // plugin class:
 Class WPOA {
