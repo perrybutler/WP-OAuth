@@ -153,7 +153,6 @@ function get_oauth_identity($wpoa) {
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
-
 	$_SESSION['WPOA']['NEW_USER'] = $result_obj;
 	return $oauth_identity;
 }

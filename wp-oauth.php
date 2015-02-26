@@ -545,7 +545,7 @@ Class WPOA {
 	
 	// pushes login messages into the dom where they can be extracted by javascript:
 	function wpoa_push_login_messages() {
-		$result = $_SESSION['WPOA']['RESULT'];
+		$result = isset( $_SESSION['WPOA']['RESULT'] ) ? $_SESSION['WPOA']['RESULT'] : '';
 		$_SESSION['WPOA']['RESULT'] = '';
 		echo "<div id='wpoa-result'>" . $result . "</div>";
 	}
