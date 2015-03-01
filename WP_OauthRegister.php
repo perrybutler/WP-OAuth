@@ -12,6 +12,7 @@ class WP_OauthRegister {
   public function register()
   {
     if( $this->can_register() ){
+      $_SESSION["WPOA"]['IS_NEW_USER'] = false;
       $authData = $this->get_auth_data();
       $sessionAuth = isset( $_SESSION['WPOA']['NEW_USER'] ) ? $_SESSION['WPOA']['NEW_USER'] : '';
       $email = isset( $sessionAuth['email'] ) ? $sessionAuth['email'] : null;
@@ -156,6 +157,8 @@ class WP_OauthRegister {
       $_SESSION["WPOA"]["RESULT"] = $user_id->get_error_message();
       $this->redirect();
     }
+
+    $_SESSION["WPOA"]['IS_NEW_USER'] = true;
 
     return $user_id;
   }

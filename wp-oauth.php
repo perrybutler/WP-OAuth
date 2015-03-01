@@ -402,9 +402,15 @@ Class WPOA {
 			// there was a matching wordpress user account, log it in now:
 			$user_id = $matched_user->ID;
 			$user_login = $matched_user->user_login;
+
+			$user_can_login = apply_filters( 'wpoa/user_can_login', true, $user_id );
+
+			if( !$user_can_login ){ return; }
+
 			wp_set_current_user( $user_id, $user_login );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $user_login, $matched_user );
+			update_user_meta( $user_id, 'oauth_provider', $oauth_identity );
 			// after login, redirect to the user's last location
 			$this->wpoa_end_login("Logged in successfully!");
 		}
