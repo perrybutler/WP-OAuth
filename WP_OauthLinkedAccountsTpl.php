@@ -69,7 +69,18 @@ class WP_OauthLinkedAccountsTpl {
     $design = get_option('wpoa_login_form_show_profile_page');
     if ($design != "None") {
       // TODO: we need to use $settings defaults here, not hard-coded defaults...
-      echo $this->wpoa->wpoa_login_form_content($design, 'none', 'buttons-row', 'Link', 'left', 'always', 'never', 'Select a provider:', 'Select a provider:', 'Authenticating...', '');
+      echo $this->wpoa->wpoa_login_form_content(array(
+        "design" => $design,
+        "icon_set" => 'none',
+        "layout" => 'buttons-row',
+        "button_prefix" => 'Link',
+        "show_login" => 'always',
+        "show_logout" => 'never',
+        "logged_out_title__" => ( 'Select a provider:' ),
+        "logged_in_title__" => ( 'Select a provider:' ),
+        "logging_in_title__" => ( 'Authenticating...' ),
+        "logging_out_title" => ''
+      ));
     }
   }
 }
