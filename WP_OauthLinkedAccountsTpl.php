@@ -6,6 +6,7 @@ class WP_OauthLinkedAccountsTpl {
   function __construct( $wpoa, $query_result ) {
     $this->query_result = $query_result;
     $this->wpoa = $wpoa;
+    $_SESSION["WPOA"]["LINK_ACCOUNT_PAGE"] = htmlspecialchars( "//$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]", ENT_QUOTES, 'UTF-8' );
   }
 
   public function display() {

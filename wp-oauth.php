@@ -438,11 +438,21 @@ Class WPOA {
 	// ends the login request by clearing the login state and redirecting the user to the desired page:
 	function wpoa_end_login($msg) {
 		$last_url = $_SESSION["WPOA"]["LAST_URL"];
+
 		unset($_SESSION["WPOA"]["LAST_URL"]);
+
 		$_SESSION["WPOA"]["RESULT"] = $msg;
 		$this->wpoa_clear_login_state();
+
+		if( !empty( $_SESSION["WPOA"]["LINK_ACCOUNT_PAGE"] ) ){
+			wp_safe_redirect( $_SESSION["WPOA"]["LINK_ACCOUNT_PAGE"] );
+			unset($_SESSION["WPOA"]["LINK_ACCOUNT_PAGE"]);
+			die();
+		}
+
 		$redirect_method = get_option("wpoa_login_redirect");
 		$redirect_url = "";
+
 		switch ($redirect_method) {
 			case "home_page":
 				$redirect_url = site_url();
