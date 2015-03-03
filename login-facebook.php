@@ -102,7 +102,11 @@ function get_oauth_token($wpoa) {
 	if( is_wp_error( $result ) ){
 		oath_identity_fail( $wpoa );
 	}
+	$json_result = json_decode( $result );
 
+	if( isset( $json_result->error ) ){
+		wp_die( $json_result->error->message );
+	}
 
 	parse_str($result, $result_obj); // PROVIDER SPECIFIC: Facebook encodes the access token result as a querystring by default
 	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Facebook returns the access token KEEP THIS PROTECTED!
