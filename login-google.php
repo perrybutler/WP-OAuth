@@ -9,6 +9,7 @@ define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_google_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_google_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_google_api_secret'));
+define( 'CLIENT_HD', get_option('wpoa_google_api_hd') ); // PROVIDER SPECIFIC: limits access to google account using this domain
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', 'profile'); // PROVIDER SPECIFIC: 'profile' is the minimum scope required to get the user's id from Google
 define('URL_AUTH', "https://accounts.google.com/o/oauth2/auth?");
@@ -77,6 +78,7 @@ function get_oauth_code($wpoa) {
 	$params = array(
 		'response_type' => 'code',
 		'client_id' => CLIENT_ID,
+		'hd' => CLIENT_HD,
 		'scope' => SCOPE,
 		'state' => uniqid('', true),
 		'redirect_uri' => REDIRECT_URI,
