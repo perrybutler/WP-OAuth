@@ -31,6 +31,7 @@ Roadmap
 -------
 * Full compabitility with WordPress Multisite, BuddyPress, bbpress.
 * Icon sets for the login provider buttons.
+* Ability to acquire a registering user's third-party username / nickname / email address and auto-populate the WordPress user profile. Works as an alternative to the userXX naming pattern.
 * Advanced options for account merging.
 * Advanced options for account recovery.
 * More custom login forms, layouts and login screen customization options.
