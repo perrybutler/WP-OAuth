@@ -66,19 +66,42 @@ class WP_OauthRegister {
 
   protected function set_user_info( $user_info )
   {
-    $website = !empty( $user_info['website'] ) ? $user_info['website'] : '';
+    $existing_user = get_user_by( 'id', $this->user_id );
 
-    wp_update_user( array(
+    $updated_user =  array(
       "ID" => $this->user_id,
-      "user_nicename" => !empty( $user_info['name'] ) ? $user_info['name'] : '',
-      "nickname" => !empty( $user_info['name'] ) ? $user_info['name'] : '',
-      "user_url" => apply_filters( 'wpoa/user_url', $website ),
-      "user_email" => !empty( $user_info['email'] ) ? $user_info['email'] : '',
-      "display_name" => !empty( $user_info['name'] ) ? $user_info['name'] : '',
-      "first_name" => !empty( $user_info['first_name'] ) ? $user_info['first_name'] : '',
-      "last_name" => !empty( $user_info['last_name'] ) ? $user_info['last_name'] : '',
-    ) );
+    );
 
+    if( empty( $existing_user->user_email ) && !empty( $user_info['email'] ) ){
+      $updated_user["user_email"] = $user_info['email'];
+    }
+
+    if( empty( $existing_user->user_nicename ) && !empty( $user_info['name'] ) ){
+      $updated_user["user_nicename"] = $user_info['name'];
+    }
+
+    if( empty( $existing_user->nickname ) && !empty( $user_info['name'] ) ){
+      $updated_user["nickname"] = $user_info['name'];
+    }
+
+    if( empty( $existing_user->display_name ) && !empty( $user_info['name'] ) ){
+      $updated_user["display_name"] = $user_info['name'];
+    }
+
+    if( empty( $existing_user->first_name ) && !empty( $user_info['first_name'] ) ){
+      $updated_user["first_name"] = $user_info['first_name'];
+    }
+
+    if( empty( $existing_user->last_name ) && !empty( $user_info['last_name'] ) ){
+      $updated_user["last_name"] = $user_info['last_name'];
+    }
+
+    if( !empty( $user_info['website'] ) ){
+      $updated_user["user_url"] = apply_filters( 'wpoa/user_url', $user_info['website'] );
+    }
+
+    $updated_user = apply_filters( 'wpoa/before_set_user_info', $updated_user, $this->user_id, $user_info );
+    wp_update_user( $updated_user );
     do_action( 'wpoa/set_user_info', $this->user_id, $user_info );
   }
 
