@@ -64,7 +64,7 @@ class WP_OauthRegister {
   }
 
 
-  protected function set_user_info( $user_info )
+  public function set_user_info( $oauth_info )
   {
     $existing_user = get_user_by( 'id', $this->user_id );
 
@@ -72,37 +72,37 @@ class WP_OauthRegister {
       "ID" => $this->user_id,
     );
 
-    if( empty( $existing_user->user_email ) && !empty( $user_info['email'] ) ){
-      $updated_user["user_email"] = $user_info['email'];
+
+    if( empty( $existing_user->data->user_email ) && !empty( $oauth_info['email'] ) ){
+      $updated_user["user_email"] = $oauth_info['email'];
     }
 
-    if( empty( $existing_user->user_nicename ) && !empty( $user_info['name'] ) ){
-      $updated_user["user_nicename"] = $user_info['name'];
+    if( empty( $existing_user->data->user_nicename ) && !empty( $oauth_info['name'] ) ){
+      $updated_user["user_nicename"] = $oauth_info['name'];
+    }
+    if( empty( $existing_user->data->nickname ) && !empty( $oauth_info['name'] ) ){
+      $updated_user["nickname"] = $oauth_info['name'];
     }
 
-    if( empty( $existing_user->nickname ) && !empty( $user_info['name'] ) ){
-      $updated_user["nickname"] = $user_info['name'];
+    if( empty( $existing_user->data->display_name ) && !empty( $oauth_info['name'] ) ){
+      $updated_user["display_name"] = $oauth_info['name'];
     }
 
-    if( empty( $existing_user->display_name ) && !empty( $user_info['name'] ) ){
-      $updated_user["display_name"] = $user_info['name'];
+    if( empty( $existing_user->data->first_name ) && !empty( $oauth_info['first_name'] ) ){
+      $updated_user["first_name"] = $oauth_info['first_name'];
     }
 
-    if( empty( $existing_user->first_name ) && !empty( $user_info['first_name'] ) ){
-      $updated_user["first_name"] = $user_info['first_name'];
+    if( empty( $existing_user->data->last_name ) && !empty( $oauth_info['last_name'] ) ){
+      $updated_user["last_name"] = $oauth_info['last_name'];
     }
 
-    if( empty( $existing_user->last_name ) && !empty( $user_info['last_name'] ) ){
-      $updated_user["last_name"] = $user_info['last_name'];
+    if( !empty( $oauth_info['website'] ) ){
+      $updated_user["user_url"] = apply_filters( 'wpoa/user_url', $oauth_info['website'] );
     }
 
-    if( !empty( $user_info['website'] ) ){
-      $updated_user["user_url"] = apply_filters( 'wpoa/user_url', $user_info['website'] );
-    }
-
-    $updated_user = apply_filters( 'wpoa/before_set_user_info', $updated_user, $this->user_id, $user_info );
+    $updated_user = apply_filters( 'wpoa/before_set_user_info', $updated_user, $this->user_id, $oauth_info );
     wp_update_user( $updated_user );
-    do_action( 'wpoa/set_user_info', $this->user_id, $user_info );
+    do_action( 'wpoa/set_user_info', $this->user_id, $oauth_info );
   }
 
 
@@ -184,6 +184,11 @@ class WP_OauthRegister {
     $_SESSION["WPOA"]['IS_NEW_USER'] = true;
 
     return $user_id;
+  }
+
+  public function set_user_id( $id )
+  {
+    $this->user_id = $id;
   }
 
 

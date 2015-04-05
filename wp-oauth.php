@@ -532,6 +532,12 @@ Class WPOA {
 	// links a third-party account to an existing wordpress user account:
 	function wpoa_link_account($user_id) {
 		if ($_SESSION['WPOA']['USER_ID'] != '') {
+			if( isset( $_SESSION['WPOA']['NEW_USER'] ) ){
+				$oauthRegister = new WP_OauthRegister( $this );
+				$oauthRegister->set_user_id( $user_id );
+				$oauthRegister->set_user_info( $_SESSION['WPOA']['NEW_USER'] );
+			}
+
 			add_user_meta( $user_id, 'wpoa_identity', $_SESSION['WPOA']['PROVIDER'] . '|' . $_SESSION['WPOA']['USER_ID'] . '|' . time());
 		}
 	}
@@ -693,6 +699,9 @@ Class WPOA {
 
 	// gets the content to be used for displaying the login/logout form:
 	function wpoa_login_form_content( $options ) {
+		if( isset( $_GET['checkemail'] ) && $_GET['checkemail'] == 'registered' ){
+			return '';
+		}
 		$options = array_merge( $this->wpopa_login_form_defaults(), $options );
 
 		if ($options['design'] != '' && WPOA::wpoa_login_form_design_exists($options['design'])) { // TODO: remove first condition not needed
