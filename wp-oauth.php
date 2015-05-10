@@ -543,6 +543,9 @@ Class WPOA {
 	
 	// pushes login messages into the dom where they can be extracted by javascript:
 	function wpoa_push_login_messages() {
+		if( empty( $_SESSION['WPOA']['RESULT'] ) ){
+			return;
+		}
 		$result = $_SESSION['WPOA']['RESULT'];
 		$_SESSION['WPOA']['RESULT'] = '';
 		echo "<div id='wpoa-result'>" . $result . "</div>";
@@ -687,7 +690,7 @@ Class WPOA {
 	function wpoa_login_buttons($icon_set, $button_prefix) {
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
-		$redirect_to = urlencode($_GET['redirect_to']);
+		$redirect_to = empty($_GET['redirect_to']) ? '' : urlencode($_GET['redirect_to']);
 		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
@@ -711,7 +714,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
 		if ($html == '') {
-			$html .= 'Sorry, no login providers have been enabled.';
+			$html .= apply_filters('wpoa_login_no_providers','Sorry, no login providers have been enabled.');
 		}
 		return $html;
 	}
