@@ -11,7 +11,9 @@ License: GPL2
 */
 
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
-session_start();
+if (!isset($_SESSION)) {
+    session_start();
+}
 
 // plugin class:
 Class WPOA {
