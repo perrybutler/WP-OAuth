@@ -12,6 +12,7 @@ License: GPL2
 
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
 session_start();
+require_once( 'register.php' );
 
 // plugin class:
 Class WPOA {
@@ -420,7 +421,8 @@ Class WPOA {
 		// handle the logged out user or no matching user (register the user):
 		if ( !is_user_logged_in() && !$matched_user ) {
 			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
-			include 'register.php';
+			$oauthRegister = new WP_OauthRegister( $this );
+			$oauthRegister->register();
 		}
 		// we shouldn't be here, but just in case...
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
