@@ -187,13 +187,14 @@
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Login redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
+				<?php $login_redirect = get_option('wpoa_login_redirect'); ?>
 					<select name='wpoa_login_redirect'>
-						<option value='home_page' <?php selected(get_option('wpoa_login_redirect'), 'home_page'); ?>>Home Page</option>
-						<option value='last_page' <?php selected(get_option('wpoa_login_redirect'), 'last_page'); ?>>Last Page</option>
-						<option value='specific_page' <?php selected(get_option('wpoa_login_redirect'), 'specific_page'); ?>>Specific Page</option>
-						<option value='admin_dashboard' <?php selected(get_option('wpoa_login_redirect'), 'admin_dashboard'); ?>>Admin Dashboard</option>
-						<option value='user_profile' <?php selected(get_option('wpoa_login_redirect'), 'user_profile'); ?>>User's Profile Page</option>
-						<option value='custom_url' <?php selected(get_option('wpoa_login_redirect'), 'custom_url'); ?>>Custom URL</option>
+						<option value='home_page' <?php selected($login_redirect, 'home_page'); ?>>Home Page</option>
+						<option value='last_page' <?php selected($login_redirect, 'last_page'); ?>>Last Page</option>
+						<option value='specific_page' <?php selected($login_redirect, 'specific_page'); ?>>Specific Page</option>
+						<option value='admin_dashboard' <?php selected($login_redirect, 'admin_dashboard'); ?>>Admin Dashboard</option>
+						<option value='user_profile' <?php selected($login_redirect, 'user_profile'); ?>>User's Profile Page</option>
+						<option value='custom_url' <?php selected($login_redirect, 'custom_url'); ?>>Custom URL</option>
 					</select>
 					<?php wp_dropdown_pages(array("id" => "wpoa_login_redirect_page", "name" => "wpoa_login_redirect_page", "selected" => get_option('wpoa_login_redirect_page'))); ?>
 					<input type="text" name="wpoa_login_redirect_url" value="<?php echo get_option('wpoa_login_redirect_url'); ?>" style="display:none;" />
@@ -204,14 +205,15 @@
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logout redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
+					<?php $logout_redirect = get_option('wpoa_logout_redirect'); ?>
 					<select name='wpoa_logout_redirect'>
-						<option value='default_handling' <?php selected(get_option('wpoa_logout_redirect'), 'default_handling'); ?>>Let WordPress handle it</option>
-						<option value='home_page' <?php selected(get_option('wpoa_logout_redirect'), 'home_page'); ?>>Home Page</option>
-						<option value='last_page' <?php selected(get_option('wpoa_logout_redirect'), 'last_page'); ?>>Last Page</option>
-						<option value='specific_page' <?php selected(get_option('wpoa_logout_redirect'), 'specific_page'); ?>>Specific Page</option>
-						<option value='admin_dashboard' <?php selected(get_option('wpoa_logout_redirect'), 'admin_dashboard'); ?>>Admin Dashboard</option>
-						<option value='user_profile' <?php selected(get_option('wpoa_logout_redirect'), 'user_profile'); ?>>User's Profile Page</option>
-						<option value='custom_url' <?php selected(get_option('wpoa_logout_redirect'), 'custom_url'); ?>>Custom URL</option>
+						<option value='default_handling' <?php selected($logout_redirect, 'default_handling'); ?>>Let WordPress handle it</option>
+						<option value='home_page' <?php selected($logout_redirect, 'home_page'); ?>>Home Page</option>
+						<option value='last_page' <?php selected($logout_redirect, 'last_page'); ?>>Last Page</option>
+						<option value='specific_page' <?php selected($logout_redirect, 'specific_page'); ?>>Specific Page</option>
+						<option value='admin_dashboard' <?php selected($logout_redirect, 'admin_dashboard'); ?>>Admin Dashboard</option>
+						<option value='user_profile' <?php selected($logout_redirect, 'user_profile'); ?>>User's Profile Page</option>
+						<option value='custom_url' <?php selected($logout_redirect, 'custom_url'); ?>>Custom URL</option>
 					</select>
 					<?php wp_dropdown_pages(array("id" => "wpoa_logout_redirect_page", "name" => "wpoa_logout_redirect_page", "selected" => get_option('wpoa_logout_redirect_page'))); ?>
 					<input type="text" name="wpoa_logout_redirect_url" value="<?php echo get_option('wpoa_logout_redirect_url'); ?>" style="display:none;" />
@@ -222,15 +224,16 @@
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Automatically logout inactive users: <a href="#" class="tip-button">[?]</a></th>
 				<td>
+				<?php $autologout_interval = get_option('wpoa_logout_inactive_users'); ?>
 					<select name='wpoa_logout_inactive_users'>
-						<option value='0' <?php selected(get_option('wpoa_logout_inactive_users'), '0'); ?>>Never</option>
-						<option value='1' <?php selected(get_option('wpoa_logout_inactive_users'), '1'); ?>>After 1 minute</option>
-						<option value='5' <?php selected(get_option('wpoa_logout_inactive_users'), '5'); ?>>After 5 minutes</option>
-						<option value='15' <?php selected(get_option('wpoa_logout_inactive_users'), '15'); ?>>After 15 minutes</option>
-						<option value='30' <?php selected(get_option('wpoa_logout_inactive_users'), '30'); ?>>After 30 minutes</option>
-						<option value='60' <?php selected(get_option('wpoa_logout_inactive_users'), '60'); ?>>After 1 hour</option>
-						<option value='120' <?php selected(get_option('wpoa_logout_inactive_users'), '120'); ?>>After 2 hours</option>
-						<option value='240' <?php selected(get_option('wpoa_logout_inactive_users'), '240'); ?>>After 4 hours</option>
+						<option value='0' <?php selected($autologout_interval, '0'); ?>>Never</option>
+						<option value='1' <?php selected($autologout_interval, '1'); ?>>After 1 minute</option>
+						<option value='5' <?php selected($autologout_interval, '5'); ?>>After 5 minutes</option>
+						<option value='15' <?php selected($autologout_interval, '15'); ?>>After 15 minutes</option>
+						<option value='30' <?php selected($autologout_interval, '30'); ?>>After 30 minutes</option>
+						<option value='60' <?php selected($autologout_interval, '60'); ?>>After 1 hour</option>
+						<option value='120' <?php selected($autologout_interval, '120'); ?>>After 2 hours</option>
+						<option value='240' <?php selected($autologout_interval, '240'); ?>>After 4 hours</option>
 					</select>
 					<p class="tip-message">Specifies whether to log out users automatically after a period of inactivity.</p>
 					<p class="tip-message tip-warning"><strong>Warning:</strong> When a user logs out of WordPress, they will remain logged into their third-party provider until they close their browser. Logging out of WordPress DOES NOT log you out of Google, Facebook, LinkedIn, etc...</p>
@@ -884,17 +887,6 @@
 			<div class='form-padding'>
 			<p>These settings are for troubleshooting and/or fine tuning the back channel communication this plugin utilizes between your server and the third-party providers.</p>
 			<table class='form-table'>
-				<tr valign='top' class="has-tip">
-				<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
-				<td>
-					<select name='wpoa_http_util'>
-						<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option>
-						<option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option>
-					</select>
-					<p class="tip-message">The method used by the web server for performing HTTP requests to the third-party providers. Most servers support cURL, but some servers may require Stream Context instead.</p>
-				</td>
-				</tr>
-				
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Verify Peer/Host SSL Certificates: <a href="#" class="tip-button">[?]</a></th>
 				<td>
