@@ -806,6 +806,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
+		$html .= $this->wpoa_login_button("yahoo", "Yahoo", $atts);
 		if ($html == '') {
 			$html .= 'Sorry, no login providers have been enabled.';
 		}
