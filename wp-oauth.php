@@ -234,6 +234,57 @@ Class WPOA {
 			add_filter('login_footer', array($this, 'wpoa_push_login_messages'));
 		}
 	}
+	function wpoa_register_last($username) {
+		$password = wp_generate_password();
+		$useremail = $_SESSION["WPOA"]["USER_MAIL"];
+		$user_id = wp_create_user( $username, $password, $useremail );
+		if ( is_wp_error($user_id) ) {
+			$errors=$user_id;
+			// there was an error during registration, redirect and notify the user:
+			$_SESSION["WPOA"]["RESULT"] = $errors->get_error_message();
+			die("wpoa_register_last 1 :<br/>\n".print_r($errors,true));
+		} else {
+			global $wpdb;
+			// now try to update the username to something more permanent and recognizable:
+			//$update_username_result = $wpdb->update($wpdb->users, array('user_nicename' => $username, 'display_name' => $username), array('ID' => $user_id));
+			//$update_nickname_result = update_user_meta($user_id, 'nickname', $username);
+			// apply the custom default user role:
+			$role = get_option('wpoa_new_user_role');
+			$update_role_result = wp_update_user(array('ID' => $user_id, 'role' => $role));
+			/* proceed if no errors were detected:
+			if ($update_username_result == false || $update_nickname_result == false) {
+				// there was an error during registration, redirect and notify the user:
+				$_SESSION["WPOA"]["RESULT"] = "Could not rename the username during registration. Please contact an admin or try again later.";
+				die("wpoa_register_last 2: " . print_r(Array($_SESSION["WPOA"],$update_username_result,$update_nickname_result) ,true));//["LAST_URL"]
+			} else
+				*/
+			if (is_wp_error($update_role_result)) {
+				// there was an error during registration, redirect and notify the user:
+				$_SESSION["WPOA"]["RESULT"] = "Could not assign default user role during registration. Please contact an admin or try again later.";
+				die("wpoa_register_last 3: " . print_r(Array($_SESSION["WPOA"],$update_role_result) ,true));//["LAST_URL"]
+			} else {
+				// registration was successful, the user account was created, proceed to login the user automatically...
+				// associate the wordpress user account with the now-authenticated third party account:
+				add_user_meta( $user_id, 'wpoa_identity', $_SESSION['WPOA']['PROVIDER'] . '|' . $_SESSION['WPOA']['USER_ID'] . '|' . time());
+				// attempt to login the new user (this could be error prone):
+				echo "user tous vas bien il es cree";
+				$creds = array();
+				$creds['user_login'] = $username;
+				$creds['user_password'] = $password;
+				$creds['remember'] = true;
+				$user = wp_signon( $creds, false );
+				// send a notification e-mail to the admin and the new user (we can also build our own email if necessary):
+				if (!get_option('wpoa_suppress_welcome_email')) {
+					//wp_mail($username, "New User Registration", "Thank you for registering!\r\nYour username: " . $username . "\r\nYour password: " . $password, $headers);
+					wp_new_user_notification( $user_id, $password );
+				}
+				// finally redirect the user back to the page they were on and notify them of successful registration:
+				$_SESSION["WPOA"]["RESULT"] = "You have been registered successfully!";
+				wp_safe_redirect($_SESSION["WPOA"]["LAST_URL"]);
+				//die("wpoa_register_last 4: " . print_r($_SESSION["WPOA"],true));
+			}
+		}
+	}
 	
 	// init scripts and styles for use on FRONTEND PAGES:
 	function wpoa_init_frontend_scripts_styles() {
@@ -387,6 +438,16 @@ Class WPOA {
 		$query_result = $wpdb->get_var($query_string);
 		// attempt to get a wordpress user with the matched id:
 		$user = get_user_by('id', $query_result);
+		// no user? try to find mail
+		if (!$user) {
+			$users_table = $wpdb->users;
+			$query_string = "SELECT $users_table.ID FROM $users_table WHERE $users_table.user_email LIKE '" . $oauth_identity['email'] . "'";
+			$query_result = $wpdb->get_var($query_string);
+			// attempt to get a wordpress user with the matched id:
+			$user = get_user_by('id', $query_result);
+			if ($user)
+				$this->wpoa_link_account($query_result);
+		}
 		return $user;
 	}
 	
@@ -394,6 +455,7 @@ Class WPOA {
 	function wpoa_login_user($oauth_identity) {
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
+		$_SESSION["WPOA"]["USER_MAIL"] = $oauth_identity['email'];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
 		// handle the matched user if there is one:
@@ -420,7 +482,17 @@ Class WPOA {
 		// handle the logged out user or no matching user (register the user):
 		if ( !is_user_logged_in() && !$matched_user ) {
 			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
-			include 'register.php';
+			global $wpdb;
+			// prevent users from registering if the option is turned off in the dashboard:
+			if (!get_option("users_can_register")) {
+				$_SESSION["WPOA"]["RESULT"] = "Sorry, user registration is disabled at this time. Your account could not be registered. Please notify the admin or try again later.";
+				header("Location: " . $_SESSION["WPOA"]["LAST_URL"]);
+				exit;
+			} else {
+				$_SESSION["WPOA"]["RESULT"] = "You have been identified successfully, now we will registered you!";
+				header("Location: /wp-login.php?wpoa_asklogin=1" );//?action=register-live
+				exit;
+			}
 		}
 		// we shouldn't be here, but just in case...
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
@@ -570,10 +642,18 @@ Class WPOA {
 	// show a custom login form on the default login screen:
 	function wpoa_customize_login_screen() {
 		$html = "";
-		$design = get_option('wpoa_login_form_show_login_screen');
-		if ($design != "None") {
-			// TODO: we need to use $settings defaults here, not hard-coded defaults...
-			$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
+		try {
+			if (! empty( $_REQUEST['redirect_to'] ))
+				$_SESSION['WPOA']['LAST_URL'] = esc_url($_GET['redirect_to']);
+			if (empty($_SESSION['WPOA']['LAST_URL']))
+				$_SESSION['WPOA']['LAST_URL'] = strtok($_SERVER['HTTP_REFERER'], "?");
+			$design = get_option('wpoa_login_form_show_login_screen');
+			if ($design != "None") {
+				// TODO: we need to use $settings defaults here, not hard-coded defaults...
+				$html .= $this->wpoa_login_form_content($design, 'none', 'buttons-column', 'Connect with', 'center', 'conditional', 'conditional', 'Please login:', 'You are already logged in.', 'Logging in...', 'Logging out...');
+			}
+		} catch(Exception $e) {
+			//die(print_r($e,true));
 		}
 		echo $html;
 	}
@@ -656,26 +736,42 @@ Class WPOA {
 		$html = "";
 		$html .= "<div class='wpoa-login-form wpoa-layout-$layout wpoa-layout-align-$align $class' style='$style' data-logging-in-title='$logging_in_title' data-logging-out-title='$logging_out_title'>";
 		$html .= "<nav>";
-		if (is_user_logged_in()) {
-			if ($logged_in_title) {
-				$html .= "<p id='wpoa-title'>" . $logged_in_title . "</p>";
+		
+		if ((isset($_POST['wpoa_asklogin']) && strlen($_POST['wpoa_asklogin'])>0) || (isset($_GET['wpoa_asklogin']) && strlen($_GET['wpoa_asklogin'])>0) && get_option('users_can_register')) {
+			//login_header(__('Registration Form'), '<p class="message register">' . __('Register For This Site') . '</p>', $errors);
+			if (isset($_POST['wpoa_login']) && strlen($_POST['wpoa_login'])>0) {
+				$this->wpoa_register_last($_POST['wpoa_login']);
+			} else {
+				$user_login=$_SESSION["WPOA"]["username"];
+				$user_email=$_SESSION["WPOA"]["USER_MAIL"];
+				$html .= "<form action=\"".esc_url( site_url('wp-login.php') )."\" method=\"post\" novalidate=\"novalidate\">";
+				$html .= "<p><label for=\"wpoa_login\">".translate('Username')."<br /><input type=\"text\" name=\"wpoa_login\" id=\"wpoa_login\" class=\"input\" value=\"".esc_attr(wp_unslash($user_login))."\" size=\"20\" /></label></p>";
+				$html .= "<p><label for=\"wpoa_email\">".translate('E-mail').":".esc_attr( wp_unslash( $user_email ) )."</label></p>";
+				$html .= "<input type=\"hidden\" name=\"wpoa_asklogin\" value=\"1\" /><br class=\"clear\" />";
+				$html .= "<p class=\"submit\"><input type=\"submit\" name=\"wp-submit\" id=\"wp-submit\" class=\"button button-primary button-large\" value=\"".esc_attr('Save')."\" /></p>";
+				$html .= "</form>";
 			}
-			if ($show_login == 'always') {
-				$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
-			}
-			if ($show_logout == 'always' || $show_logout == 'conditional') {
-				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
-			}
-		}
-		else {
-			if ($logged_out_title) {
-				$html .= "<p id='wpoa-title'>" . $logged_out_title . "</p>";
-			}
-			if ($show_login == 'always' || $show_login == 'conditional') {
-				$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
-			}
-			if ($show_logout == 'always') {
-				$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
+		} else {
+			if (is_user_logged_in()) {
+				if ($logged_in_title) {
+					$html .= "<p id='wpoa-title'>" . $logged_in_title . "</p>";
+				}
+				if ($show_login == 'always') {
+					$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
+				}
+				if ($show_logout == 'always' || $show_logout == 'conditional') {
+					$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
+				}
+			} else {
+				if ($logged_out_title) {
+					$html .= "<p id='wpoa-title'>" . $logged_out_title . "</p>";
+				}
+				if ($show_login == 'always' || $show_login == 'conditional') {
+					$html .= $this->wpoa_login_buttons($icon_set, $button_prefix);
+				}
+				if ($show_logout == 'always') {
+					$html .= "<a class='wpoa-logout-button' href='" . wp_logout_url() . "' title='Logout'>Logout</a>";
+				}
 			}
 		}
 		$html .= "</nav>";
@@ -710,6 +806,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
+		$html .= $this->wpoa_login_button("yahoo", "Yahoo", $atts);
 		if ($html == '') {
 			$html .= 'Sorry, no login providers have been enabled.';
 		}
