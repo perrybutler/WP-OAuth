@@ -3,7 +3,7 @@
 /*
 Plugin Name: WP-OAuth
 Plugin URI: http://github.com/perrybutler/wp-oauth
-Description: A WordPress plugin that allows users to login or register by authenticating with an existing Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
+Description: A WordPress plugin that allows users to login or register by authenticating with an existing Fiware, Google, Facebook, LinkedIn, Github, Reddit or Windows Live account via OAuth 2.0. Easily drops into new or existing sites, integrates with existing users.
 Version: 0.4
 Author: Perry Butler
 Author URI: http://glassocean.net
@@ -79,6 +79,9 @@ Class WPOA {
 			),
 		'wpoa_suppress_welcome_email' => 0,								// 0, 1
 		'wpoa_new_user_role' => 'contributor',							// role
+		'wpoa_sd_api_enabled' => 0,									// 0, 1
+		'wpoa_fiware_api_id' => '',										// any string
+		'wpoa_fiware_api_secret' => '',									// any string		
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
 		'wpoa_google_api_secret' => '',									// any string
@@ -701,6 +704,7 @@ Class WPOA {
 		// generate the login buttons for available providers:
 		// TODO: don't hard-code the buttons/providers here, we want to be able to add more providers without having to update this function...
 		$html = "";
+		$html .= $this->wpoa_login_button("fiware", "Fiware", $atts);
 		$html .= $this->wpoa_login_button("google", "Google", $atts);
 		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
 		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
