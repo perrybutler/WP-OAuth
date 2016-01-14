@@ -685,10 +685,11 @@ Class WPOA {
 	
 	// generate and return the login buttons, depending on available providers:
 	function wpoa_login_buttons($icon_set, $button_prefix) {
+		$redirect_to = '';
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
-		$redirect_to = urlencode($_GET['redirect_to']);
-		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
+		if(isset($_GET['redirect_to'])){$redirect_to = urlencode($_GET['redirect_to']);}
+		if (isset($redirect_to)) {$redirect_to = "&redirect_to=" . $redirect_to;}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
 		$atts = array(
