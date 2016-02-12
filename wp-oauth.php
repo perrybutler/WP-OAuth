@@ -91,6 +91,9 @@ Class WPOA {
 		'wpoa_github_api_enabled' => 0,									// 0, 1
 		'wpoa_github_api_id' => '',										// any string
 		'wpoa_github_api_secret' => '',									// any string
+		'wpoa_itembase_api_enabled' => 0,								// 0, 1
+		'wpoa_itembase_api_id' => '',									// any string
+		'wpoa_itembase_api_secret' => '',								// any string
 		'wpoa_reddit_api_enabled' => 0,									// 0, 1
 		'wpoa_reddit_api_id' => '',										// any string
 		'wpoa_reddit_api_secret' => '',									// any string
@@ -705,6 +708,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
 		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
+		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
 		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
