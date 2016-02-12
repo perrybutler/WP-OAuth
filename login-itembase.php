@@ -12,7 +12,7 @@ define('CLIENT_SECRET', get_option('wpoa_itembase_api_secret'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', 'user.minimal'); // PROVIDER SPECIFIC: "user.minimal" is the minimum scope required to get the user's id from itembase
 define('URL_AUTH', "https://accounts.itembase.com/oauth/v2/auth?");
-define('URL_TOKEN', "https://accounts.itembase.com/oauth/v2/token");
+define('URL_TOKEN', "https://accounts.itembase.com/oauth/v2/token?");
 define('URL_USER', "https://users.itembase.com/v1/me?");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
