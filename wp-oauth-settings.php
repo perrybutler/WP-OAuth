@@ -152,12 +152,6 @@
 				</form>
 			</div>
 		</div>
-		<div id="wpoa-settings-section-live-demo" class="wpoa-settings-section">
-			<h3 id="bookmark-live-demo">Live Demo</h3>
-			<div class='form-padding'>
-				<p>A live demo is available at <a href="http://choiceschances.com" target="_blank">choiceschances.com</a>.</p>
-			</div>
-		</div>
 		<div id="wpoa-settings-section-support" class="wpoa-settings-section">
 			<h3 id="bookmark-login-page-form-customization">Support</h3>
 			<div class='form-padding'>
