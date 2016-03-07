@@ -11,7 +11,9 @@ License: GPL2
 */
 
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
-session_start();
+if (!isset($_SESSION)) {
+    session_start();
+}
 
 // plugin class:
 Class WPOA {
@@ -290,6 +292,11 @@ Class WPOA {
 	
 	// init scripts and styles for use on the LOGIN PAGE:
 	function wpoa_init_login_scripts_styles() {
+		if (isset($_SESSION['WPOA']['RESULT'])) {
+			$login_message = $_SESSION['WPOA']['RESULT'];
+		} else {
+			$login_message = '';
+		}
 		// here we "localize" php variables, making them available as a js variable in the browser:
 		$wpoa_cvars = array(
 			// basic info:
@@ -303,7 +310,7 @@ Class WPOA {
 			'hide_login_form' => get_option('wpoa_hide_wordpress_login_form'),
 			'logo_image' => get_option('wpoa_logo_image'),
 			'bg_image' => get_option('wpoa_bg_image'),
-			'login_message' => $_SESSION['WPOA']['RESULT'],
+			'login_message' => $login_message,
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
 			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
 			'logged_in' => is_user_logged_in(),
@@ -543,9 +550,11 @@ Class WPOA {
 	
 	// pushes login messages into the dom where they can be extracted by javascript:
 	function wpoa_push_login_messages() {
-		$result = $_SESSION['WPOA']['RESULT'];
+		if (isset($_SESSION['WPOA']['RESULT'])) {
+			$result = $_SESSION['WPOA']['RESULT'];
+			echo "<div id='wpoa-result'>" . $result . "</div>";
+		}
 		$_SESSION['WPOA']['RESULT'] = '';
-		echo "<div id='wpoa-result'>" . $result . "</div>";
 	}
 	
 	// clears the login state:
