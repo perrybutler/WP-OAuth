@@ -560,6 +560,13 @@
 					<input type='text' name='wpoa_oauth_server_api_endpoint' value='<?php echo get_option('wpoa_oauth_server_api_endpoint'); ?>' />
 				</td>
 				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Login Button Text:</th>
+				<td>
+					<input type='text' name='wpoa_oauth_server_api_button_text' value='<?php echo get_option('wpoa_oauth_server_api_button_text'); ?>' />
+				</td>
+				</tr>
 			</table> <!-- .form-table -->
 			<p>
 				<strong>Instructions:</strong>
