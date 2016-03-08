@@ -114,6 +114,7 @@ Class WPOA {
 		'wpoa_oauth_server_api_id' => '',								// any string
 		'wpoa_oauth_server_api_secret' => '',							// any string
 		'wpoa_oauth_server_api_endpoint' => '',							// any string
+		'wpoa_oauth_server_api_button_text' => '',						// any string
 
 		'wpoa_http_util' => 'curl',										// curl, stream-context
 		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
@@ -396,9 +397,9 @@ Class WPOA {
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
 		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity['provider'] . "|" . $oauth_identity['id'] . "%'";
-		print_r( $query_string ); exit;
+		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
-		print_r( $query_result ); exit;
+		//print_r( $query_result ); exit;
 		// attempt to get a wordpress user with the matched id:
 		$user = get_user_by('id', $query_result);
 		return $user;
@@ -726,7 +727,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
-		$html .= $this->wpoa_login_button("oauth_server", "WP OAuth Server", $atts);
+		$html .= $this->wpoa_login_button( 'oauth_server' , get_option( 'wpoa_oauth_server_api_button_text' ), $atts );
 		if ($html == '') {
 			$html .= 'Sorry, no login providers have been enabled.';
 		}
