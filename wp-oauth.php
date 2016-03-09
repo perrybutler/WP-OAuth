@@ -111,7 +111,14 @@ Class WPOA {
 		'wpoa_instagram_api_secret' => '',								// any string
 		'wpoa_battlenet_api_enabled' => 0,								// 0, 1
 		'wpoa_battlenet_api_id' => '',									// any string
-		'wpoa_battlenet_api_secret' => '',								// any string
+		'wpoa_battlenet_api_secret' => '',
+																		// any string
+		'wpoa_oauth_server_api_enabled' => 0,							// 0, 1
+		'wpoa_oauth_server_api_id' => '',								// any string
+		'wpoa_oauth_server_api_secret' => '',							// any string
+		'wpoa_oauth_server_api_endpoint' => '',							// any string
+		'wpoa_oauth_server_api_button_text' => '',						// any string
+
 		'wpoa_http_util' => 'curl',										// curl, stream-context
 		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_restore_default_settings' => 0,							// 0, 1
@@ -277,7 +284,6 @@ Class WPOA {
 			'plugins_url' => plugins_url(),
 			'plugin_dir_url' => plugin_dir_url(__FILE__),
 			'url' => get_bloginfo('url'),
-			// other:
 			'show_login_messages' => get_option('wpoa_show_login_messages'),
 			'logout_inactive_users' => get_option('wpoa_logout_inactive_users'),
 			'logged_in' => is_user_logged_in(),
@@ -394,7 +400,9 @@ Class WPOA {
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
 		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity['provider'] . "|" . $oauth_identity['id'] . "%'";
+		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
+		//print_r( $query_result ); exit;
 		// attempt to get a wordpress user with the matched id:
 		$user = get_user_by('id', $query_result);
 		return $user;
@@ -724,6 +732,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
+		$html .= $this->wpoa_login_button( 'oauth_server' , get_option( 'wpoa_oauth_server_api_button_text' ), $atts );
 		if ($html == '') {
 			$html .= 'Sorry, no login providers have been enabled.';
 		}
