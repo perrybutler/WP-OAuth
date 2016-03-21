@@ -177,7 +177,8 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Facebook returns the user's unique id
+	$oauth_identity = array_merge($oauth_identity,$result_obj);
+	//$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Facebook returns the user's unique id
 	//$oauth_identity['email'] = $result_obj['email']; //PROVIDER SPECIFIC: this is how Facebook returns the email address
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
