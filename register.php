@@ -41,8 +41,35 @@ if (is_wp_error($user_id)) {
 
 // now try to update the username to something more permanent and recognizable:
 $username = "user" . $user_id;
-$update_username_result = $wpdb->update($wpdb->users, array('user_login' => $username, 'user_nicename' => $username, 'display_name' => $username), array('ID' => $user_id));
-$update_nickname_result = update_user_meta($user_id, 'nickname', $username);
+
+// set defaults
+$nickname = $username;
+$first_name = $last_name = $email = '';
+
+// use identity info for creating the new profile
+if(isset($oauth_identity)) {
+  if(isset($oauth_identity['nickname'])) {
+    $username = strtolower($oauth_identity['username']) . $user_id;
+    $nickname = $username;
+  }
+  if(isset($oauth_identity['nickname'])) {
+    $nickname = $oauth_identity['nickname'];
+  }
+  if(isset($oauth_identity['first_name'])) {
+    $first_name = $oauth_identity['first_name'];
+  }
+  if(isset($oauth_identity['last_name'])) {
+    $last_name = $oauth_identity['last_name'];
+  }
+  if(isset($oauth_identity['email'])) {
+    $email = $oauth_identity['email'];
+  }
+}
+
+$update_username_result = $wpdb->update($wpdb->users, array('user_login' => $username, 'user_nicename' => $nickname, 'user_email' => $email, 'display_name' => $nickname), array('ID' => $user_id));
+$update_nickname_result = update_user_meta($user_id, 'nickname', $nickname);
+$update_first_name_result = update_user_meta($user_id, 'first_name', $first_name);
+$update_last_name_result = update_user_meta($user_id, 'last_name', $last_name);
 
 // apply the custom default user role:
 $role = get_option('wpoa_new_user_role');
