@@ -679,7 +679,7 @@
 				<tr valign='top'>
 				<th scope='row'>Application Name:</th>
 				<td>
-					<input type='text' name='wpoa_generic_provider' value='<?php echo get_option('wpoa_generic_provider'); ?>' />
+					<input type='text' name='wpoa_generic_provider_name' value='<?php echo get_option('wpoa_generic_provider_name'); ?>' />
 				</td>
 				</tr>
 

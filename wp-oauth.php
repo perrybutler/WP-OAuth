@@ -92,7 +92,7 @@ Class WPOA {
 		'wpoa_linkedin_api_secret' => '',								// any string
 
 		'wpoa_generic_api_enabled' => 0,
-		'wpoa_generic_provider' => '',
+		'wpoa_generic_provider_name' => '',
 		'wpoa_generic_api_id' => '',
 		'wpoa_generic_api_secret' => '',
 		'wpoa_generic_scope' => '',
@@ -735,7 +735,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("google", "Google", $atts);
 		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
 		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
-		$html .= $this->wpoa_login_button("generic", get_option('wpoa_generic_provider'), $atts);
+		$html .= $this->wpoa_login_button("generic", get_option('wpoa_generic_provider_name'), $atts);
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
 		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);

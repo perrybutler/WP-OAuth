@@ -6,7 +6,7 @@ if (!isset($_SESSION)) {
 }
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-$_SESSION['WPOA']['PROVIDER'] = get_option('wpoa_generic_provider');
+$_SESSION['WPOA']['PROVIDER'] = 'generic';
 define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_generic_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_generic_api_id'));
