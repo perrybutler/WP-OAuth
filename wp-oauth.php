@@ -735,6 +735,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("google", "Google", $atts);
 		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
 		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
+		$html .= $this->wpoa_login_button("generic", get_option('wpoa_generic_provider'), $atts);
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
 		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
