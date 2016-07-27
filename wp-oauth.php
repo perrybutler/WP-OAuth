@@ -90,6 +90,16 @@ Class WPOA {
 		'wpoa_linkedin_api_enabled' => 0,								// 0, 1
 		'wpoa_linkedin_api_id' => '',									// any string
 		'wpoa_linkedin_api_secret' => '',								// any string
+
+		'wpoa_generic_api_enabled' => 0,
+		'wpoa_generic_provider' => '',
+		'wpoa_generic_api_id' => '',
+		'wpoa_generic_api_secret' => '',
+		'wpoa_generic_scope' => '',
+		'wpoa_generic_url_auth' => '',
+		'wpoa_generic_url_token' => '',
+		'wpoa_generic_url_user' => '',
+
 		'wpoa_github_api_enabled' => 0,									// 0, 1
 		'wpoa_github_api_id' => '',										// any string
 		'wpoa_github_api_secret' => '',									// any string
