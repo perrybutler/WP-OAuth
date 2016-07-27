@@ -120,7 +120,7 @@ function get_oauth_token($wpoa) {
 			break;
 	}
 	// parse the result:
-	parse_str($result, $result_obj); // PROVIDER SPECIFIC: Github encodes the access token result as a querystring by default
+	$result_obj = json_decode($result, true); // PROVIDER SPECIFIC: Github encodes the access token result as a querystring by default
 	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Github returns the access token KEEP THIS PROTECTED!
 	//$expires_in = $result_obj['expires_in']; // PROVIDER SPECIFIC: Github does not return an access token expiration!
 	//$expires_at = time() + $expires_in; // PROVIDER SPECIFIC: Github does not return an access token expiration!
