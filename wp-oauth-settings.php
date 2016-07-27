@@ -663,7 +663,76 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with LinkedIn section -->
-			
+
+			<!-- START Login with Generic section -->
+			<div id="wpoa-settings-section-login-with-generic" class="wpoa-settings-section">
+			<h3>Login with Custom Application</h3>
+			<div class='form-padding'>
+			<table class='form-table'>
+				<tr valign='top'>
+				<th scope='row'>Enabled:</th>
+				<td>
+					<input type='checkbox' name='wpoa_generic_api_enabled' value='1' <?php checked(get_option('wpoa_generic_api_enabled') == 1); ?> />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Application Name:</th>
+				<td>
+					<input type='text' name='wpoa_generic_provider_name' value='<?php echo get_option('wpoa_generic_provider_name'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Scopes:</th>
+				<td>
+					<input type='text' name='wpoa_generic_scope' value='<?php echo get_option('wpoa_generic_scope'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Authentication URL:</th>
+				<td>
+					<input type='text' name='wpoa_generic_url_auth' value='<?php echo get_option('wpoa_generic_url_auth'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Token URL:</th>
+				<td>
+					<input type='text' name='wpoa_generic_url_token' value='<?php echo get_option('wpoa_generic_url_token'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>User URL:</th>
+				<td>
+					<input type='text' name='wpoa_generic_url_user' value='<?php echo get_option('wpoa_generic_url_user'); ?>' />
+				</td>
+				</tr>
+
+
+				<tr valign='top'>
+				<th scope='row'>Client ID:</th>
+				<td>
+					<input type='text' name='wpoa_generic_api_id' value='<?php echo get_option('wpoa_generic_api_id'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Client Secret:</th>
+				<td>
+					<input type='text' name='wpoa_generic_api_secret' value='<?php echo get_option('wpoa_generic_api_secret'); ?>' />
+				</td>
+				</tr>
+			</table> <!-- .form-table -->
+
+			<?php submit_button('Save all settings'); ?>
+			</div> <!-- .form-padding -->
+			</div> <!-- .wpoa-settings-section -->
+			<!-- END Login with Generic section -->
+
+
 			<!-- START Login with Github section -->
 			<div id="wpoa-settings-section-login-with-github" class="wpoa-settings-section">
 			<h3>Login with Github</h3>
