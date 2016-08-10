@@ -980,44 +980,51 @@
 				</tr>
 
 				<tr valign='top'>
-				<th scope='row'>Client id / resource:</th>
+				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_id' value='<?php echo get_option('wpoa_custom_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_id' value='<?php echo get_option('wpoa_custom_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
-				<th scope='row'>Secret / public key:</th>
+				<th scope='row'>Secret:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_secret' value='<?php echo get_option('wpoa_custom_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_secret' value='<?php echo get_option('wpoa_custom_api_secret'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Scopes:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_scope' value='<?php echo get_option('wpoa_custom_api_scope'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_scope' value='<?php echo get_option('wpoa_custom_api_scope'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Authentication URL:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_auth_url' value='<?php echo get_option('wpoa_custom_api_auth_url'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_auth_url' value='<?php echo get_option('wpoa_custom_api_auth_url'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Token URL:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_token_url' value='<?php echo get_option('wpoa_custom_api_token_url'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_token_url' value='<?php echo get_option('wpoa_custom_api_token_url'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>User URL:</th>
 				<td>
-					<input type='text' name='wpoa_custom_api_user_url' value='<?php echo get_option('wpoa_custom_api_user_url'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_custom_api_user_url' value='<?php echo get_option('wpoa_custom_api_user_url'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>UserInfo element (usually 'id' or 'username'):</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_identity_id' value='<?php echo get_option('wpoa_custom_api_identity_id'); ?>' />
 				</td>
 				</tr>
 
@@ -1027,7 +1034,7 @@
 				<strong>Instructions:</strong>
 				<ol>
 					<li>Install a 3<sup>rd</sup>-party OAuth server, such as <a href="http://www.keycloak.org/">KeyCloack</a></li>
-					<li>Check for <em>authentication url</em>, <em>token URL</em> and <em>user url</em> (if it exists)</li>
+					<li>Check for <em>authentication url</em>, <em>token URL</em> and <em>user url</em>. For Keycloack find them at <tt>https://<em>your-domain</em>auth/realms/<em>your-realm</em>/.well-known/openid-configuration</tt></li>
 					<li>Enter details provided by your OAuth server into the input fields above.</li>
 				</ol>
 				<strong>References:</strong>
@@ -1052,7 +1059,7 @@
 				<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_http_util'>
-						<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option>
+						<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL / wp_remote_get</option>
 						<option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option>
 					</select>
 					<p class="tip-message">The method used by the web server for performing HTTP requests to the third-party providers. Most servers support cURL, but some servers may require Stream Context instead.</p>
@@ -1075,7 +1082,7 @@
 
 			<!-- START Maintenance & Troubleshooting section -->
 			<div id="wpoa-settings-section-maintenance-troubleshooting" class="wpoa-settings-section">
-			<h3>Maintenance & Troubleshooting</h3>
+			<h3>Maintenance &amp; Troubleshooting</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top' class="has-tip">

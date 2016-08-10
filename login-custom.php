@@ -18,7 +18,7 @@ function add_question_mark($key) {
 }
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-$_SESSION['WPOA']['PROVIDER'] = 'Other';
+$_SESSION['WPOA']['PROVIDER'] = 'custom';
 define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_custom_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_custom_api_id'));
@@ -27,7 +27,7 @@ define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
 define('SCOPE', get_option('wpoa_custom_api_scope'));
 define('URL_AUTH', add_question_mark(get_option('wpoa_custom_api_auth_url')));
 define('URL_TOKEN', add_question_mark(get_option('wpoa_custom_api_token_url')));
-define('URL_USER', add_question_mark(get_option('wpoa_custom_api_user_url')));
+define('URL_USER', get_option('wpoa_custom_api_user_url'));
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
@@ -112,17 +112,25 @@ function get_oauth_token($wpoa) {
 	$url_params = http_build_query($params);
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_TOKEN . $url_params;
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_URL, $url);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			// PROVIDER NORMALIZATION: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
-			// PROVIDER NORMALIZATION: PayPal/Reddit requires sending the client id/secret via http basic authentication
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
-			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
-			$result = curl_exec($curl);
+			$url = URL_TOKEN;
+
+			$response = wp_remote_post(
+				$url, array(
+					'body' => $params,
+					'sslverify' => get_option('wpoa_http_util_verify_ssl')
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+			   $error_message = $response->get_error_message();
+				 error_log("token failed retrival - " . $result);
+
+			   $wpoa->wpoa_end_login( $error_message );
+				 return false;
+			}
+
+			$result = $response['body'];
+
 			break;
 		case 'stream-context':
 			$url = rtrim(URL_TOKEN, "?");
@@ -141,9 +149,10 @@ function get_oauth_token($wpoa) {
 			break;
 	}
 	// parse the result:
-	$result_obj = json_decode($result, true); // PROVIDER SPECIFIC: Google encodes the access token result as json by default
-	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Google returns the access token KEEP THIS PROTECTED!
-	$expires_in = $result_obj['expires_in']; // PROVIDER SPECIFIC: this is how Google returns the access token's expiration
+	$result_obj = json_decode($result, false, 512); // PROVIDER SPECIFIC: Google encodes the access token result as json by default
+	$access_token = $result_obj->access_token; // PROVIDER SPECIFIC: this is how Google returns the access token KEEP THIS PROTECTED!
+
+	$expires_in = $result_obj->expires_in; // PROVIDER SPECIFIC: this is how Google returns the access token's expiration
 	$expires_at = time() + $expires_in;
 	// handle the result:
 	if (!$access_token || !$expires_in) {
@@ -168,13 +177,27 @@ function get_oauth_identity($wpoa) {
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
-			$curl = curl_init();
-			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
-			// PROVIDER NORMALIZATION: PayPal/Reddit require that we send the access token via a bearer header, PayPal also requires a Content-Type: application/json header...
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($curl);
+			$url = URL_USER;
+
+			$response = wp_remote_get(
+				$url,
+				array(
+					'headers' => array(
+						'Authorization' => 'Bearer ' . $_SESSION['WPOA']['ACCESS_TOKEN']
+					)
+				)
+			);
+
+			if ( is_wp_error( $response ) ) {
+			   $error_message = $response->get_error_message();
+				 error_log("userinfo failed retrival - " . $result);
+
+			   $wpoa->wpoa_end_login( $error_message );
+				 return false;
+			}
+
+			$result = $response['body'];
+
 			$result_obj = json_decode($result, true);
 			break;
 		case 'stream-context':
@@ -197,10 +220,25 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
+	/*
+	{
+	  "name": "Admin User",
+	  "sub": "88dd0538-5f32-4222-af07-efe5cd809038",
+	  "preferred_username": "admin@ibxgaming.com",
+	  "given_name": "Admin",
+	  "family_name": "User",
+	  "email": "admin@ibxgaming.com"
+	}
+	*/
+	$objtype = get_option('wpoa_custom_api_identity_id');
+	if ($objtype == null || $objtype == false || $objtype == '') {
+		$objtype = 'preferred_username';
+	}
+	$oauth_identity['id'] = $result_obj[$objtype]; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
 	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
 	if (!$oauth_identity['id']) {
-		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
+		// $wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found: " . $_SESSION['WPOA']['ACCESS_TOKEN']);
+		$wpoa->wpoa_end_login("Sorry, we could not log you in. User identity was not found. Please notify the admin or try again later.");
 	}
 	return $oauth_identity;
 }

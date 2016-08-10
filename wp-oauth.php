@@ -119,12 +119,12 @@ Class WPOA {
 		'wpoa_custom_api_auth_url' => '',							// any string
 		'wpoa_custom_api_token_url' => '',							// any string
 		'wpoa_custom_api_user_url' => '',							// any string
+		'wpoa_custom_api_identity_id' => '',							// any string
 		'wpoa_oauth_server_api_enabled' => 0,							// 0, 1
 		'wpoa_oauth_server_api_id' => '',								// any string
 		'wpoa_oauth_server_api_secret' => '',							// any string
 		'wpoa_oauth_server_api_endpoint' => '',							// any string
 		'wpoa_oauth_server_api_button_text' => '',						// any string
-
 		'wpoa_http_util' => 'curl',										// curl, stream-context
 		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_restore_default_settings' => 0,							// 0, 1
