@@ -221,10 +221,11 @@ function get_oauth_identity($wpoa) {
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
 	/*
+	Response example from Keycloack
 	{
 	  "name": "Admin User",
 	  "sub": "88dd0538-5f32-4222-af07-efe5cd809038",
-	  "preferred_username": "admin@ibxgaming.com",
+	  "preferred_username": "admin@example.com",
 	  "given_name": "Admin",
 	  "family_name": "User",
 	  "email": "admin@ibxgaming.com"
@@ -232,10 +233,15 @@ function get_oauth_identity($wpoa) {
 	*/
 	$objtype = get_option('wpoa_custom_api_identity_id');
 	if ($objtype == null || $objtype == false || $objtype == '') {
+		$objtype = 'id';
+	}
+	$oauth_identity['id'] = $result_obj[$objtype];
+	$objtype = get_option('wpoa_custom_api_identity_preferred_username');
+	if ($objtype == null || $objtype == false || $objtype == '') {
 		$objtype = 'preferred_username';
 	}
-	$oauth_identity['id'] = $result_obj[$objtype]; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
-	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
+	$oauth_identity['preferred_username'] = $result_obj[$objtype];
+
 	if (!$oauth_identity['id']) {
 		// $wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found: " . $_SESSION['WPOA']['ACCESS_TOKEN']);
 		$wpoa->wpoa_end_login("Sorry, we could not log you in. User identity was not found. Please notify the admin or try again later.");

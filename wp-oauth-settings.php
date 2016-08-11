@@ -481,6 +481,20 @@
 					<p class="tip-message">Specifies what user role will be assigned to newly registered users.</p>
 				</td>
 				</tr>
+
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Link new users to the following WordPress user: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<?php wp_dropdown_users(array(
+						'selected' => get_option('wpoa_new_user'),
+						'include_selected' => true,
+						'show_option_none' => '- disable -',
+						'name' => 'wpoa_new_user'
+					)); ?>
+					<p class="tip-message">If you disable registrations on your web site, you can link all new users to the same WordPress user this way. If you deselect this option, a new user will be created for every 3<sup>rd</sup>-party login.</p>
+				</td>
+				</tr>
+
 			</table> <!-- .form-table -->
 			<?php submit_button('Save all settings'); ?>
 			</div> <!-- .form-padding -->
@@ -502,14 +516,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_google_api_id' value='<?php echo get_option('wpoa_google_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_google_api_id' value='<?php echo get_option('wpoa_google_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -543,28 +557,28 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_id' value='<?php echo get_option('wpoa_oauth_server_api_id'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_oauth_server_api_id' value='<?php echo get_option('wpoa_oauth_server_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_secret' value='<?php echo get_option('wpoa_oauth_server_api_secret'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_oauth_server_api_secret' value='<?php echo get_option('wpoa_oauth_server_api_secret'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>OAuth Server Endpoint:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_endpoint' value='<?php echo get_option('wpoa_oauth_server_api_endpoint'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_oauth_server_api_endpoint' value='<?php echo get_option('wpoa_oauth_server_api_endpoint'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Login Button Text:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_button_text' value='<?php echo get_option('wpoa_oauth_server_api_button_text'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_oauth_server_api_button_text' value='<?php echo get_option('wpoa_oauth_server_api_button_text'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -599,14 +613,14 @@
 				<tr valign='top'>
 				<th scope='row'>App ID:</th>
 				<td>
-					<input type='text' name='wpoa_facebook_api_id' value='<?php echo get_option('wpoa_facebook_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_facebook_api_id' value='<?php echo get_option('wpoa_facebook_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>App Secret:</th>
 				<td>
-					<input type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -639,14 +653,14 @@
 				<tr valign='top'>
 				<th scope='row'>API Key:</th>
 				<td>
-					<input type='text' name='wpoa_linkedin_api_id' value='<?php echo get_option('wpoa_linkedin_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_linkedin_api_id' value='<?php echo get_option('wpoa_linkedin_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Secret Key:</th>
 				<td>
-					<input type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -679,14 +693,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_github_api_id' value='<?php echo get_option('wpoa_github_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_github_api_id' value='<?php echo get_option('wpoa_github_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -719,14 +733,14 @@
 						<tr valign='top'>
 							<th scope='row'>Client ID:</th>
 							<td>
-								<input type='text' name='wpoa_itembase_api_id' value='<?php echo get_option('wpoa_itembase_api_id'); ?>' />
+								<input style="width: 100%" type='text' name='wpoa_itembase_api_id' value='<?php echo get_option('wpoa_itembase_api_id'); ?>' />
 							</td>
 						</tr>
 
 						<tr valign='top'>
 							<th scope='row'>Client Secret:</th>
 							<td>
-								<input type='text' name='wpoa_itembase_api_secret' value='<?php echo get_option('wpoa_itembase_api_secret'); ?>' />
+								<input style="width: 100%" type='text' name='wpoa_itembase_api_secret' value='<?php echo get_option('wpoa_itembase_api_secret'); ?>' />
 							</td>
 						</tr>
 					</table> <!-- .form-table -->
@@ -758,14 +772,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_reddit_api_id' value='<?php echo get_option('wpoa_reddit_api_id'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_reddit_api_id' value='<?php echo get_option('wpoa_reddit_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -798,14 +812,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_windowslive_api_id' value='<?php echo get_option('wpoa_windowslive_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_windowslive_api_id' value='<?php echo get_option('wpoa_windowslive_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -846,14 +860,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_paypal_api_id' value='<?php echo get_option('wpoa_paypal_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_paypal_api_id' value='<?php echo get_option('wpoa_paypal_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_paypal_api_secret' value='<?php echo get_option('wpoa_paypal_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_paypal_api_secret' value='<?php echo get_option('wpoa_paypal_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -888,14 +902,14 @@
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_instagram_api_id' value='<?php echo get_option('wpoa_instagram_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_instagram_api_id' value='<?php echo get_option('wpoa_instagram_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_instagram_api_secret' value='<?php echo get_option('wpoa_instagram_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_instagram_api_secret' value='<?php echo get_option('wpoa_instagram_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -934,14 +948,14 @@
 				<tr valign='top'>
 				<th scope='row'>Key:</th>
 				<td>
-					<input type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Secret:</th>
 				<td>
-					<input type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -1022,9 +1036,16 @@
 				</tr>
 
 				<tr valign='top'>
-				<th scope='row'>UserInfo element (usually 'id' or 'username'):</th>
+				<th scope='row'>UserInfo element for unique ID (usually 'id' or 'username'):</th>
 				<td>
 					<input style="width: 100%" type='text' name='wpoa_custom_api_identity_id' value='<?php echo get_option('wpoa_custom_api_identity_id'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>UserInfo element for preffered username (usually 'username' or 'preferred_username'):</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_identity_preferred_username' value='<?php echo get_option('wpoa_custom_api_identity_preferred_username'); ?>' />
 				</td>
 				</tr>
 

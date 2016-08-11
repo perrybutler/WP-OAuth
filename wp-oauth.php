@@ -24,6 +24,19 @@ Class WPOA {
 
 	// set a version that we can use for performing plugin updates, this should always match the plugin version:
 	const PLUGIN_VERSION = "0.4.1.1";
+	static $WPOA_LOGIN_PROVIDERS = array(
+		"google" => "Google",
+		"facebook" => "Facebook",
+		"linkedin" => "LinkedIn",
+		"github" => "GitHub",
+		"itembase" => "itembase",
+		"reddit" => "Reddit",
+		"windowslive" => "Windows Live",
+		"paypal" => "PayPal",
+		"instagram" => "Instagram",
+		"battlenet" => "Battlenet",
+		"custom" => "Other"
+	);
 
 	// singleton class pattern:
 	protected static $instance = NULL;
@@ -81,6 +94,7 @@ Class WPOA {
 			),
 		'wpoa_suppress_welcome_email' => 0,								// 0, 1
 		'wpoa_new_user_role' => 'contributor',							// role
+		'wpoa_new_user' => null,											// default new user
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
 		'wpoa_google_api_secret' => '',									// any string
@@ -120,6 +134,7 @@ Class WPOA {
 		'wpoa_custom_api_token_url' => '',							// any string
 		'wpoa_custom_api_user_url' => '',							// any string
 		'wpoa_custom_api_identity_id' => '',							// any string
+		'wpoa_custom_api_identity_preferred_username' => '',							// any string
 		'wpoa_oauth_server_api_enabled' => 0,							// 0, 1
 		'wpoa_oauth_server_api_id' => '',								// any string
 		'wpoa_oauth_server_api_secret' => '',							// any string
@@ -219,9 +234,13 @@ Class WPOA {
 
 	// initialize the plugin's functionality by hooking into wordpress:
 	function init() {
+
 		// restore default settings if necessary; this might get toggled by the admin or forced by a new version of the plugin:
 		if (get_option("wpoa_restore_default_settings")) {$this->wpoa_restore_default_settings();}
 		// hook the query_vars and template_redirect so we can stay within the wordpress context no matter what (avoids having to use wp-load.php)
+
+		$this->wpoa_login_redirect_if_single_provider();
+
 		add_filter('query_vars', array($this, 'wpoa_qvar_triggers'));
 		add_action('template_redirect', array($this, 'wpoa_qvar_handlers'));
 		// hook scripts and styles for frontend pages:
@@ -370,6 +389,27 @@ Class WPOA {
 		return $vars;
 	}
 
+	// Redirect users to the provider if there's only single provider (and login form is disabled)
+	function wpoa_login_redirect_if_single_provider() {
+		if ( $_SERVER['REQUEST_METHOD'] == 'GET' && (is_page( 'login' ) || $GLOBALS['pagenow'] === 'wp-login.php' || in_array( $_SERVER['PHP_SELF'], array( '/wp-login.php', '/wp-register.php' ) )) ) {
+			// We're on the login page!
+			// Check if we only have one provider
+			$count = 0;
+			$provider = "";
+			foreach (self::$WPOA_LOGIN_PROVIDERS as $key => $value) {
+				if (get_option("wpoa_" . $key . "_api_enabled")) {
+					$count = $count + 1;
+					$provider = $key;
+				}
+			}
+			if ( $count == 1 && get_option("wpoa_hide_wordpress_login_form") == 1) {
+				$_SESSION['WPOA']['PROVIDER'] = $provider;
+				$this->wpoa_include_connector($provider);
+				return;
+			}
+		}
+	}
+
 	// handle the querystring triggers:
 	function wpoa_qvar_handlers() {
 		if (get_query_var('connect')) {
@@ -420,6 +460,7 @@ Class WPOA {
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
+		$mapped_user = false;
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
 			// there was a matching wordpress user account, log it in now:
@@ -430,6 +471,18 @@ Class WPOA {
 			do_action( 'wp_login', $user_login, $matched_user );
 			// after login, redirect to the user's last location
 			$this->wpoa_end_login("Logged in successfully!");
+			$mapped_user = true;
+		} else if(get_option("wpoa_new_user")!=null && get_option("wpoa_new_user") != '' && get_option("wpoa_new_user") != -1 && get_userdata(get_option("wpoa_new_user")) != false) {
+			$_SESSION["WPOA"]["USER_ID"] = get_option("wpoa_new_user");
+
+			$user_id = $_SESSION["WPOA"]["USER_ID"];
+			$user_login = get_userdata($user_id)->user_login;
+			wp_set_current_user( $user_id, $user_login );
+			wp_set_auth_cookie( $user_id );
+			do_action( 'wp_login', $user_login, $matched_user );
+			// after login, redirect to the user's last location
+			$this->wpoa_end_login("Logged in successfully as " . $user_login . "!");
+			$mapped_user = true;
 		}
 		// handle the already logged in user if there is one:
 		if ( is_user_logged_in() ) {
@@ -442,8 +495,9 @@ Class WPOA {
 			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
 		}
 		// handle the logged out user or no matching user (register the user):
-		if ( !is_user_logged_in() && !$matched_user ) {
+		if ( !is_user_logged_in() && !$mapped_user ) {
 			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
+			$_SESSION["WPOA"]["PREFERRED_USERNAME"] = $oauth_identity["preferred_username"];
 			include 'register.php';
 		}
 		// we shouldn't be here, but just in case...
@@ -726,19 +780,10 @@ Class WPOA {
 			'button_prefix' => $button_prefix,
 		);
 		// generate the login buttons for available providers:
-		// TODO: don't hard-code the buttons/providers here, we want to be able to add more providers without having to update this function...
 		$html = "";
-		$html .= $this->wpoa_login_button("google", "Google", $atts);
-		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
-		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
-		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
-		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
-		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
-		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
-		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
-		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
-		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
-		$html .= $this->wpoa_login_button("custom", "Other", $atts);
+		foreach (self::$WPOA_LOGIN_PROVIDERS as $key => $value) {
+			$html .= $this->wpoa_login_button($key, $value, $atts);
+		}
 		$html .= $this->wpoa_login_button( 'oauth_server' , get_option( 'wpoa_oauth_server_api_button_text' ), $atts );
 		if ($html == '') {
 			$html .= 'Sorry, no login providers have been enabled.';
