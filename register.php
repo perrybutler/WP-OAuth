@@ -9,8 +9,8 @@ global $wpdb;
 // initiate the user session:
 session_start();
 
-$logger->log("Register : Id = " . WPOA_Session::get_id());
-$logger->dump($oauth_identity);
+Logger::Instance()->log("Register : Id = " . WPOA_Session::get_id());
+Logger::Instance()->dump($oauth_identity);
 
 // prevent users from registering if the option is turned off in the dashboard:
 if (!get_option("users_can_register")) {
@@ -20,22 +20,22 @@ if (!get_option("users_can_register")) {
 if (array_key_exists(WPOA_Session::USER_NAME, $oauth_identity)) {
 	$username = $oauth_identity[WPOA_Session::USER_NAME];
 } else {
-	$logger->log("Register : User name not set, using it from post");
+	Logger::Instance()->log("Register : User name not set, using it from post");
 	$username = $_POST['identity'];
 }
 
 if (array_key_exists(WPOA_Session::USER_EMAIL, $oauth_identity)) {
 	$email = $oauth_identity[WPOA_Session::USER_EMAIL];
 } else {
-	$logger->log("Register : Email not set, using it from post");
+	Logger::Instance()->log("Register : Email not set, using it from post");
 	$email = $_POST['identity'];
 }
 
 $password = wp_generate_password();
 
-$logger->log("Register : Username = " . $username);
-$logger->log("Register : Password = " . $password);
-$logger->log("Register : Email = " . $email);
+Logger::Instance()->log("Register : Username = " . $username);
+Logger::Instance()->log("Register : Password = " . $password);
+Logger::Instance()->log("Register : Email = " . $email);
 
 
 
@@ -58,7 +58,7 @@ $update_role_result = wp_update_user(array('ID' => $user_id, 'role' => $role));
 
 // proceed if no errors were detected:
 if ($update_username_result == false) {
-	$logger->log("Register : username = " . $update_username_result . " / nickname = " . $update_nickname_result);
+	Logger::Instance()->log("Register : username = " . $update_username_result . " / nickname = " . $update_nickname_result);
 	$this->fail("Could not rename the username during registration. Please contact an admin or try again later.");
 }
 elseif ($update_role_result == false) {

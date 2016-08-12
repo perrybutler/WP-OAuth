@@ -2,7 +2,7 @@
 include_once "logger.php";
 
 function init_curl($url) {
-	$logger->log("CURL : Init with url = " . $url);
+	Logger::Instance()->log("CURL : Init with url = " . $url);
 	$curl = curl_init($url);
 	$verify_ssl= get_option('wpoa_http_util_verify_ssl');
 	curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, ($verify_ssl == 1 ? 1 : 0));
@@ -17,10 +17,10 @@ function exec_curl($curl, $message = "") {
 
     if(!$result) { 
       curl_error($curl);
-      $logger->log("CURL : error : " . $message);
+      Logger::Instance()->log("CURL : error : " . $message);
       trigger_error($error); 
     }
     curl_close($curl);
-    $logger->log("CURL : exec reult = " . $result);
+    Logger::Instance()->log("CURL : exec reult = " . $result);
     return $result;
 }

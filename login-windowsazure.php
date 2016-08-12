@@ -79,13 +79,13 @@ function get_oauth_code($wpoa) {
 	);
 	WPOA_Session::set_state($params['state']);
 	$url = URL_AUTH . http_build_query($params);
-	$logger->log("AZURE : Get Oauth code from : " . $url);
+	Logger::Instance()->log("AZURE : Get Oauth code from : " . $url);
 	header("Location: $url");
 	exit;
 }
 
 function get_oauth_token($wpoa) {
-	$logger->log("AZURE : get_oauth_token");
+	Logger::Instance()->log("AZURE : get_oauth_token");
 	$params = array(
 		'grant_type' => 'authorization_code',
 		'client_id' => CLIENT_ID,
@@ -143,11 +143,11 @@ function get_oauth_token($wpoa) {
 }
 
 function get_oauth_identity($wpoa) {
-	$logger->log("AZURE : get_oauth_identity");
+	Logger::Instance()->log("AZURE : get_oauth_identity");
 	// here we exchange the access token for the user info...
 	// set the access token param:
 	$access_token = WPOA_Session::get_token();
-	$logger->log("AZURE : token = " .$access_token);
+	Logger::Instance()->log("AZURE : token = " .$access_token);
 	$params = array(
 		"api-version" => "1.6",
 	);

@@ -11,7 +11,7 @@ class WPOA_Session {
     public static function start()
     {
         session_start();    
-        $logger->dump($_SESSION);
+        Logger::Instance()->dump($_SESSION);
     }
 
     public static function get_id() {
@@ -89,7 +89,7 @@ class WPOA_Session {
     }
 
     public static function set_result($value) {
-        $logger->log("SESSION : Set_result = " . $value);
+        Logger::Instance()->log("SESSION : Set_result = " . $value);
         $_SESSION["WPOA"]["RESULT"] = $value;
     }
 
@@ -104,7 +104,7 @@ class WPOA_Session {
     
    
     public static function clear() {
-        $logger->log("SESSION : Clearing session");
+        Logger::Instance()->log("SESSION : Clearing session");
         unset($_SESSION["WPOA"]["PROVIDER"]);
         unset($_SESSION["WPOA"]["USER_ID"]);
 		unset($_SESSION["WPOA"]["USER_EMAIL"]);

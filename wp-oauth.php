@@ -132,7 +132,7 @@ Class WPOA {
 	
 	// when the plugin class gets created, fire the initialization:
 	function __construct() {
-		$logger->log("Create instance");
+		Logger::Instance()->log("Create instance");
 		// hook activation and deactivation for the plugin:
 		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
 		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
@@ -219,16 +219,16 @@ Class WPOA {
 
 	
 	function redirect_to_login_if_not_logged() {
-		$logger->log("check if User is logged");
+		Logger::Instance()->log("check if User is logged");
 		if (!is_user_logged_in()) {
 			$url = $_SERVER["REQUEST_URI"];
-			$logger->log("User not logged, checking page : " . $url);
+			Logger::Instance()->log("User not logged, checking page : " . $url);
 			if (strpos($url, "wp-login.php") === false 
 				&& strpos($url, "connect") == false
 				&& strpos($url, "state") == false
 				&& strpos($url, "connect") == false
 				) {
-				$logger->log("User not logged, redirecting to login page");
+				Logger::Instance()->log("User not logged, redirecting to login page");
 				$url = $_SERVER['HTTP_HOST'] . "/wp-login.php";
 				wp_safe_redirect( wp_login_url(), 302 ); exit();
 				//$this->fail("");
@@ -393,7 +393,7 @@ Class WPOA {
 	// handle the querystring triggers:
 	function wpoa_qvar_handlers() {
 		if (get_query_var('connect')) {
-			$logger->log("using connect");
+			Logger::Instance()->log("using connect");
 			$provider = get_query_var('connect');
 			$this->wpoa_include_connector($provider);
 		}
@@ -414,7 +414,7 @@ Class WPOA {
 		$provider = str_replace(" ", "", $provider);
 		$provider = str_replace(".", "", $provider);
 		// include the provider script:
-		$logger->log("Loading provider " . $provider);
+		Logger::Instance()->log("Loading provider " . $provider);
 		include 'login-' . $provider . '.php';
 	}
 	
@@ -428,7 +428,7 @@ Class WPOA {
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
 		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity[WPOA_Session::PROVIDER] . "|" . $oauth_identity[WPOA_Session::USER_ID] . "%'";
-		$logger->log($query_string);
+		Logger::Instance()->log($query_string);
 		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
 		//print_r( $query_result ); exit;
@@ -439,12 +439,12 @@ Class WPOA {
 	
 	// login (or register and login) a wordpress user based on their oauth identity:
 	function wpoa_login_user($oauth_identity) {
-		$logger->log("login_user ... ");
+		Logger::Instance()->log("login_user ... ");
 		ob_start();
 		var_dump($oauth_identity);
 		$log = ob_get_clean();
 		ob_end_clean();
-		$logger->log($log);
+		Logger::Instance()->log($log);
 		
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		WPOA_Session::set_id($oauth_identity[WPOA_Session::USER_ID]);
@@ -452,7 +452,7 @@ Class WPOA {
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
-			$logger->log("there was a matching wordpress user account, log it in now");
+			Logger::Instance()->log("there was a matching wordpress user account, log it in now");
 			$user_id = $matched_user->ID;
 			$user_login = $matched_user->user_login;
 			wp_set_current_user( $user_id, $user_login );
@@ -463,7 +463,7 @@ Class WPOA {
 		}
 		// handle the already logged in user if there is one:
 		if ( is_user_logged_in() ) {
-			$logger->log("there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now");
+			Logger::Instance()->log("there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now");
 			global $current_user;
 			get_currentuserinfo();
 			$user_id = $current_user->ID;
@@ -482,7 +482,7 @@ Class WPOA {
 	
 	// ends the login request by clearing the login state and redirecting the user to the desired page:
 	function wpoa_end_login($msg) {
-		$logger->log("wpoa_end_login : " . $msg);
+		Logger::Instance()->log("wpoa_end_login : " . $msg);
 		$last_url = WPOA_Session::get_last_url();
 		WPOA_Session::clear_last_url();
 		WPOA_Session::set_result($msg);
@@ -568,11 +568,11 @@ Class WPOA {
 	// links a third-party account to an existing wordpress user account:
 	function wpoa_link_account($user_id) {
 		$id = WPOA_Session::get_id();
-		$logger->log("Linking account with user id" . $id);
+		Logger::Instance()->log("Linking account with user id" . $id);
 		if ($id && $id != '') {
 			add_user_meta( $user_id, 'wpoa_identity', WPOA_Session::get_provider() . '|' . $id . '|' . time());
 		} else {
-			$logger->log("wpoa_link_account : no user id");
+			Logger::Instance()->log("wpoa_link_account : no user id");
 		}
 	}
 
@@ -931,7 +931,7 @@ Class WPOA {
 
 	function fail($message)
 	{
-		$logger->log($message);
+		Logger::Instance()->log($message);
 		WPOA_Session::set_result($message);
 		// header("Location: " . WPOA_Session::get_last_url());
 		wp_safe_redirect( wp_login_url(), 302 ); exit();
