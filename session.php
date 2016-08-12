@@ -1,11 +1,12 @@
 <?php
 
+include_once "logger.php";
+
 class WPOA_Session {
     public static function start()
     {
-        if (!isset($_SESSION)) {
-            session_start();
-        }
+        session_start();    
+        $logger->dump($_SESSION);
     }
 
     public static function get_id() {
@@ -13,7 +14,6 @@ class WPOA_Session {
     }
 
     public static function set_id($value) {
-        start();
         $_SESSION['WPOA']['USER_ID'] = $value;
     }
 
@@ -22,7 +22,6 @@ class WPOA_Session {
     }
 
     public static function set_provider($value) {
-        start();
         $_SESSION['WPOA']['PROVIDER'] = $value;
     }
     
@@ -31,7 +30,6 @@ class WPOA_Session {
     }
 
     public static function set_email($value) {
-        start();
         $_SESSION['WPOA']['USER_EMAIL'] = $value;
     }
 
@@ -40,7 +38,6 @@ class WPOA_Session {
     }
 
     public static function set_token($value) {
-        start();
         $_SESSION['WPOA']['ACCESS_TOKEN'] = $value;
     }
     
@@ -49,7 +46,6 @@ class WPOA_Session {
     }
 
     public static function set_expires_in($value) {
-        start();
         $_SESSION['WPOA']['EXPIRES_IN'] = $value;
     }
     
@@ -58,7 +54,6 @@ class WPOA_Session {
     }
 
     public static function set_expires_at($value) {
-        start();
         $_SESSION['WPOA']['EXPIRES_AT'] = $value;
     }
    
@@ -66,8 +61,16 @@ class WPOA_Session {
         return $_SESSION['WPOA']['LAST_URL'];
     }
 
+    
+    public static function set_last_url($value) {
+        $_SESSION['WPOA']['LAST_URL'] = $value;
+    }
+
+    public static function clear_last_url() {
+        unset($_SESSION["WPOA"]["LAST_URL"]);
+    }
+
     public static function save_last_url() {
-        start();
         // try to obtain the redirect_url from the default login page:
 	    $redirect_url = esc_url($_GET['redirect_to']);
 	    // if no redirect_url was found, set it to the user's last page:
@@ -77,8 +80,29 @@ class WPOA_Session {
     	// set the user's last page so we can return that user there after they login:
     	$_SESSION['WPOA']['LAST_URL'] = $redirect_url;
     }
+
+    public static function get_result() {
+        return $_SESSION["WPOA"]["RESULT"];
+    }
+
+    public static function set_result($value) {
+        $logger->log("SESSION : Set_result = " . $value);
+        $_SESSION["WPOA"]["RESULT"] = $value;
+    }
+
+    
+    public static function get_state() {
+        return $_SESSION['WPOA']['STATE'];
+    }
+
+    public static function set_state($value) {
+        $_SESSION['WPOA']['STATE'] = $value;
+    }
+    
    
     public static function clear() {
+        $logger->log("SESSION : Clearing session");
+        // print_stack_trace();
         unset($_SESSION["WPOA"]["PROVIDER"]);
         unset($_SESSION["WPOA"]["USER_ID"]);
 		unset($_SESSION["WPOA"]["USER_EMAIL"]);
@@ -86,5 +110,9 @@ class WPOA_Session {
 		unset($_SESSION["WPOA"]["EXPIRES_IN"]);
 		unset($_SESSION["WPOA"]["EXPIRES_AT"]);
 		unset($_SESSION["WPOA"]["LAST_URL"]);
+        unset($_SESSION["WPOA"]["RESULT"]);
+        unset($_SESSION['WPOA']['STATE']);
     }
 }
+
+WPOA_Session::start();
