@@ -4,16 +4,19 @@ include_once 'session.php';
 include_once 'login-common.php';
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-WPOA_Session::set_provider('Google');
+WPOA_Session::set_provider('Windows Azure');
 define('HTTP_UTIL', get_option('wpoa_http_util'));
-define('CLIENT_ENABLED', get_option('wpoa_google_api_enabled'));
-define('CLIENT_ID', get_option('wpoa_google_api_id'));
-define('CLIENT_SECRET', get_option('wpoa_google_api_secret'));
+define('CLIENT_ENABLED', get_option('wpoa_windowsazure_api_enabled'));
+define('CLIENT_ID', get_option('wpoa_windowsazure_api_id'));
+define('CLIENT_SECRET', get_option('wpoa_windowsazure_api_secret'));
+define('TENANT_ID', get_option('wpoa_windowsazure_tenant_id'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'profile'); // PROVIDER SPECIFIC: 'profile' is the minimum scope required to get the user's id from Google
-define('URL_AUTH', "https://accounts.google.com/o/oauth2/auth?");
-define('URL_TOKEN', "https://accounts.google.com/o/oauth2/token?");
-define('URL_USER', "https://www.googleapis.com/plus/v1/people/me?");
+define('SCOPE', 'https%3A%2F%2Fgraph.microsoft.com%2Fmail.read');
+define('URL_AUTH', "https://login.microsoftonline.com/" . TENANT_ID . "/oauth2/authorize?");
+define('URL_TOKEN', "https://login.microsoftonline.com/" . TENANT_ID . "/oauth2/token");
+define('GRAPH', "https://graph.windows.net/");
+define('URL_USER', "GRAPH" . TENANT_ID . "/me?");
+
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 WPOA_Session::save_last_url();
@@ -55,6 +58,7 @@ else {
 	if ((empty(WPOA_Session::get_expires_at())) || (time() > WPOA_Session::get_expires_at())) {
 		// expired token; clear the state:
 		$this->wpoa_clear_login_state();
+		WPOA_Session::set_provider('Windows Azure');
 	}
 	get_oauth_code($this);
 }
@@ -66,37 +70,43 @@ $this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow te
 function get_oauth_code($wpoa) {
 	$params = array(
 		'response_type' => 'code',
+		'response_mode' => 'query',
 		'client_id' => CLIENT_ID,
 		'scope' => SCOPE,
 		'state' => uniqid('', true),
 		'redirect_uri' => REDIRECT_URI,
-		'scope' => 'email',
+		'resource' => GRAPH
 	);
 	WPOA_Session::set_state($params['state']);
 	$url = URL_AUTH . http_build_query($params);
+	$logger->log("AZURE : Get Oauth code from : " . $url);
 	header("Location: $url");
 	exit;
 }
 
 function get_oauth_token($wpoa) {
+	$logger->log("AZURE : get_oauth_token");
 	$params = array(
 		'grant_type' => 'authorization_code',
 		'client_id' => CLIENT_ID,
 		'client_secret' => CLIENT_SECRET,
 		'code' => $_GET['code'],
 		'redirect_uri' => REDIRECT_URI,
+		'resource' => GRAPH,
 	);
 	$url_params = http_build_query($params);
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
 			$url = URL_TOKEN . $url_params;
+			$url = URL_TOKEN;
 			$curl = init_curl($url);
+			// curl_setopt($curl, CURLOPT_URL, $url);
 			curl_setopt($curl, CURLOPT_POST, 1);
-			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-			// PROVIDER NORMALIZATION: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
-			// PROVIDER NORMALIZATION: PayPal/Reddit requires sending the client id/secret via http basic authentication
+			curl_setopt($curl, CURLOPT_POSTFIELDS, $params); // TODO: for Google we use $params...
+			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
+			// PROVIDER NORMALIZATION: Reddit requires sending the client id/secret via http basic authentication...
 			
-			$result = exec_curl($curl, "google get token");
+			$result = exec_curl($curl, "Get oauth token");
 			break;
 		case 'stream-context':
 			$url = rtrim(URL_TOKEN, "?");
@@ -115,9 +125,9 @@ function get_oauth_token($wpoa) {
 			break;
 	}
 	// parse the result:
-	$result_obj = json_decode($result, true); // PROVIDER SPECIFIC: Google encodes the access token result as json by default
-	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Google returns the access token KEEP THIS PROTECTED!
-	$expires_in = $result_obj['expires_in']; // PROVIDER SPECIFIC: this is how Google returns the access token's expiration
+	$result_obj = json_decode($result, true); // PROVIDER SPECIFIC: Windows Live encodes the access token result as json by default
+	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Windows Live returns the access token KEEP THIS PROTECTED!
+	$expires_in = $result_obj['expires_in']; // PROVIDER SPECIFIC: this is how Windows Live returns the access token's expiration
 	$expires_at = time() + $expires_in;
 	// handle the result:
 	if (!$access_token || !$expires_in) {
@@ -133,20 +143,27 @@ function get_oauth_token($wpoa) {
 }
 
 function get_oauth_identity($wpoa) {
+	$logger->log("AZURE : get_oauth_identity");
 	// here we exchange the access token for the user info...
 	// set the access token param:
+	$access_token = WPOA_Session::get_token();
+	$logger->log("AZURE : token = " .$access_token);
 	$params = array(
-		'access_token' => WPOA_Session::get_token(), // PROVIDER SPECIFIC: the access_token is passed to Google via POST param
+		"api-version" => "1.6",
 	);
 	$url_params = http_build_query($params);
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
+			$url = GRAPH . TENANT_ID . "/me?";
+			$url .= $url_params;
 			$curl = init_curl($url);
-			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
-			// PROVIDER NORMALIZATION: PayPal/Reddit require that we send the access token via a bearer header, PayPal also requires a Content-Type: application/json header, LinkedIn requires an x-li-format: json header...
-			$result = exec_curl($curl, "google identity");
+			curl_setopt($curl, CURLOPT_URL, $url);
+			curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // TODO: does Windows Live require this?
+			curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $access_token)); // PROVIDER SPECIFIC: do we have to do this for Windows Live?
+			// curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json')); // PROVIDER SPECIFIC: I think this is only for LinkedIn...
+			
+			$result = exec_curl($curl, "get oauth identity");
 			$result_obj = json_decode($result, true);
 			break;
 		case 'stream-context':
@@ -166,41 +183,16 @@ function get_oauth_identity($wpoa) {
 			$result_obj = json_decode($result, true);
 			break;
 	}
-	$result_obj = verify_domain($result_obj, $wpoa);
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity[WPOA_Session::PROVIDER] = WPOA_Session::get_provider();
-	$oauth_identity[WPOA_Session::USER_ID] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
+	$oauth_identity[WPOA_Session::USER_ID] = $result_obj['objectId']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
 	$oauth_identity[WPOA_Session::USER_NAME] = $result_obj['displayName'];
-	$oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['emails'][0]['value'];
+	$oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['userPrincipalName'];
 	if (!$oauth_identity[WPOA_Session::USER_ID]) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
 	return $oauth_identity;
 }
-
-function verify_domain($base_result, $wpoa)
-{
-	$allowedConfig = get_option('wpoa_google_check_domain');
-	if (!$allowedConfig) {
-		return $base_result;
-	}
-	
-	$allowedConfig = str_replace(" ", "", $allowedConfig);
-	$key = "domain";
-	$value = "Gmail";
-	if (array_key_exists($key, $base_result))
-	{
-		$value = $base_result[$key]; 
-		$allowed = explode(",", $allowedConfig);  
-		if ($value && in_array($value, $allowed))
-		{
-			return $base_result;
-		}
-	}
-	$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Your ". $key ." is not allowed : " . $value);
-	return $null;
-}
 # END OF AUTHENTICATION FLOW HELPER FUNCTIONS #
 ?>
-

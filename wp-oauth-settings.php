@@ -512,6 +512,14 @@
 					<input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
 				</td>
 				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Limit to following domains (for non gmail account) :</th>
+				<td>
+					<input type='text' name='wpoa_google_check_domain' value='<?php echo get_option('wpoa_google_check_domain'); ?>' />
+				</td>
+				</tr>
+			
 			</table> <!-- .form-table -->
 			<p>
 				<strong>Instructions:</strong>
@@ -521,6 +529,7 @@
 					<li>At Google, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new Project's Redirect URI. Don't forget the trailing slash!</li>
 					<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when they are asked to grant access to your site/app.</li>
 					<li>Paste your Client ID/Secret provided by Google into the fields above, then click the Save all settings button.</li>
+					<li>If you use a corporate account, you can limit to your compagny by sessing the limit domain. If you have multiple domain, use coma for separation (ie: example.com, another-example.com)</li>
 				</ol>
 			</p>
 			<?php submit_button('Save all settings'); ?>
@@ -816,6 +825,50 @@
 					<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
 					<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 					<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click the Save all settings button.</li>
+				</ol>
+			</p>
+			<?php submit_button('Save all settings'); ?>
+			</div> <!-- .form-padding -->
+			</div> <!-- .wpoa-settings-section -->
+			<!-- END Login with Windows Live section -->
+
+			<!-- START Login with Windows Azure section -->
+			<div id="wpoa-settings-section-login-with-windowsAzure" class="wpoa-settings-section">
+			<h3>Login with Windows Azure or Office 365</h3>
+			<div class='form-padding'>
+			<table class='form-table'>
+				<tr valign='top'>
+				<th scope='row'>Enabled:</th>
+				<td>
+					<input type='checkbox' name='wpoa_windowsazure_api_enabled' value='1' <?php checked(get_option('wpoa_windowsazure_api_enabled') == 1); ?> />
+				</td>
+				</tr>
+				
+				<tr valign='top'>
+				<th scope='row'>Client ID:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_api_id' value='<?php echo get_option('wpoa_windowsazure_api_id'); ?>' />
+				</td>
+				</tr>
+				 
+				<tr valign='top'>
+				<th scope='row'>Client Secret:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_api_secret' value='<?php echo get_option('wpoa_windowsazure_api_secret'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Tenant Id:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_tenant_id' value='<?php echo get_option('wpoa_windowsazure_tenant_id'); ?>' />
+				</td>
+				</tr>
+			</table> <!-- .form-table -->
+			<p>
+				<strong>Instructions:</strong>
+				<ol>
+					<li>Follow <b>Register your application with your AD tenant</b> section : <a target="_blank" href="https://azure.microsoft.com/en-us/documentation/articles/active-directory-protocols-oauth-code/">https://azure.microsoft.com/en-us/documentation/articles/active-directory-protocols-oauth-code/</a>.</li>
 				</ol>
 			</p>
 			<?php submit_button('Save all settings'); ?>

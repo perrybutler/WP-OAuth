@@ -11,9 +11,9 @@ License: GPL2
 */
 
 // start the user session for persisting user/login state during ajax, header redirect, and cross domain calls:
-if (!isset($_SESSION)) {
-    session_start();
-}
+include_once "logger.php";
+include_once 'session.php';
+
 
 // plugin class:
 Class WPOA {
@@ -84,6 +84,7 @@ Class WPOA {
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
 		'wpoa_google_api_secret' => '',									// any string
+		'wpoa_google_check_domain' => '',								// any string
 		'wpoa_facebook_api_enabled' => 0,								// 0, 1
 		'wpoa_facebook_api_id' => '',									// any string
 		'wpoa_facebook_api_secret' => '',								// any string
@@ -102,6 +103,10 @@ Class WPOA {
 		'wpoa_windowslive_api_enabled' => 0,							// 0, 1
 		'wpoa_windowslive_api_id' => '',								// any string
 		'wpoa_windowslive_api_secret' => '',							// any string
+		'wpoa_windowsazure_api_enabled' => 0,							// 0, 1
+		'wpoa_windowsazure_api_id' => '',								// any string
+		'wpoa_windowsazure_api_secret' => '',							// any string
+		'wpoa_windowsazure_tenant_id' => '',							// any string
 		'wpoa_paypal_api_enabled' => 0,									// 0, 1
 		'wpoa_paypal_api_id' => '',										// any string
 		'wpoa_paypal_api_secret' => '',									// any string
@@ -127,6 +132,7 @@ Class WPOA {
 	
 	// when the plugin class gets created, fire the initialization:
 	function __construct() {
+		$logger->log("Create instance");
 		// hook activation and deactivation for the plugin:
 		register_activation_hook(__FILE__, array($this, 'wpoa_activate'));
 		register_deactivation_hook(__FILE__, array($this, 'wpoa_deactivate'));
@@ -211,6 +217,25 @@ Class WPOA {
 		<?php
 	}
 
+	
+	function redirect_to_login_if_not_logged() {
+		$logger->log("check if User is logged");
+		if (!is_user_logged_in()) {
+			$url = $_SERVER["REQUEST_URI"];
+			$logger->log("User not logged, checking page : " . $url);
+			if (strpos($url, "wp-login.php") === false 
+				&& strpos($url, "connect") == false
+				&& strpos($url, "state") == false
+				&& strpos($url, "connect") == false
+				) {
+				$logger->log("User not logged, redirecting to login page");
+				$url = $_SERVER['HTTP_HOST'] . "/wp-login.php";
+				wp_safe_redirect( wp_login_url(), 302 ); exit();
+				//$this->fail("");
+			} 
+		}
+	}
+
 	// initialize the plugin's functionality by hooking into wordpress:
 	function init() {
 		// restore default settings if necessary; this might get toggled by the admin or forced by a new version of the plugin:
@@ -245,6 +270,8 @@ Class WPOA {
 			add_filter('admin_footer', array($this, 'wpoa_push_login_messages'));
 			add_filter('login_footer', array($this, 'wpoa_push_login_messages'));
 		}
+
+		$this->redirect_to_login_if_not_logged();
 	}
 	
 	// init scripts and styles for use on FRONTEND PAGES:
@@ -301,9 +328,8 @@ Class WPOA {
 	
 	// init scripts and styles for use on the LOGIN PAGE:
 	function wpoa_init_login_scripts_styles() {
-		if (isset($_SESSION['WPOA']['RESULT'])) {
-			$login_message = $_SESSION['WPOA']['RESULT'];
-		} else {
+		$login_message = WPOA_Session::get_result();
+		if (!$login_message) {
 			$login_message = '';
 		}
 		// here we "localize" php variables, making them available as a js variable in the browser:
@@ -367,15 +393,16 @@ Class WPOA {
 	// handle the querystring triggers:
 	function wpoa_qvar_handlers() {
 		if (get_query_var('connect')) {
+			$logger->log("using connect");
 			$provider = get_query_var('connect');
 			$this->wpoa_include_connector($provider);
 		}
 		elseif (get_query_var('code')) {
-			$provider = $_SESSION['WPOA']['PROVIDER'];
+			$provider = WPOA_Session::get_provider();
 			$this->wpoa_include_connector($provider);
 		}
 		elseif (get_query_var('error_description') || get_query_var('error_message')) {
-			$provider = $_SESSION['WPOA']['PROVIDER'];
+			$provider = WPOA_Session::get_provider();
 			$this->wpoa_include_connector($provider);
 		}
 	}
@@ -387,6 +414,7 @@ Class WPOA {
 		$provider = str_replace(" ", "", $provider);
 		$provider = str_replace(".", "", $provider);
 		// include the provider script:
+		$logger->log("Loading provider " . $provider);
 		include 'login-' . $provider . '.php';
 	}
 	
@@ -396,10 +424,11 @@ Class WPOA {
 
 	// match the oauth identity to an existing wordpress user account:
 	function wpoa_match_wordpress_user($oauth_identity) {
-		// attempt to get a wordpress user id from the database that matches the $oauth_identity['id'] value:
+		// attempt to get a wordpress user id from the database that matches the $oauth_identity[WPOA_Session::USER_ID] value:
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
-		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity['provider'] . "|" . $oauth_identity['id'] . "%'";
+		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity[WPOA_Session::PROVIDER] . "|" . $oauth_identity[WPOA_Session::USER_ID] . "%'";
+		$logger->log($query_string);
 		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
 		//print_r( $query_result ); exit;
@@ -410,13 +439,20 @@ Class WPOA {
 	
 	// login (or register and login) a wordpress user based on their oauth identity:
 	function wpoa_login_user($oauth_identity) {
+		$logger->log("login_user ... ");
+		ob_start();
+		var_dump($oauth_identity);
+		$log = ob_get_clean();
+		ob_end_clean();
+		$logger->log($log);
+		
 		// store the user info in the user session so we can grab it later if we need to register the user:
-		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
+		WPOA_Session::set_id($oauth_identity[WPOA_Session::USER_ID]);
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
-			// there was a matching wordpress user account, log it in now:
+			$logger->log("there was a matching wordpress user account, log it in now");
 			$user_id = $matched_user->ID;
 			$user_login = $matched_user->user_login;
 			wp_set_current_user( $user_id, $user_login );
@@ -427,7 +463,7 @@ Class WPOA {
 		}
 		// handle the already logged in user if there is one:
 		if ( is_user_logged_in() ) {
-			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
+			$logger->log("there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now");
 			global $current_user;
 			get_currentuserinfo();
 			$user_id = $current_user->ID;
@@ -446,9 +482,10 @@ Class WPOA {
 	
 	// ends the login request by clearing the login state and redirecting the user to the desired page:
 	function wpoa_end_login($msg) {
-		$last_url = $_SESSION["WPOA"]["LAST_URL"];
-		unset($_SESSION["WPOA"]["LAST_URL"]);
-		$_SESSION["WPOA"]["RESULT"] = $msg;
+		$logger->log("wpoa_end_login : " . $msg);
+		$last_url = WPOA_Session::get_last_url();
+		WPOA_Session::clear_last_url();
+		WPOA_Session::set_result($msg);
 		$this->wpoa_clear_login_state();
 		$redirect_method = get_option("wpoa_login_redirect");
 		$redirect_url = "";
@@ -488,7 +525,7 @@ Class WPOA {
 	
 	// ends the logout request by redirecting the user to the desired page:
 	function wpoa_end_logout() {
-		$_SESSION["WPOA"]["RESULT"] = 'Logged out successfully.';
+		WPOA_Session::set_result('Logged out successfully.');
 		if (is_user_logged_in()) {
 			// user is logged in and trying to logout...get their Last Page:
 			$last_url = $_SERVER['HTTP_REFERER'];
@@ -497,7 +534,7 @@ Class WPOA {
 			// user is NOT logged in and trying to logout...get their Last Page minus the querystring so we don't trigger the logout confirmation:
 			$last_url = strtok($_SERVER['HTTP_REFERER'], "?");
 		}
-		unset($_SESSION["WPOA"]["LAST_URL"]);
+		WPOA_Session::clear_last_url();
 		$this->wpoa_clear_login_state();
 		$redirect_method = get_option("wpoa_logout_redirect");
 		$redirect_url = "";
@@ -530,8 +567,12 @@ Class WPOA {
 	
 	// links a third-party account to an existing wordpress user account:
 	function wpoa_link_account($user_id) {
-		if ($_SESSION['WPOA']['USER_ID'] != '') {
-			add_user_meta( $user_id, 'wpoa_identity', $_SESSION['WPOA']['PROVIDER'] . '|' . $_SESSION['WPOA']['USER_ID'] . '|' . time());
+		$id = WPOA_Session::get_id();
+		$logger->log("Linking account with user id" . $id);
+		if ($id && $id != '') {
+			add_user_meta( $user_id, 'wpoa_identity', WPOA_Session::get_provider() . '|' . $id . '|' . time());
+		} else {
+			$logger->log("wpoa_link_account : no user id");
 		}
 	}
 
@@ -561,21 +602,18 @@ Class WPOA {
 	
 	// pushes login messages into the dom where they can be extracted by javascript:
 	function wpoa_push_login_messages() {
-		if (isset($_SESSION['WPOA']['RESULT'])) {
-			$result = $_SESSION['WPOA']['RESULT'];
+		$result = WPOA_Session::get_result();
+		if ($result) {
 			echo "<div id='wpoa-result'>" . $result . "</div>";
 		}
-		$_SESSION['WPOA']['RESULT'] = '';
+		WPOA_Session::set_result('');
 	}
 	
 	// clears the login state:
 	function wpoa_clear_login_state() {
-		unset($_SESSION["WPOA"]["USER_ID"]);
-		unset($_SESSION["WPOA"]["USER_EMAIL"]);
-		unset($_SESSION["WPOA"]["ACCESS_TOKEN"]);
-		unset($_SESSION["WPOA"]["EXPIRES_IN"]);
-		unset($_SESSION["WPOA"]["EXPIRES_AT"]);
-		//unset($_SESSION["WPOA"]["LAST_URL"]);
+		$provider = WPOA_Session::get_provider();
+		WPOA_Session::clear();
+		WPOA_Session::set_provider($provider);
 	}
 	
 	// ===================================
@@ -729,6 +767,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
 		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
+		$html .= $this->wpoa_login_button("windowsazure", "Windows Azure", $atts);
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
 		$html .= $this->wpoa_login_button("battlenet", "Battlenet", $atts);
@@ -888,6 +927,15 @@ Class WPOA {
 		}
 		$blog_url = rtrim(site_url(), "/") . "/";
 		include 'wp-oauth-settings.php';
+	}
+
+	function fail($message)
+	{
+		$logger->log($message);
+		WPOA_Session::set_result($message);
+		// header("Location: " . WPOA_Session::get_last_url());
+		wp_safe_redirect( wp_login_url(), 302 ); exit();
+		exit;
 	}
 } // END OF WPOA CLASS
 
