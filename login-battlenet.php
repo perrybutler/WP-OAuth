@@ -171,10 +171,10 @@ function get_oauth_identity($wpoa) {
 	}
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
-	$oauth_identity['provider'] = WPOA_Session::get_provider();
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
-	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
-	if (!$oauth_identity['id']) {
+	$oauth_identity[WPOA_Session::PROVIDER] = WPOA_Session::get_provider();
+	$oauth_identity[WPOA_Session::USER_ID] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
+	//$oauth_identity[WPOA_Session::USER_NAME] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
+	if (!$oauth_identity[WPOA_Session::USER_ID]) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
 	return $oauth_identity;

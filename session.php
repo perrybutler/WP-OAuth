@@ -3,6 +3,11 @@
 include_once "logger.php";
 
 class WPOA_Session {
+    const PROVIDER = 'provider';
+    const USER_ID = 'user_id';
+    const USER_NAME = 'user_name';
+    const USER_EMAIL = 'user_email';
+    
     public static function start()
     {
         session_start();    
@@ -71,13 +76,11 @@ class WPOA_Session {
     }
 
     public static function save_last_url() {
-        // try to obtain the redirect_url from the default login page:
+        // try to obtain the redirect_url from the default login page. If no one exists, then get user's last page
 	    $redirect_url = esc_url($_GET['redirect_to']);
-	    // if no redirect_url was found, set it to the user's last page:
 	    if (!$redirect_url) {
     		$redirect_url = strtok($_SERVER['HTTP_REFERER'], "?");
     	}
-    	// set the user's last page so we can return that user there after they login:
     	$_SESSION['WPOA']['LAST_URL'] = $redirect_url;
     }
 
@@ -102,7 +105,6 @@ class WPOA_Session {
    
     public static function clear() {
         $logger->log("SESSION : Clearing session");
-        // print_stack_trace();
         unset($_SESSION["WPOA"]["PROVIDER"]);
         unset($_SESSION["WPOA"]["USER_ID"]);
 		unset($_SESSION["WPOA"]["USER_EMAIL"]);
