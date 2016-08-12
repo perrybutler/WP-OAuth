@@ -1,12 +1,9 @@
 <?php
 
-// start the user session for maintaining individual user states during the multi-stage authentication flow:
-if (!isset($_SESSION)) {
-    session_start();
-}
+include_once 'session.php';
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-$_SESSION['WPOA']['PROVIDER'] = 'Battle.net';
+WPOA_Session::set_provider('Battle.net');
 define('HTTP_UTIL', get_option('wpoa_http_util'));
 define('CLIENT_ENABLED', get_option('wpoa_battlenet_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_battlenet_api_id'));
@@ -18,17 +15,7 @@ define('URL_TOKEN', "https://us.battle.net/oauth/token?");
 define('URL_USER', "https://us.api.battle.net/account/user/id?");
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
-// remember the user's last url so we can redirect them back to there after the login ends:
-if (!$_SESSION['WPOA']['LAST_URL']) {
-	// try to obtain the redirect_url from the default login page:
-	$redirect_url = esc_url($_GET['redirect_to']);
-	// if no redirect_url was found, set it to the user's last page:
-	if (!$redirect_url) {
-		$redirect_url = strtok($_SERVER['HTTP_REFERER'], "?");
-	}
-	// set the user's last page so we can return that user there after they login:
-	$_SESSION['WPOA']['LAST_URL'] = $redirect_url;
-}
+WPOA_Session::save_last_url();
 
 # AUTHENTICATION FLOW #
 // the oauth 2.0 authentication flow will start in this script and make several calls to the third-party authentication provider which in turn will make callbacks to this script that we continue to handle until the login completes with a success or failure:
@@ -49,7 +36,7 @@ elseif (isset($_GET['error_message'])) {
 }
 elseif (isset($_GET['code'])) {
 	// post-auth phase, verify the state:
-	if ($_SESSION['WPOA']['STATE'] == $_GET['state']) {
+	if (WPOA_Session::get_state() == $_GET['state']) {
 		// get an access token from the third party provider:
 		get_oauth_token($this);
 		// get the user's third-party identity and attempt to login/register a matching wordpress user account:
@@ -64,7 +51,7 @@ elseif (isset($_GET['code'])) {
 }
 else {
 	// pre-auth, start the auth process:
-	if ((empty($_SESSION['WPOA']['EXPIRES_AT'])) || (time() > $_SESSION['WPOA']['EXPIRES_AT'])) {
+	if ((empty(WPOA_Session::get_expires_at())) || (time() > WPOA_Session::get_expires_at())) {
 		// expired token; clear the state:
 		$this->wpoa_clear_login_state();
 	}
@@ -83,7 +70,7 @@ function get_oauth_code($wpoa) {
 		'state' => uniqid('', true),
 		'redirect_uri' => REDIRECT_URI,
 	);
-	$_SESSION['WPOA']['STATE'] = $params['state'];
+	WPOA_Session::set_state($params['state']);
 	$url = URL_AUTH . http_build_query($params);
 	header("Location: $url");
 	exit;
@@ -139,9 +126,9 @@ function get_oauth_token($wpoa) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. Malformed access token result detected. Please notify the admin or try again later.");
 	}
 	else {
-		$_SESSION['WPOA']['ACCESS_TOKEN'] = $access_token;
-		$_SESSION['WPOA']['EXPIRES_IN'] = $expires_in;
-		$_SESSION['WPOA']['EXPIRES_AT'] = $expires_at;
+		WPOA_Session::set_token($access_token);
+		WPOA_Session::set_expires_in($expires_in);
+		WPOA_Session::set_expires_at($expires_at);
 		return true;
 	}
 }
@@ -150,7 +137,7 @@ function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
 	$params = array(
-		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access_token is passed to Google via POST param
+		'access_token' => WPOA_Session::get_token(), // PROVIDER SPECIFIC: the access_token is passed to Google via POST param
 	);
 	$url_params = http_build_query($params);
 	// perform the http request:
@@ -171,7 +158,7 @@ function get_oauth_identity($wpoa) {
 				array(
 					'method'  => 'GET',
 					// PROVIDER NORMALIZATION: Reddit/Github User-Agent
-					'header'  => "Authorization: Bearer " . $_SESSION['WPOA']['ACCESS_TOKEN'] . "\r\n" . "x-li-format: json\r\n", // PROVIDER SPECIFIC: i think only LinkedIn uses x-li-format...
+					'header'  => "Authorization: Bearer " . WPOA_Session::get_token() . "\r\n" . "x-li-format: json\r\n", // PROVIDER SPECIFIC: i think only LinkedIn uses x-li-format...
 				)
 			);
 			$context = $context  = stream_context_create($opts);
@@ -184,7 +171,7 @@ function get_oauth_identity($wpoa) {
 	}
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
-	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
+	$oauth_identity['provider'] = WPOA_Session::get_provider();
 	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
 	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
 	if (!$oauth_identity['id']) {
