@@ -176,10 +176,10 @@ function get_oauth_identity($wpoa) {
 	}
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
-	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Windows Live returns the user's unique id
-	//$oauth_identity['email'] = 'not_provided'; // PROVIDER SPECIFIC: Windows Live never provides the user's email!
-	if (!$oauth_identity['id']) {
+	$oauth_identity[WPOA_Session::PROVIDER] = $_SESSION['WPOA']['PROVIDER'];
+	$oauth_identity[WPOA_Session::USER_ID] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Windows Live returns the user's unique id
+	//$oauth_identity[WPOA_Session::USER_NAME] = 'not_provided'; // PROVIDER SPECIFIC: Windows Live never provides the user's email!
+	if (!$oauth_identity[WPOA_Session::USER_ID]) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
 	return $oauth_identity;
