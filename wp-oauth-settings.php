@@ -982,7 +982,7 @@
 			<!-- END Login with Battle.net section -->
 
 			<!-- START Login with Custom OAuth provider section -->
-			<div id="wpoa-settings-section-login-with-battlenet" class="wpoa-settings-section">
+			<div id="wpoa-settings-section-login-with-custom" class="wpoa-settings-section">
 			<h3>Login with a custom OAuth2 provider</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
