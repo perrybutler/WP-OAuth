@@ -3,22 +3,6 @@
 include_once 'session.php';
 include_once 'login-common.php';
 
-# DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-WPOA_Session::set_provider('Windows Azure');
-define('HTTP_UTIL', get_option('wpoa_http_util'));
-define('CLIENT_ENABLED', get_option('wpoa_windowsazure_api_enabled'));
-define('CLIENT_ID', get_option('wpoa_windowsazure_api_id'));
-define('CLIENT_SECRET', get_option('wpoa_windowsazure_api_secret'));
-define('TENANT_ID', get_option('wpoa_windowsazure_tenant_id'));
-define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'https%3A%2F%2Fgraph.microsoft.com%2Fmail.read');
-define('URL_AUTH', "https://login.microsoftonline.com/" . TENANT_ID . "/oauth2/authorize?");
-define('URL_TOKEN', "https://login.microsoftonline.com/" . TENANT_ID . "/oauth2/token");
-define('GRAPH', "https://graph.windows.net/");
-define('URL_USER', "GRAPH" . TENANT_ID . "/me?");
-
-# END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
-
 error_reporting(E_ALL | E_STRICT);
 
 class LoginAzure extends AbstractLoginCommon {
