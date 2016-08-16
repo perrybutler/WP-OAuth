@@ -10,6 +10,9 @@ function init_curl($url) {
   curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, ($verify_ssl == 1 ? 1 : 0));
   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, ($verify_ssl == 1 ? 2 : 0));
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+  
+  //curl_setopt($curl, CURLOPT_VERBOSE, true);
+  //curl_setopt($curl, CURLOPT_STDERR, fopen('php://stderr', 'w'));
   return $curl;
 }
 
@@ -42,14 +45,13 @@ abstract class AbstractLoginCommon {
   private $clientEnabled;
   private $clientId;
   private $clientSecret;
-  //   define('TENANT_ID', get_option('wpoa_windowsazure_tenant_id'));
+  
   private $redirectUri;
 
   private $requestMode;
   
   protected $useBearer;
-  //   define('SCOPE', 'https%3A%2F%2Fgraph.microsoft.com%2Fmail.read');
-  
+    
   protected function __construct($name, $urlAuth, $urlToken, $urlUser, $wpoa) {
     $this->id = $this->clean($name);
     $this->name = $name;
@@ -129,11 +131,12 @@ abstract class AbstractLoginCommon {
     Logger::Instance()->log($this->id . ": Get Oauth code from : " . $url);
     header("Location: $url");
     exit;
-    }
+  }
   
     
-    function getOAuthToken() {
-    Logger::Instance()->log($this->id . ": Get Token");
+  function getOAuthToken() {
+    $logMessage = $this->id . ": Get Token";
+    Logger::Instance()->log($logMessage);
     $params = array(
       'grant_type' => 'authorization_code',
       'client_id' => $this->clientId,
@@ -148,11 +151,11 @@ abstract class AbstractLoginCommon {
         $url = $this->urlToken;
         $curl = init_curl($url);
         curl_setopt($curl, CURLOPT_POST, 1);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $url_params);
         // PROVIDER NORMALIZATION: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
         // PROVIDER NORMALIZATION: PayPal/Reddit requires sending the client id/secret via http basic authentication
         
-        $result = exec_curl($curl, $this->id . " get token");
+        $result = exec_curl($curl, $logMessage);
         break;
       case 'stream-context':
         $url = rtrim($this->urlToken, "?");
@@ -225,12 +228,16 @@ abstract class AbstractLoginCommon {
         $url .= $url_params;
         $curl = init_curl($url);
         Logger::Instance()->log($this->id . ": Bearer $this->useBearer");
+    
         if ($this->useBearer === true) {
           Logger::Instance()->log($this->id . ": Using Bearer");
           curl_setopt($curl, CURLOPT_URL, $url);
           curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // TODO: does Windows Live require this?
-          curl_setopt($curl, CURLOPT_HTTPHEADER, array("Authorization: Bearer " . $access_token)); // PROVIDER SPECIFIC: do we have to do this for Windows Live?
+          $header = array("Authorization: Bearer " . $access_token, 
+                          "x-li-format: json");
+          curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         }
+    
         
         $result = exec_curl($curl, "get oauth identity");
         $result_obj = json_decode($result, true);
