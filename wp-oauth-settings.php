@@ -821,7 +821,7 @@
 			<p>
 				<strong>Instructions:</strong>
 				<ol>
-					<li>Register as a Windows Live Developer at <a href='https://manage.dev.live.com' target="_blank">manage.dev.live.com</a>.</li>
+					<li>Register as a Windows Live Developer at <a href='https://apps.dev.microsoft.com/' target="_blank">apps.dev.microsoft.com/</a>.</li>
 					<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
 					<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 					<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click the Save all settings button.</li>
