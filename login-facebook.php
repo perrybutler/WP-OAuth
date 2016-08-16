@@ -1,6 +1,7 @@
 <?php
 
 include_once 'session.php';
+include_once 'login-common.php';
 
 # DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 WPOA_Session::set_provider('Facebook');
@@ -9,7 +10,7 @@ define('CLIENT_ENABLED', get_option('wpoa_facebook_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_facebook_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_facebook_api_secret'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'email'); // PROVIDER SPECIFIC: 'email' is the minimum scope required to get the user's id from Facebook
+define('SCOPE', 'public_profile,email'); // PROVIDER SPECIFIC: 'email' is the minimum scope required to get the user's id from Facebook
 define('URL_AUTH', "https://www.facebook.com/dialog/oauth?");
 define('URL_TOKEN', "https://graph.facebook.com/oauth/access_token?");
 define('URL_USER', "https://graph.facebook.com/me?");
@@ -88,16 +89,13 @@ function get_oauth_token($wpoa) {
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
 			$url = URL_TOKEN . $url_params;
-			$curl = curl_init();
+			$curl = init_curl($url);
 			curl_setopt($curl, CURLOPT_URL, $url);
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
 			curl_setopt($curl, CURLOPT_POST, 1);
 			curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
 			// PROVIDER NORMALIZATION: Reddit requires sending a User-Agent header...
 			// PROVIDER NORMALIZATION: Reddit requires sending the client id/secret via http basic authentication
-			curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
-			curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
-			$result = curl_exec($curl);
+			$result = exec_curl($curl);
 			break;
 		case 'stream-context':
 			$url = rtrim(URL_TOKEN, "?");
@@ -138,19 +136,19 @@ function get_oauth_identity($wpoa) {
 	// set the access token param:
 	$params = array(
 		'access_token' => WPOA_Session::get_token(), // PROVIDER SPECIFIC: the access token is passed to Facebook using this key name
+		'fields' => "id,name,email"
 	);
 	$url_params = http_build_query($params);
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
 			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
-			$curl = curl_init();
+			$curl = init_curl($url);
 			curl_setopt($curl, CURLOPT_URL, $url);
 			// PROVIDER NORMALIZATION: Reddit/Github requires a User-Agent here...
 			// PROVIDER NORMALIZATION: Reddit requires that we send the access token via a bearer header...
 			//curl_setopt($curl, CURLOPT_HTTPHEADER, array('x-li-format: json')); // PROVIDER SPECIFIC: I think this is only for LinkedIn...
-			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-			$result = curl_exec($curl);
+			$result = exec_curl($curl);
 			$result_obj = json_decode($result, true);
 			break;
 		case 'stream-context':
@@ -171,10 +169,13 @@ function get_oauth_identity($wpoa) {
 			break;
 	}
 	// parse and return the user's oauth identity:
+	Logger::Instance()->log("FACEBOOK LOG");
+	Logger::Instance()->dump($result_obj);
 	$oauth_identity = array();
 	$oauth_identity[WPOA_Session::PROVIDER] = WPOA_Session::get_provider();
 	$oauth_identity[WPOA_Session::USER_ID] = $result_obj['id']; // PROVIDER SPECIFIC: this is how Facebook returns the user's unique id
-	//$oauth_identity[WPOA_Session::USER_NAME] = $result_obj['email']; //PROVIDER SPECIFIC: this is how Facebook returns the email address
+	$oauth_identity[WPOA_Session::USER_NAME] = $result_obj['name']; // PROVIDER SPECIFIC: this is how Facebook returns the user's unique id
+	$oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['email']; //PROVIDER SPECIFIC: this is how Facebook returns the email address
 	if (!$oauth_identity[WPOA_Session::USER_ID]) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}
