@@ -41,6 +41,9 @@ abstract class AbstractLoginCommon {
   private $urlToken;
   private $urlUser;
   
+  protected function getUrlUser() {
+    return $this->urlUser;
+  }
   
   private $clientEnabled;
   private $clientId;
@@ -50,7 +53,8 @@ abstract class AbstractLoginCommon {
 
   private $requestMode;
   
-  protected $useBearer;
+  protected $useBearer = false;
+  protected $ignoreExpiresIn = false;
     
   protected function __construct($name, $urlAuth, $urlToken, $urlUser, $wpoa) {
     $this->id = $this->clean($name);
@@ -188,7 +192,7 @@ abstract class AbstractLoginCommon {
 
     $expires_at = time() + $expires_in;
   
-    if (!$access_token || !$expires_in) {
+    if (!$access_token || (!$this->ignoreExpiresIn && !$expires_in)) {
       // malformed access token result detected:
       $this->wpoa->wpoa_end_login("Sorry, we couldn't log you in. Malformed access token result detected. Please notify the admin or try again later.");
     }
@@ -213,24 +217,24 @@ abstract class AbstractLoginCommon {
     return $output;
   }
 
-  function getOAuthIdentity() {
-    Logger::Instance()->log($this->id . ": Get Identity");
+  protected function getRequest($url, $message) {
+    Logger::Instance()->log($message . "->" . $url);
     // here we exchange the access token for the user info...
     // set the access token param:
     $access_token = WPOA_Session::get_token();
-    Logger::Instance()->log($this->id . ": token = " .$access_token);
+    Logger::Instance()->log($message. ": token = " .$access_token);
     $params = $this->getOAuthIdentityParameters();
     $url_params = http_build_query($params);
     // perform the http request:
     switch ($this->requestMode) {
       case 'curl':
-        $url = $this->urlUser;
+        $url = rtrim($url, "?") . "?";
         $url .= $url_params;
         $curl = init_curl($url);
-        Logger::Instance()->log($this->id . ": Bearer $this->useBearer");
-    
+        Logger::Instance()->log($message . ": Bearer $this->useBearer");
+        curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']);
         if ($this->useBearer === true) {
-          Logger::Instance()->log($this->id . ": Using Bearer");
+          Logger::Instance()->log($message . ": Using Bearer");
           curl_setopt($curl, CURLOPT_URL, $url);
           curl_setopt($curl, CURLOPT_USERAGENT, $_SERVER['HTTP_USER_AGENT']); // TODO: does Windows Live require this?
           $header = array("Authorization: Bearer " . $access_token, 
@@ -243,7 +247,7 @@ abstract class AbstractLoginCommon {
         $result_obj = json_decode($result, true);
         break;
       case 'stream-context':
-        $url = rtrim($this->urlUser, "?");
+        $url = rtrim($url, "?");
         $opts = array('http' =>
           array(
             'method'  => 'GET',
@@ -259,6 +263,11 @@ abstract class AbstractLoginCommon {
         $result_obj = json_decode($result, true);
         break;
     }
+    return $result_obj;
+  }
+
+  function getOAuthIdentity() {
+    $result_obj = $this->getRequest($this->urlUser, $this->id . ": Get Identity");
     $result_obj = $this->getOauthIdentityPostTreatment($result_obj);
     $oauth_identity = array();
     $oauth_identity[WPOA_Session::PROVIDER] = WPOA_Session::get_provider();
