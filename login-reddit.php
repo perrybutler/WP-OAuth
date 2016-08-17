@@ -38,7 +38,7 @@ class LoginReddit extends AbstractLoginCommon {
         $oauth_identity[WPOA_Session::USER_ID] = $result_obj['id'];
         $oauth_identity[WPOA_Session::USER_NAME] = $result_obj['name'];
         // TODO : Reddit does not send email. If they implement it, we must update the following line.
-        $oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['name'] . "@reddit.com";
+        $oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['name'] . "@example.com";
 
         return $oauth_identity;
     }

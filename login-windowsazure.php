@@ -29,10 +29,7 @@ class LoginAzure extends AbstractLoginCommon {
     }
 
     function getOAuthIdentityParameters(){
-        $params = array(
-                'api-version' => "1.6",
-                );
-        return $params;
+        return array('api-version' => "1.6");
     }
 
     function getOAuthIdentityFillArray($result_obj, $oauth_identity){

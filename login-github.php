@@ -20,12 +20,6 @@ class LoginGitHub extends AbstractLoginCommon {
         return $array;
     }
 
-    function getOAuthIdentityParameters(){
-        return array(
-                'access_token' => WPOA_Session::get_token()
-                );
-    }
-
     function getOAuthIdentityFillArray($result_obj, $oauth_identity){
         $oauth_identity[WPOA_Session::USER_ID] = $result_obj['id'];
         $oauth_identity[WPOA_Session::USER_NAME] = $result_obj['name'];

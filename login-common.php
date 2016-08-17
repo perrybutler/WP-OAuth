@@ -122,7 +122,7 @@ abstract class AbstractLoginCommon {
         }
     }
 
-    function getOAuthCode() {
+    private function getOAuthCode() {
         Logger::Instance()->log($this->id . ": Get code");
         $params = array(
                 'response_type' => 'code',
@@ -140,7 +140,7 @@ abstract class AbstractLoginCommon {
     }
 
 
-    function getOAuthToken() {
+    private function getOAuthToken() {
         $logMessage = $this->id . ": Get Token";
         Logger::Instance()->log($logMessage);
         $params = array(
@@ -277,7 +277,7 @@ abstract class AbstractLoginCommon {
         return $result_obj;
     }
 
-    function getOAuthIdentity() {
+    private function getOAuthIdentity() {
         $result_obj = $this->getRequest($this->urlUser, $this->id . ": Get Identity");
         $result_obj = $this->getOauthIdentityPostTreatment($result_obj);
         $oauth_identity = array();
@@ -289,15 +289,21 @@ abstract class AbstractLoginCommon {
         return $oauth_identity;
     }
 
-
-    abstract function getOAuthCodeExtendArray($array);
-    abstract function getOAuthIdentityParameters();
-    abstract function getOAuthIdentityFillArray($result_obj, $oauth_identity);
-
-    function getOAuthTokenExtendArray($array) {
+    // Following function can be overloaded
+    protected function getOAuthCodeExtendArray($array) {
         return $array;
     }
-    function getOauthIdentityPostTreatment($result_obj) {
+
+    protected function getOAuthIdentityParameters(){
+        return array('access_token' => WPOA_Session::get_token());
+    }
+    
+    protected function getOAuthTokenExtendArray($array) {
+        return $array;
+    }
+    protected function getOauthIdentityPostTreatment($result_obj) {
         return $result_obj;
     }
+
+    abstract function getOAuthIdentityFillArray($result_obj, $oauth_identity);
 }

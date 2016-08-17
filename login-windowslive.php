@@ -27,10 +27,7 @@ class LoginWindowsLive extends AbstractLoginCommon {
     }
 
     function getOAuthIdentityParameters(){
-        $params = array(
-                'api-version' => "1.6",
-                );
-        return array();
+        return array('api-version' => "1.6");
     }
 
     function getOAuthIdentityFillArray($result_obj, $oauth_identity){

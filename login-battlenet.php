@@ -12,13 +12,6 @@ class LoginBattlenet extends AbstractLoginCommon {
                 "https://us.battle.net/oauth/token?",
                 "https://us.api.battle.net/account/user/id?",
                 $wpoa);
-        //$this->useBearer = true;
-        //$this->sendIdAndSecretInHeader = true;
-    }
-
-
-    function getOAuthCodeExtendArray($array) {
-        return $array;
     }
 
     function getOAuthIdentityParameters(){
@@ -30,7 +23,7 @@ class LoginBattlenet extends AbstractLoginCommon {
         $oauth_identity[WPOA_Session::USER_ID] = $result_obj['id'];
         // TODO : Battlenet only send id. If they implement name and email, we must update the following line.
         $oauth_identity[WPOA_Session::USER_NAME] = $result_obj['id'];
-        $oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['id'] . "@battle.net";
+        $oauth_identity[WPOA_Session::USER_EMAIL] = $result_obj['id'] . "@example.net";
 
         return $oauth_identity;
     }
