@@ -7,12 +7,13 @@ function init_curl($url) {
   Logger::Instance()->log("CURL : Init with url = " . $url);
   $curl = curl_init($url);
   $verify_ssl= get_option('wpoa_http_util_verify_ssl');
+  curl_setopt($curl, CURLOPT_URL, $url);
   curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, ($verify_ssl == 1 ? 1 : 0));
   curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, ($verify_ssl == 1 ? 2 : 0));
   curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
   
   //curl_setopt($curl, CURLOPT_VERBOSE, true);
-  //curl_setopt($curl, CURLOPT_STDERR, fopen('php://stderr', 'w'));
+  //curl_setopt($curl, CURLOPT_STDERR, fopen('C:\tmp\php\wordpress\wp-content\debug.log', 'a'));
   return $curl;
 }
 
@@ -55,6 +56,7 @@ abstract class AbstractLoginCommon {
   
   protected $useBearer = false;
   protected $ignoreExpiresIn = false;
+  protected $sendIdAndSecretInHeader = false;
     
   protected function __construct($name, $urlAuth, $urlToken, $urlUser, $wpoa) {
     $this->id = $this->clean($name);
@@ -158,7 +160,16 @@ abstract class AbstractLoginCommon {
         curl_setopt($curl, CURLOPT_POSTFIELDS, $url_params);
         // PROVIDER NORMALIZATION: PayPal requires Accept and Accept-Language headers, Reddit requires sending a User-Agent header
         // PROVIDER NORMALIZATION: PayPal/Reddit requires sending the client id/secret via http basic authentication
-        
+        if ($this->sendIdAndSecretInHeader === true) {
+          Logger::Instance()->log($logMessage . " / Sending ID/Secret in header");
+          curl_setopt($curl, CURLOPT_USERPWD, $this->clientId . ":" . $this->clientSecret);
+          $encoded = base64_encode($this->clientId . ":" . $this->clientSecret);
+          $header = array("Accept: application/json", 
+                          "Accept-Language: en_US", 
+                          "Content-Type: application/x-www-form-urlencoded");
+
+          curl_setopt($curl, CURLOPT_HTTPHEADER, $header); 
+        }
         $result = exec_curl($curl, $logMessage);
         break;
       case 'stream-context':
