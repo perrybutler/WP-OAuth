@@ -7,7 +7,7 @@ class Logger {
         $this->debug = get_option('wpoa_debug_plugin') ? true : false;
     }
 
-    
+
     public function dump($value) {
         if ($this->debug === true) {
             ob_start();
@@ -21,10 +21,10 @@ class Logger {
     public function print_stack_trace($value) {
         if ($this->debug === true) {
             ob_start();
-		    debug_print_backtrace();
-		    $log = ob_get_clean();
-		    ob_end_clean();
-		    error_log($log);
+            debug_print_backtrace();
+            $log = ob_get_clean();
+            ob_end_clean();
+            error_log($log);
         }
     }
 
@@ -38,7 +38,7 @@ class Logger {
     public static function Instance(){
         static $logger = null;
         if ($logger === null) {
-             $logger = new Logger();
+            $logger = new Logger();
         }
         return $logger;
     }
