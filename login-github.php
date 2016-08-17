@@ -5,7 +5,7 @@ include_once 'login-common.php';
 
 error_reporting(E_ALL | E_STRICT);
 
-class LoginLinkedin extends AbstractLoginCommon {
+class LoginGitHub extends AbstractLoginCommon {
     public function __construct($wpoa) {
         parent::__construct('Github',
                 "https://github.com/login/oauth/authorize?",
@@ -43,5 +43,5 @@ class LoginLinkedin extends AbstractLoginCommon {
     }
 }
 
-$login = new LoginLinkedin($this);
+$login = new LoginGitHub($this);
 $login->run();
