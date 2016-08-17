@@ -128,6 +128,7 @@ Class WPOA {
 		'wpoa_http_util_verify_ssl' => 1,								// 0, 1
 		'wpoa_restore_default_settings' => 0,							// 0, 1
 		'wpoa_delete_settings_on_uninstall' => 0,						// 0, 1
+		'wpoa_debug_plugin' => 0,                						// 0, 1
 	);
 	
 	// when the plugin class gets created, fire the initialization:

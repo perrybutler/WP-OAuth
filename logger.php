@@ -4,7 +4,7 @@ class Logger {
     private $debug;
 
     private function __construct() {
-        $this->debug = get_option('wpao_debug_plugin');
+        $this->debug = get_option('wpoa_debug_plugin') ? true : false;
     }
 
     
@@ -13,7 +13,7 @@ class Logger {
             ob_start();
             var_dump($value);
             $log = ob_get_clean();
-            ob_end_clean();
+            ob_end_flush();
             error_log($log);
         }
     }

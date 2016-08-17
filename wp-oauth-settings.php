@@ -1063,6 +1063,19 @@
 					<p class="tip-message"><strong>Instructions:</strong> Check the box above, click the Save all settings button, and the settings will be restored to default.</p>
 					<p class="tip-message tip-warning"><strong>Warning:</strong> This will restore the default settings, erasing any API keys/secrets that you may have entered above.</p>
 				</td>
+				</tr>
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Enable debug: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<input type='checkbox' name='wpoa_debug_plugin' value='1' <?php checked(get_option('wpoa_debug_plugin') == 1); ?> />
+					<p>
+						<strong>Instructions:</strong>
+						<ol>
+							<li>Check the box above and <a href="https://codex.wordpress.org/Debugging_in_WordPress">enable debug</a> for wordpress.</li>
+							<li>This will log request in debug.log file.</li>
+						</ol>
+					</p>
+				</td>
 				</tr>		
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Delete settings on uninstall: <a href="#" class="tip-button">[?]</a></th>
