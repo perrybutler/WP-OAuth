@@ -708,7 +708,7 @@ Class WPOA {
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
 		if( force_ssl_admin() ) { $site_url = set_url_scheme( $site_url, 'https' ); }
-		$redirect_to = urlencode($_GET['redirect_to']);
+		$redirect_to = isset($_GET['redirect_to']) ? urlencode($_GET['redirect_to']) : '';
 		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
