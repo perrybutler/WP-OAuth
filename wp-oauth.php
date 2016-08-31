@@ -429,7 +429,7 @@ Class WPOA {
 		if ( is_user_logged_in() ) {
 			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
 			global $current_user;
-			get_currentuserinfo();
+			wp_get_current_user();
 			$user_id = $current_user->ID;
 			$this->wpoa_link_account($user_id);
 			// after linking the account, redirect user to their last url
@@ -541,7 +541,7 @@ Class WPOA {
 		$wpoa_identity_row = $_POST['wpoa_identity_row']; // SANITIZED via $wpdb->prepare()
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// delete the wpoa_identity record from the wp_usermeta table:
 		global $wpdb;
@@ -821,7 +821,7 @@ Class WPOA {
 	function wpoa_linked_accounts() {
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// get the wpoa_identity records:
 		global $wpdb;
