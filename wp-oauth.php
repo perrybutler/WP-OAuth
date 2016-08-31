@@ -408,13 +408,34 @@ Class WPOA {
 		$user = get_user_by('id', $query_result);
 		return $user;
 	}
+
+	/**
+	 * Check for existing WP user by email
+	 * 
+	 * @since 0.4.1
+	 *
+	 * @param Array  $oauth_identity
+	 * @return WP_User|false
+	 */
+	function wpoa_match_wordpress_user_by_email($oauth_identity) {
+	    $user = get_user_by('email', $oauth_identity['email']);
+	    return $user;
+	}
 	
-	// login (or register and login) a wordpress user based on their oauth identity:
+	/**
+	 * Login (or register and login) a wordpress user based on their oauth identity:
+	 *
+	 * @param Array $oauth_identity
+	 */
 	function wpoa_login_user($oauth_identity) {
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
+		// If user is not found by oauth identity, then attempt by email.
+		if ( !$matched_user ) {
+			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
+		}
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
 			// there was a matching wordpress user account, log it in now:
