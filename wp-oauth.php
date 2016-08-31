@@ -432,8 +432,8 @@ Class WPOA {
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
-		// If user is not found by oauth identity, then attempt by email.
-		if ( !$matched_user ) {
+		// If user is not found by oauth identity, then attempt by email (if enabled).
+		if(get_option('wpoa_email_linking') && !$matched_user) {
 			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
 		}
 		// handle the matched user if there is one:
