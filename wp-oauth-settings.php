@@ -473,6 +473,14 @@
 					<p class="tip-message">Prevents WordPress from sending an email to newly registered users by default, which contains their username and password.</p>
 				</td>
 				</tr>
+
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Allow email linking when loggin in: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<input type='checkbox' name='wpoa_email_linking' value='1' <?php checked(get_option('wpoa_email_linking') == 1); ?> />
+					<p class="tip-message">Increases permission request from user to include email in order to match authenticated user with registered users. Because this exposes more user data, please use at your discretion.</p>
+				</td>
+				</tr>
 				
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Assign new users to the following role: <a href="#" class="tip-button">[?]</a></th>

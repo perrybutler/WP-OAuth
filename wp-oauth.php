@@ -80,6 +80,7 @@ Class WPOA {
 				),
 			),
 		'wpoa_suppress_welcome_email' => 0,								// 0, 1
+		'wpoa_email_linking' => 0,										// 0, 1
 		'wpoa_new_user_role' => 'contributor',							// role
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
