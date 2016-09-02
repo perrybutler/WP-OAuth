@@ -79,6 +79,12 @@ $this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow te
 # END OF AUTHENTICATION FLOW #
 
 # AUTHENTICATION FLOW HELPER FUNCTIONS #
+
+/**
+ * Gets the oauth code.
+ *
+ * @param      WPOA  $wpoa
+ */
 function get_oauth_code($wpoa) {
 	$params = array(
 		'response_type' => 'code',
@@ -93,6 +99,12 @@ function get_oauth_code($wpoa) {
 	exit;
 }
 
+/**
+ * Gets the oauth token.
+ *
+ * @param      WPOA   $wpoa
+ * @return     boolean
+ */
 function get_oauth_token($wpoa) {
 	$params = array(
 		'grant_type' => 'authorization_code',
@@ -150,6 +162,12 @@ function get_oauth_token($wpoa) {
 	}
 }
 
+/**
+ * Gets the oauth identity.
+ *
+ * @param      WPOA  $wpoa
+ * @return     array
+ */
 function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
