@@ -12,10 +12,14 @@ define('CLIENT_ENABLED', get_option('wpoa_google_api_enabled'));
 define('CLIENT_ID', get_option('wpoa_google_api_id'));
 define('CLIENT_SECRET', get_option('wpoa_google_api_secret'));
 define('REDIRECT_URI', rtrim(site_url(), '/') . '/');
-define('SCOPE', 'profile'); // PROVIDER SPECIFIC: 'profile' is the minimum scope required to get the user's id from Google
 define('URL_AUTH', "https://accounts.google.com/o/oauth2/auth?");
-define('URL_TOKEN', "https://accounts.google.com/o/oauth2/token?");
+define('URL_TOKEN', "https://accounts.google.com/o/oauth2/token");
 define('URL_USER', "https://www.googleapis.com/plus/v1/people/me?");
+// PROVIDER SPECIFIC: profile minimum and emails for matching users
+if(get_option('wpoa_email_linking'))
+	define('SCOPE', 'https://www.googleapis.com/auth/plus.profile.emails.read'); 
+else
+	define('SCOPE', 'profile');
 # END OF DEFINE THE OAUTH PROVIDER AND SETTINGS TO USE #
 
 // remember the user's last url so we can redirect them back to there after the login ends:
@@ -75,6 +79,12 @@ $this->wpoa_end_login("Sorry, we couldn't log you in. The authentication flow te
 # END OF AUTHENTICATION FLOW #
 
 # AUTHENTICATION FLOW HELPER FUNCTIONS #
+
+/**
+ * Gets the oauth code.
+ *
+ * @param      WPOA  $wpoa
+ */
 function get_oauth_code($wpoa) {
 	$params = array(
 		'response_type' => 'code',
@@ -89,6 +99,12 @@ function get_oauth_code($wpoa) {
 	exit;
 }
 
+/**
+ * Gets the oauth token.
+ *
+ * @param      WPOA   $wpoa
+ * @return     boolean
+ */
 function get_oauth_token($wpoa) {
 	$params = array(
 		'grant_type' => 'authorization_code',
@@ -100,7 +116,7 @@ function get_oauth_token($wpoa) {
 	$url_params = http_build_query($params);
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_TOKEN . $url_params;
+			$url = URL_TOKEN;
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -146,6 +162,12 @@ function get_oauth_token($wpoa) {
 	}
 }
 
+/**
+ * Gets the oauth identity.
+ *
+ * @param      WPOA  $wpoa
+ * @return     array
+ */
 function get_oauth_identity($wpoa) {
 	// here we exchange the access token for the user info...
 	// set the access token param:
@@ -156,12 +178,14 @@ function get_oauth_identity($wpoa) {
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
-			$url = URL_USER . $url_params; // TODO: we probably want to send this using a curl_setopt...
+			$url = URL_USER . $url_params;
 			$curl = curl_init();
 			curl_setopt($curl, CURLOPT_URL, $url);
-			// PROVIDER NORMALIZATION: Github/Reddit require a User-Agent here...
-			// PROVIDER NORMALIZATION: PayPal/Reddit require that we send the access token via a bearer header, PayPal also requires a Content-Type: application/json header, LinkedIn requires an x-li-format: json header...
 			curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+			// curl_setopt($curl, CURLOPT_POST, 1);
+			// curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
+			// curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, (get_option('wpoa_http_util_verify_ssl') == 1 ? 1 : 0));
+			// curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, (get_option('wpoa_http_util_verify_ssl') == 1 ? 2 : 0));
 			$result = curl_exec($curl);
 			$result_obj = json_decode($result, true);
 			break;
@@ -185,8 +209,10 @@ function get_oauth_identity($wpoa) {
 	// parse and return the user's oauth identity:
 	$oauth_identity = array();
 	$oauth_identity['provider'] = $_SESSION['WPOA']['PROVIDER'];
-	$oauth_identity['id'] = $result_obj['id']; // PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
-	//$oauth_identity['email'] = $result_obj['emails'][0]['value']; // PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently don't collect the user's email address.
+	// PROVIDER SPECIFIC: Google returns the user's OAuth identity as id
+	$oauth_identity['id'] = $result_obj['id'];
+	// PROVIDER SPECIFIC: Google returns an array of email addresses. To respect privacy we currently only collect if the registration setting is enabled.
+	$oauth_identity['email'] = (isset($result_obj['emails'])) ? $result_obj['emails'][0]['value'] : '';
 	if (!$oauth_identity['id']) {
 		$wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found. Please notify the admin or try again later.");
 	}

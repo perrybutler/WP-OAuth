@@ -80,6 +80,7 @@ Class WPOA {
 				),
 			),
 		'wpoa_suppress_welcome_email' => 0,								// 0, 1
+		'wpoa_email_linking' => 0,										// 0, 1
 		'wpoa_new_user_role' => 'contributor',							// role
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
@@ -407,13 +408,34 @@ Class WPOA {
 		$user = get_user_by('id', $query_result);
 		return $user;
 	}
+
+	/**
+	 * Check for existing WP user by email
+	 * 
+	 * @since 0.4.1
+	 *
+	 * @param Array  $oauth_identity
+	 * @return WP_User|false
+	 */
+	function wpoa_match_wordpress_user_by_email($oauth_identity) {
+	    $user = get_user_by('email', $oauth_identity['email']);
+	    return $user;
+	}
 	
-	// login (or register and login) a wordpress user based on their oauth identity:
+	/**
+	 * Login (or register and login) a wordpress user based on their oauth identity:
+	 *
+	 * @param Array $oauth_identity
+	 */
 	function wpoa_login_user($oauth_identity) {
 		// store the user info in the user session so we can grab it later if we need to register the user:
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
 		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
+		// If user is not found by oauth identity, then attempt by email (if enabled).
+		if(get_option('wpoa_email_linking') && !$matched_user) {
+			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
+		}
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
 			// there was a matching wordpress user account, log it in now:
@@ -429,7 +451,7 @@ Class WPOA {
 		if ( is_user_logged_in() ) {
 			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
 			global $current_user;
-			get_currentuserinfo();
+			wp_get_current_user();
 			$user_id = $current_user->ID;
 			$this->wpoa_link_account($user_id);
 			// after linking the account, redirect user to their last url
@@ -541,7 +563,7 @@ Class WPOA {
 		$wpoa_identity_row = $_POST['wpoa_identity_row']; // SANITIZED via $wpdb->prepare()
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// delete the wpoa_identity record from the wp_usermeta table:
 		global $wpdb;
@@ -708,7 +730,7 @@ Class WPOA {
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
 		if( force_ssl_admin() ) { $site_url = set_url_scheme( $site_url, 'https' ); }
-		$redirect_to = urlencode($_GET['redirect_to']);
+		$redirect_to = isset($_GET['redirect_to']) ? urlencode($_GET['redirect_to']) : '';
 		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
@@ -821,7 +843,7 @@ Class WPOA {
 	function wpoa_linked_accounts() {
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// get the wpoa_identity records:
 		global $wpdb;
