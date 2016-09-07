@@ -439,6 +439,7 @@ Class WPOA {
 		// If user is not found by oauth identity, then attempt by email (if enabled).
 		if(get_option('wpoa_email_linking') && !$matched_user) {
 			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
+			$_SESSION['WPOA']['LINK_ACCOUNT'] = TRUE;
 		}
 		// handle the matched user if there is one:
 		if ( $matched_user ) {
@@ -448,6 +449,8 @@ Class WPOA {
 			wp_set_current_user( $user_id, $user_login );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $user_login, $matched_user );
+			/* If this is a first time login for the provider, make sure to match it to the account */
+			if($_SESSION['WPOA']['LINK_ACCOUNT']) $this->wpoa_link_account($user_id);
 			// after login, redirect to the user's last location
 			$this->wpoa_end_login("Logged in successfully!");
 		}
