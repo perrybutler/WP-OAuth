@@ -100,6 +100,10 @@ Class WPOA {
 		'wpoa_reddit_api_enabled' => 0,									// 0, 1
 		'wpoa_reddit_api_id' => '',										// any string
 		'wpoa_reddit_api_secret' => '',									// any string
+		'wpoa_office365_api_enabled' => 0,								// 0, 1
+		'wpoa_office365_api_id' => '',									// any string
+		'wpoa_office365_api_secret' => '',								// any string
+		'wpoa_office365_tenant' => 'common',							// any string
 		'wpoa_windowslive_api_enabled' => 0,							// 0, 1
 		'wpoa_windowslive_api_id' => '',								// any string
 		'wpoa_windowslive_api_secret' => '',							// any string
@@ -750,6 +754,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
 		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
+		$html .= $this->wpoa_login_button("office365", "Office 365", $atts);
 		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
