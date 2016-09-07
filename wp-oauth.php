@@ -80,6 +80,7 @@ Class WPOA {
 				),
 			),
 		'wpoa_suppress_welcome_email' => 0,								// 0, 1
+		'wpoa_email_linking' => 0,										// 0, 1
 		'wpoa_new_user_role' => 'contributor',							// role
 		'wpoa_google_api_enabled' => 0,									// 0, 1
 		'wpoa_google_api_id' => '',										// any string
@@ -99,6 +100,10 @@ Class WPOA {
 		'wpoa_reddit_api_enabled' => 0,									// 0, 1
 		'wpoa_reddit_api_id' => '',										// any string
 		'wpoa_reddit_api_secret' => '',									// any string
+		'wpoa_office365_api_enabled' => 0,								// 0, 1
+		'wpoa_office365_api_id' => '',									// any string
+		'wpoa_office365_api_secret' => '',								// any string
+		'wpoa_office365_tenant' => 'common',							// any string
 		'wpoa_windowslive_api_enabled' => 0,							// 0, 1
 		'wpoa_windowslive_api_id' => '',								// any string
 		'wpoa_windowslive_api_secret' => '',							// any string
@@ -400,47 +405,70 @@ Class WPOA {
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
 		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity['provider'] . "|" . $oauth_identity['id'] . "%'";
-		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
-		//print_r( $query_result ); exit;
 		// attempt to get a wordpress user with the matched id:
 		$user = get_user_by('id', $query_result);
 		return $user;
 	}
+
+	/**
+	 * Check for existing WP user by email
+	 * 
+	 * @since 0.4.1
+	 *
+	 * @param Array  $oauth_identity
+	 * @return WP_User|false
+	 */
+	function wpoa_match_wordpress_user_by_email($oauth_identity) {
+	    $user = get_user_by('email', $oauth_identity['email']);
+	    return $user;
+	}
 	
-	// login (or register and login) a wordpress user based on their oauth identity:
+	/**
+	 * Login (or register and login) a wordpress user based on their oauth identity:
+	 *
+	 * @param Array $oauth_identity
+	 */
 	function wpoa_login_user($oauth_identity) {
-		// store the user info in the user session so we can grab it later if we need to register the user:
+		/* Store the user info in the user session so we can grab it later if we need to register the user */
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
-		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
+		/* Try to find a matching wp user for the now-authenticated user's oauth identity */ 
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
-		// handle the matched user if there is one:
+		/* If user is not found by oauth identity, then attempt by email (if enabled) */
+		if(get_option('wpoa_email_linking') && empty($matched_user)) {
+			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
+			/* If we find a match with this method then we need to link the account */
+	    	if(!empty($matched_user)) $link_account = TRUE;
+		}
+		/* Handle the matched user if there is one */
 		if ( $matched_user ) {
-			// there was a matching wordpress user account, log it in now:
+			/* There was a matching wordpress user account, log it in now */
 			$user_id = $matched_user->ID;
 			$user_login = $matched_user->user_login;
 			wp_set_current_user( $user_id, $user_login );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $user_login, $matched_user );
-			// after login, redirect to the user's last location
+			/* If this is a first time login for the provider, make sure to match it to the account */
+			if($link_account) $this->wpoa_link_account($user_id);
+			/* After login, redirect to the user's last location */
 			$this->wpoa_end_login("Logged in successfully!");
 		}
-		// handle the already logged in user if there is one:
+		/* Handle the already logged in user if there is one */
 		if ( is_user_logged_in() ) {
-			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
+			/* There was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now */
 			global $current_user;
-			get_currentuserinfo();
+			wp_get_current_user();
 			$user_id = $current_user->ID;
 			$this->wpoa_link_account($user_id);
 			// after linking the account, redirect user to their last url
 			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
 		}
-		// handle the logged out user or no matching user (register the user):
+		/* Handle the logged out user or no matching user (register the user) */
 		if ( !is_user_logged_in() && !$matched_user ) {
-			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
+			/* This person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user */
 			include 'register.php';
 		}
-		// we shouldn't be here, but just in case...
+		/* We shouldn't be here, but just in case... */
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
 	}
 	
@@ -541,7 +569,7 @@ Class WPOA {
 		$wpoa_identity_row = $_POST['wpoa_identity_row']; // SANITIZED via $wpdb->prepare()
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// delete the wpoa_identity record from the wp_usermeta table:
 		global $wpdb;
@@ -708,7 +736,7 @@ Class WPOA {
 		// generate the atts once (cache them), so we can use it for all buttons without computing them each time:
 		$site_url = get_bloginfo('url');
 		if( force_ssl_admin() ) { $site_url = set_url_scheme( $site_url, 'https' ); }
-		$redirect_to = urlencode($_GET['redirect_to']);
+		$redirect_to = isset($_GET['redirect_to']) ? urlencode($_GET['redirect_to']) : '';
 		if ($redirect_to) {$redirect_to = "&redirect_to=" . $redirect_to;}
 		// get shortcode atts that determine how we should build these buttons:
 		$icon_set_path = plugins_url('icons/' . $icon_set . '/', __FILE__);
@@ -728,6 +756,7 @@ Class WPOA {
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
 		$html .= $this->wpoa_login_button("itembase", "itembase", $atts);
 		$html .= $this->wpoa_login_button("reddit", "Reddit", $atts);
+		$html .= $this->wpoa_login_button("office365", "Office 365", $atts);
 		$html .= $this->wpoa_login_button("windowslive", "Windows Live", $atts);
 		$html .= $this->wpoa_login_button("paypal", "PayPal", $atts);
 		$html .= $this->wpoa_login_button("instagram", "Instagram", $atts);
@@ -821,7 +850,7 @@ Class WPOA {
 	function wpoa_linked_accounts() {
 		// get the current user:
 		global $current_user;
-		get_currentuserinfo();
+		wp_get_current_user();
 		$user_id = $current_user->ID;
 		// get the wpoa_identity records:
 		global $wpdb;

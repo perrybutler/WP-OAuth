@@ -473,6 +473,14 @@
 					<p class="tip-message">Prevents WordPress from sending an email to newly registered users by default, which contains their username and password.</p>
 				</td>
 				</tr>
+
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Allow email linking when loggin in: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<input type='checkbox' name='wpoa_email_linking' value='1' <?php checked(get_option('wpoa_email_linking') == 1); ?> />
+					<p class="tip-message">Increases permission request from user to include email in order to match authenticated user with registered users. Because this exposes more user data, please use at your discretion.</p>
+				</td>
+				</tr>
 				
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Assign new users to the following role: <a href="#" class="tip-button">[?]</a></th>
@@ -782,6 +790,55 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Reddit section -->
+
+			<!-- START Login with Office 365 section -->
+			<div id="wpoa-settings-section-login-with-office365" class="wpoa-settings-section">
+			<h3>Login with Office 365</h3>
+			<div class='form-padding'>
+			<table class='form-table'>
+				<tr valign='top'>
+				<th scope='row'>Enabled:</th>
+				<td>
+					<input type='checkbox' name='wpoa_office365_api_enabled' value='1' <?php checked(get_option('wpoa_office365_api_enabled') == 1); ?> />
+				</td>
+				</tr>
+				
+				<tr valign='top'>
+				<th scope='row'>Client ID:</th>
+				<td>
+					<input type='text' name='wpoa_office365_api_id' value='<?php echo get_option('wpoa_office365_api_id'); ?>' />
+				</td>
+				</tr>
+				 
+				<tr valign='top'>
+				<th scope='row'>Client Secret:</th>
+				<td>
+					<input type='text' name='wpoa_office365_api_secret' value='<?php echo get_option('wpoa_office365_api_secret'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Tenant:</th>
+				<td>
+					<input type='text' name='wpoa_office365_tenant' value='<?php echo get_option('wpoa_office365_tenant'); ?>' />
+					<p class="tip-message">Used to control who can sign into the application. <a href="https://azure.microsoft.com/en-us/documentation/articles/active-directory-protocols-oauth-code/#_request-an-authorization-code" target="_blank">More Details</a></p>
+				</td>
+				</tr>
+			</table> <!-- .form-table -->
+			<p>
+				<strong>Instructions:</strong>
+				<ol>
+					<li>Register as an Outlook Developer at <a href='https://apps.dev.microsoft.com/' target="_blank">apps.dev.microsoft.com</a>.</li>
+					<li>At Application Registration Portal, click "Add an app". This will enable your site to access the Outlook REST API.</li>
+					<li>Within your application, click "Add Platform" and add a "Web" platform providing your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI(s). Don't forget the trailing slash!</li>
+					<li>Paste your Client ID (Application Id)/Secret (Application Password) provided by Application Registration Portal into the fields above, then click the Save all settings button.</li>
+					<li>For more details <a href="https://azure.microsoft.com/en-us/documentation/articles/active-directory-v2-app-registration/">checkout the documenation</a>
+				</ol>
+			</p>
+			<?php submit_button('Save all settings'); ?>
+			</div> <!-- .form-padding -->
+			</div> <!-- .wpoa-settings-section -->
+			<!-- END Login with Windows Live section -->
 			
 			<!-- START Login with Windows Live section -->
 			<div id="wpoa-settings-section-login-with-windowslive" class="wpoa-settings-section">
