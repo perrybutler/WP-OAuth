@@ -178,6 +178,14 @@
 				</td>
 				</tr>
 				
+				<tr valign='top' class='has-tip' class="has-tip">
+				<th scope='row'>Override Anyone can register: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<input type='checkbox' name='wpoa_override_users_can_register' value='1' <?php checked(get_option('wpoa_override_users_can_register') == 1); ?> />
+					<p class="tip-message">Allows users to create accounts with WP-OAuth even if "Anyone can register" is not enabled in Wordpress: General - Membership. settings.</p>
+				</td>
+				</tr>
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Login redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
