@@ -405,9 +405,7 @@ Class WPOA {
 		global $wpdb;
 		$usermeta_table = $wpdb->usermeta;
 		$query_string = "SELECT $usermeta_table.user_id FROM $usermeta_table WHERE $usermeta_table.meta_key = 'wpoa_identity' AND $usermeta_table.meta_value LIKE '%" . $oauth_identity['provider'] . "|" . $oauth_identity['id'] . "%'";
-		//print_r( $query_string ); exit;
 		$query_result = $wpdb->get_var($query_string);
-		//print_r( $query_result ); exit;
 		// attempt to get a wordpress user with the matched id:
 		$user = get_user_by('id', $query_result);
 		return $user;
@@ -432,31 +430,32 @@ Class WPOA {
 	 * @param Array $oauth_identity
 	 */
 	function wpoa_login_user($oauth_identity) {
-		// store the user info in the user session so we can grab it later if we need to register the user:
+		/* Store the user info in the user session so we can grab it later if we need to register the user */
 		$_SESSION["WPOA"]["USER_ID"] = $oauth_identity["id"];
-		// try to find a matching wordpress user for the now-authenticated user's oauth identity:
+		/* Try to find a matching wp user for the now-authenticated user's oauth identity */ 
 		$matched_user = $this->wpoa_match_wordpress_user($oauth_identity);
-		// If user is not found by oauth identity, then attempt by email (if enabled).
-		if(get_option('wpoa_email_linking') && !$matched_user) {
+		/* If user is not found by oauth identity, then attempt by email (if enabled) */
+		if(get_option('wpoa_email_linking') && empty($matched_user)) {
 			$matched_user = $this->wpoa_match_wordpress_user_by_email($oauth_identity);
-			$_SESSION['WPOA']['LINK_ACCOUNT'] = TRUE;
+			/* If we find a match with this method then we need to link the account */
+	    	if(!empty($matched_user)) $link_account = TRUE;
 		}
-		// handle the matched user if there is one:
+		/* Handle the matched user if there is one */
 		if ( $matched_user ) {
-			// there was a matching wordpress user account, log it in now:
+			/* There was a matching wordpress user account, log it in now */
 			$user_id = $matched_user->ID;
 			$user_login = $matched_user->user_login;
 			wp_set_current_user( $user_id, $user_login );
 			wp_set_auth_cookie( $user_id );
 			do_action( 'wp_login', $user_login, $matched_user );
 			/* If this is a first time login for the provider, make sure to match it to the account */
-			if($_SESSION['WPOA']['LINK_ACCOUNT']) $this->wpoa_link_account($user_id);
-			// after login, redirect to the user's last location
+			if($link_account) $this->wpoa_link_account($user_id);
+			/* After login, redirect to the user's last location */
 			$this->wpoa_end_login("Logged in successfully!");
 		}
-		// handle the already logged in user if there is one:
+		/* Handle the already logged in user if there is one */
 		if ( is_user_logged_in() ) {
-			// there was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now:
+			/* There was a wordpress user logged in, but it is not associated with the now-authenticated user's email address, so associate it now */
 			global $current_user;
 			wp_get_current_user();
 			$user_id = $current_user->ID;
@@ -464,12 +463,12 @@ Class WPOA {
 			// after linking the account, redirect user to their last url
 			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
 		}
-		// handle the logged out user or no matching user (register the user):
+		/* Handle the logged out user or no matching user (register the user) */
 		if ( !is_user_logged_in() && !$matched_user ) {
-			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
+			/* This person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user */
 			include 'register.php';
 		}
-		// we shouldn't be here, but just in case...
+		/* We shouldn't be here, but just in case... */
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
 	}
 	
