@@ -2,8 +2,10 @@
 
 class Logger {
     private $debug;
+	const BASE_NAME = "WPOA: ";
 
     private function __construct() {
+		error_log(Logger::BASE_NAME . "Creating logger");
         $this->debug = get_option('wpoa_debug_plugin') ? true : false;
     }
 
@@ -14,7 +16,7 @@ class Logger {
             var_dump($value);
             $log = ob_get_clean();
             ob_end_flush();
-            error_log($log);
+            error_log(Logger::BASE_NAME . $log);
         }
     }
 
@@ -24,14 +26,14 @@ class Logger {
             debug_print_backtrace();
             $log = ob_get_clean();
             ob_end_clean();
-            error_log($log);
+            error_log(Logger::BASE_NAME . $log);
         }
     }
 
     public function log($message)
     {
         if ($this->debug === true) {
-            error_log($message);
+            error_log(Logger::BASE_NAME . $message);
         }
     }
 
