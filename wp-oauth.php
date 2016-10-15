@@ -111,8 +111,11 @@ Class WPOA {
 		'wpoa_instagram_api_secret' => '',								// any string
 		'wpoa_battlenet_api_enabled' => 0,								// 0, 1
 		'wpoa_battlenet_api_id' => '',									// any string
-		'wpoa_battlenet_api_secret' => '',
-																		// any string
+		'wpoa_battlenet_api_secret' => '',								// any string
+		'wpoa_slack_api_enabled' => 0,									// 0, 1
+		'wpoa_slack_api_id' => '',										// any string
+		'wpoa_slack_api_secret' => '',									// any string
+		
 		'wpoa_oauth_server_api_enabled' => 0,							// 0, 1
 		'wpoa_oauth_server_api_id' => '',								// any string
 		'wpoa_oauth_server_api_secret' => '',							// any string
@@ -723,6 +726,7 @@ Class WPOA {
 		// TODO: don't hard-code the buttons/providers here, we want to be able to add more providers without having to update this function...
 		$html = "";
 		$html .= $this->wpoa_login_button("google", "Google", $atts);
+		$html .= $this->wpoa_login_button("slack", "Slack", $atts);
 		$html .= $this->wpoa_login_button("facebook", "Facebook", $atts);
 		$html .= $this->wpoa_login_button("linkedin", "LinkedIn", $atts);
 		$html .= $this->wpoa_login_button("github", "GitHub", $atts);
