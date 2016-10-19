@@ -20,7 +20,7 @@
 		$points_max = 6;
 		return floor(($points / $points_max) * 100);
 	}
-	
+
 	// config check privacy
 	function wpoa_cc_privacy() {
 		$points = 0;
@@ -31,7 +31,7 @@
 		$points_max = 1;
 		return floor(($points / $points_max) * 100);
 	}
-	
+
 	// config check user experience
 	function wpoa_cc_ux() {
 		$points = 0;
@@ -44,7 +44,7 @@
 		$points_max = 2;
 		return floor(($points / $points_max) * 100);
 	}
-	
+
 	// cache the config check ratings:
 	$cc_security = wpoa_cc_security();
 	$cc_privacy = wpoa_cc_privacy();
@@ -75,10 +75,10 @@
 		<div id="wpoa-settings-section-news" class="wpoa-settings-section">
 			<h3>News</h3>
 			<div class='form-padding'>
-				<?php 
+				<?php
 				$rss = fetch_feed("http://glassocean.net/tag/wp-oauth/feed/");
 				if (!is_wp_error($rss)) {
-					$maxitems = $rss->get_item_quantity(5); 
+					$maxitems = $rss->get_item_quantity(5);
 					$rss_items = $rss->get_items(0, $maxitems);
 				}
 				?>
@@ -177,7 +177,7 @@
 					<p class="tip-message">Shows a short-lived notification message to the user which indicates whether or not the login was successful, and if there was an error.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Login redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -194,7 +194,7 @@
 					<p class="tip-message">Specifies where to redirect a user after they log in.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logout redirects to: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -212,7 +212,7 @@
 					<p class="tip-message">Specifies where to redirect a user after they log out.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Automatically logout inactive users: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -235,19 +235,19 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END General Settings section -->
-			
+
 			<!-- START Login Page & Form Customization section -->
 			<div id="wpoa-settings-section-login-forms" class="wpoa-settings-section">
 			<h3>Login Forms</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
-				
+
 				<tr valign='top'>
 				<th colspan="2">
 					<h4>Default Login Form / Page / Popup</h4>
 				</th>
 				</td>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Hide the WordPress login form: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -256,7 +256,7 @@
 					<p class="tip-message tip-warning"><strong>Warning: </strong>Hiding the WordPress login form may prevent you from being able to login. If you normally rely on this method, DO NOT enable this setting. Furthermore, please make sure your login provider(s) are active and working BEFORE enabling this setting.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logo links to site: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -264,7 +264,7 @@
 					<p class="tip-message">Forces the logo image on the login form to link to your site instead of WordPress.org.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logo image: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -275,7 +275,7 @@
 					<p class="tip-message">Changes the default WordPress logo on the login form to an image of your choice. You may select an image from the Media Library, or specify a custom URL.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Background image: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -286,13 +286,13 @@
 					<p class="tip-message">Changes the background on the login form to an image of your choice. You may select an image from the Media Library, or specify a custom URL.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th colspan="2">
 					<h4>Custom Login Forms</h4>
 				</th>
 				</td>
-			
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show on the login screen: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -300,7 +300,7 @@
 					<p class="tip-message">Create or manage these login form designs in the CUSTOM LOGIN FORM DESIGNS section.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show on the user's profile page: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -308,7 +308,7 @@
 					<p class="tip-message">Create or manage these login form designs in the CUSTOM LOGIN FORM DESIGNS section.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Custom form to show in the comments section: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -342,14 +342,14 @@
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
-			
+
 			<table class="form-table" id="wpoa-login-form-design-form">
 				<tr valign='top'>
 				<th colspan="2">
 					<h4>Edit Design</h4>
 				</th>
 				</td>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Design name: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -357,7 +357,7 @@
 					<p class="tip-message">Sets the name to use for this design.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Icon set: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -368,7 +368,7 @@
 					<p class="tip-message">Specifies which icon set to use for displaying provider icons on the login buttons.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Show login buttons: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -380,7 +380,7 @@
 					<p class="tip-message">Determines when the login buttons should be shown.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Show logout button: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -392,7 +392,7 @@
 					<p class="tip-message">Determines when the logout button should be shown.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Layout: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -405,7 +405,7 @@
 					<p class="tip-message">Sets vertical or horizontal layout for the buttons.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Login button prefix: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -413,7 +413,7 @@
 					<p class="tip-message">Sets the text prefix to be displayed on the social login buttons.</p>
 				</td>
 				</tr>
-			
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logged out title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -421,7 +421,7 @@
 					<p class="tip-message">Sets the text to be displayed above the login form for logged out users.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logged in title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -429,7 +429,7 @@
 					<p class="tip-message">Sets the text to be displayed above the login form for logged in users.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logging in title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -437,7 +437,7 @@
 					<p class="tip-message">Sets the text to be displayed above the login form for users who are logging in.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Logging out title: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -445,14 +445,14 @@
 					<p class="tip-message">Sets the text to be displayed above the login form for users who are logging out.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' id='wpoa-login-form-actions'>
 				<th scope='row'>
 					<input type="button" id="wpoa-login-form-ok" name="wpoa_login_form_ok" class="button" value="OK">
 					<input type="button" id="wpoa-login-form-cancel" name="wpoa_login_form_cancel" class="button" value="Cancel">
 				</th>
 				<td>
-					
+
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -460,7 +460,7 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login Buttons section -->
-			
+
 			<!-- START User Registration section -->
 			<div id="wpoa-settings-section-user-registration" class="wpoa-settings-section">
 			<h3>User Registration</h3>
@@ -473,7 +473,7 @@
 					<p class="tip-message">Prevents WordPress from sending an email to newly registered users by default, which contains their username and password.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Assign new users to the following role: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -481,12 +481,26 @@
 					<p class="tip-message">Specifies what user role will be assigned to newly registered users.</p>
 				</td>
 				</tr>
+
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Link new users to the following WordPress user: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<?php wp_dropdown_users(array(
+						'selected' => get_option('wpoa_new_user'),
+						'include_selected' => true,
+						'show_option_none' => '- disable -',
+						'name' => 'wpoa_new_user'
+					)); ?>
+					<p class="tip-message">If you disable registrations on your web site, you can link all new users to the same WordPress user this way. If you deselect this option, a new user will be created for every 3<sup>rd</sup>-party login.</p>
+				</td>
+				</tr>
+
 			</table> <!-- .form-table -->
 			<?php submit_button('Save all settings'); ?>
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END User Registration section -->
-			
+
 			<!-- START Login with Google section -->
 			<div id="wpoa-settings-section-login-with-google" class="wpoa-settings-section">
 			<h3>Login with Google</h3>
@@ -498,18 +512,18 @@
 					<input type='checkbox' name='wpoa_google_api_enabled' value='1' <?php checked(get_option('wpoa_google_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_google_api_id' value='<?php echo get_option('wpoa_google_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_google_api_id' value='<?php echo get_option('wpoa_google_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -539,32 +553,32 @@
 					<input type='checkbox' name='wpoa_oauth_server_api_enabled' value='1' <?php checked(get_option('wpoa_oauth_server_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_id' value='<?php echo get_option('wpoa_oauth_server_api_id'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_oauth_server_api_id' value='<?php echo get_option('wpoa_oauth_server_api_id'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_secret' value='<?php echo get_option('wpoa_oauth_server_api_secret'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_oauth_server_api_secret' value='<?php echo get_option('wpoa_oauth_server_api_secret'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>OAuth Server Endpoint:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_endpoint' value='<?php echo get_option('wpoa_oauth_server_api_endpoint'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_oauth_server_api_endpoint' value='<?php echo get_option('wpoa_oauth_server_api_endpoint'); ?>' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>Login Button Text:</th>
 				<td>
-					<input type='text' name='wpoa_oauth_server_api_button_text' value='<?php echo get_option('wpoa_oauth_server_api_button_text'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_oauth_server_api_button_text' value='<?php echo get_option('wpoa_oauth_server_api_button_text'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -583,7 +597,7 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Google section -->
-			
+
 			<!-- START Login with Facebook section -->
 			<div id="wpoa-settings-section-login-with-facebook" class="wpoa-settings-section">
 			<h3>Login with Facebook</h3>
@@ -595,18 +609,18 @@
 					<input type='checkbox' name='wpoa_facebook_api_enabled' value='1' <?php checked(get_option('wpoa_facebook_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>App ID:</th>
 				<td>
-					<input type='text' name='wpoa_facebook_api_id' value='<?php echo get_option('wpoa_facebook_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_facebook_api_id' value='<?php echo get_option('wpoa_facebook_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>App Secret:</th>
 				<td>
-					<input type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_facebook_api_secret' value='<?php echo get_option('wpoa_facebook_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -623,7 +637,7 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Facebook section -->
-			
+
 			<!-- START Login with LinkedIn section -->
 			<div id="wpoa-settings-section-login-with-linkedin" class="wpoa-settings-section">
 			<h3>Login with LinkedIn</h3>
@@ -635,18 +649,18 @@
 					<input type='checkbox' name='wpoa_linkedin_api_enabled' value='1' <?php checked(get_option('wpoa_linkedin_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>API Key:</th>
 				<td>
-					<input type='text' name='wpoa_linkedin_api_id' value='<?php echo get_option('wpoa_linkedin_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_linkedin_api_id' value='<?php echo get_option('wpoa_linkedin_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Secret Key:</th>
 				<td>
-					<input type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_linkedin_api_secret' value='<?php echo get_option('wpoa_linkedin_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -663,7 +677,7 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with LinkedIn section -->
-			
+
 			<!-- START Login with Github section -->
 			<div id="wpoa-settings-section-login-with-github" class="wpoa-settings-section">
 			<h3>Login with Github</h3>
@@ -675,18 +689,18 @@
 					<input type='checkbox' name='wpoa_github_api_enabled' value='1' <?php checked(get_option('wpoa_github_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_github_api_id' value='<?php echo get_option('wpoa_github_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_github_api_id' value='<?php echo get_option('wpoa_github_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_github_api_secret' value='<?php echo get_option('wpoa_github_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -719,14 +733,14 @@
 						<tr valign='top'>
 							<th scope='row'>Client ID:</th>
 							<td>
-								<input type='text' name='wpoa_itembase_api_id' value='<?php echo get_option('wpoa_itembase_api_id'); ?>' />
+								<input style="width: 100%" type='text' name='wpoa_itembase_api_id' value='<?php echo get_option('wpoa_itembase_api_id'); ?>' />
 							</td>
 						</tr>
 
 						<tr valign='top'>
 							<th scope='row'>Client Secret:</th>
 							<td>
-								<input type='text' name='wpoa_itembase_api_secret' value='<?php echo get_option('wpoa_itembase_api_secret'); ?>' />
+								<input style="width: 100%" type='text' name='wpoa_itembase_api_secret' value='<?php echo get_option('wpoa_itembase_api_secret'); ?>' />
 							</td>
 						</tr>
 					</table> <!-- .form-table -->
@@ -742,7 +756,7 @@
 				</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with itembase section -->
-			
+
 			<!-- START Login with Reddit section -->
 			<div id="wpoa-settings-section-login-with-reddit" class="wpoa-settings-section">
 			<h3>Login with Reddit</h3>
@@ -754,18 +768,18 @@
 					<input type='checkbox' name='wpoa_reddit_api_enabled' value='1' <?php checked(get_option('wpoa_reddit_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_reddit_api_id' value='<?php echo get_option('wpoa_reddit_api_id'); ?>' />
+					<input style="width: 100%" ='text' name='wpoa_reddit_api_id' value='<?php echo get_option('wpoa_reddit_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_reddit_api_secret' value='<?php echo get_option('wpoa_reddit_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -782,7 +796,7 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Reddit section -->
-			
+
 			<!-- START Login with Windows Live section -->
 			<div id="wpoa-settings-section-login-with-windowslive" class="wpoa-settings-section">
 			<h3>Login with Windows Live</h3>
@@ -794,18 +808,18 @@
 					<input type='checkbox' name='wpoa_windowslive_api_enabled' value='1' <?php checked(get_option('wpoa_windowslive_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_windowslive_api_id' value='<?php echo get_option('wpoa_windowslive_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_windowslive_api_id' value='<?php echo get_option('wpoa_windowslive_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_windowslive_api_secret' value='<?php echo get_option('wpoa_windowslive_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -834,7 +848,7 @@
 					<input type='checkbox' name='wpoa_paypal_api_enabled' value='1' <?php checked(get_option('wpoa_paypal_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Sandbox mode:</th>
 				<td>
@@ -842,18 +856,18 @@
 					<p class="tip-message">PayPal offers a sandbox mode for developers who wish to setup and test PayPal Login with their site before going live.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_paypal_api_id' value='<?php echo get_option('wpoa_paypal_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_paypal_api_id' value='<?php echo get_option('wpoa_paypal_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_paypal_api_secret' value='<?php echo get_option('wpoa_paypal_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_paypal_api_secret' value='<?php echo get_option('wpoa_paypal_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -884,18 +898,18 @@
 					<input type='checkbox' name='wpoa_instagram_api_enabled' value='1' <?php checked(get_option('wpoa_instagram_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Client ID:</th>
 				<td>
-					<input type='text' name='wpoa_instagram_api_id' value='<?php echo get_option('wpoa_instagram_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_instagram_api_id' value='<?php echo get_option('wpoa_instagram_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Client Secret:</th>
 				<td>
-					<input type='text' name='wpoa_instagram_api_secret' value='<?php echo get_option('wpoa_instagram_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_instagram_api_secret' value='<?php echo get_option('wpoa_instagram_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
@@ -930,22 +944,22 @@
 					<input type='checkbox' name='wpoa_battlenet_api_enabled' value='1' <?php checked(get_option('wpoa_battlenet_api_enabled') == 1); ?> />
 				</td>
 				</tr>
-				
+
 				<tr valign='top'>
 				<th scope='row'>Key:</th>
 				<td>
-					<input type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_battlenet_api_id' value='<?php echo get_option('wpoa_battlenet_api_id'); ?>' />
 				</td>
 				</tr>
-				 
+
 				<tr valign='top'>
 				<th scope='row'>Secret:</th>
 				<td>
-					<input type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
+					<input style="width: 100%" type='text' name='wpoa_battlenet_api_secret' value='<?php echo get_option('wpoa_battlenet_api_secret'); ?>' />
 				</td>
 				</tr>
 			</table> <!-- .form-table -->
-			
+
 			<p>
 				<strong>Instructions:</strong>
 				<ol>
@@ -966,7 +980,96 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Login with Battle.net section -->
-			
+
+			<!-- START Login with Custom OAuth provider section -->
+			<div id="wpoa-settings-section-login-with-custom" class="wpoa-settings-section">
+			<h3>Login with a custom OAuth2 provider</h3>
+			<div class='form-padding'>
+			<table class='form-table'>
+				<tr valign='top'>
+				<th scope='row'>Enabled:</th>
+				<td>
+					<input type='checkbox' name='wpoa_custom_api_enabled' value='1' <?php checked(get_option('wpoa_custom_api_enabled') == 1); ?> />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Client ID:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_id' value='<?php echo get_option('wpoa_custom_api_id'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Secret:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_secret' value='<?php echo get_option('wpoa_custom_api_secret'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Scopes:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_scope' value='<?php echo get_option('wpoa_custom_api_scope'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Authentication URL:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_auth_url' value='<?php echo get_option('wpoa_custom_api_auth_url'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Token URL:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_token_url' value='<?php echo get_option('wpoa_custom_api_token_url'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>User URL:</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_user_url' value='<?php echo get_option('wpoa_custom_api_user_url'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>UserInfo element for unique ID (usually 'id' or 'username'):</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_identity_id' value='<?php echo get_option('wpoa_custom_api_identity_id'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>UserInfo element for preffered username (usually 'username' or 'preferred_username'):</th>
+				<td>
+					<input style="width: 100%" type='text' name='wpoa_custom_api_identity_preferred_username' value='<?php echo get_option('wpoa_custom_api_identity_preferred_username'); ?>' />
+				</td>
+				</tr>
+
+			</table> <!-- .form-table -->
+
+			<p>
+				<strong>Instructions:</strong>
+				<ol>
+					<li>Install a 3<sup>rd</sup>-party OAuth server, such as <a href="http://www.keycloak.org/">KeyCloack</a></li>
+					<li>Check for <em>authentication url</em>, <em>token URL</em> and <em>user url</em>. For Keycloack find them at <tt>https://<em>your-domain</em>/auth/realms/<em>your-realm</em>/.well-known/openid-configuration</tt></li>
+					<li>Enter details provided by your OAuth server into the input fields above.</li>
+				</ol>
+				<strong>References:</strong>
+				<ul>
+					<li><a href='https://keycloak.gitbooks.io/authorization-services-guide/content/v/2.1/topics/service/overview.html' target='_blank'>Keycloack authorization Services</a></li>
+					<li><a href='http://oauth.net/' target='_blank'>OAuth website</a></li>
+				</ul>
+			</p>
+			<?php submit_button('Save all settings'); ?>
+			</div> <!-- .form-padding -->
+			</div> <!-- .wpoa-settings-section -->
+			<!-- END Login with Custom section -->
+
+
 			<!-- START Back Channel Configuration section -->
 			<div id="wpoa-settings-section-back-channel=configuration" class="wpoa-settings-section">
 			<h3>Back Channel Configuration</h3>
@@ -977,13 +1080,13 @@
 				<th scope='row'>HTTP utility: <a href="#" class="tip-button">[?]</a></th>
 				<td>
 					<select name='wpoa_http_util'>
-						<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL</option>
+						<option value='curl' <?php selected(get_option('wpoa_http_util'), 'curl'); ?>>cURL / wp_remote_get</option>
 						<option value='stream-context' <?php selected(get_option('wpoa_http_util'), 'stream-context'); ?>>Stream Context</option>
 					</select>
 					<p class="tip-message">The method used by the web server for performing HTTP requests to the third-party providers. Most servers support cURL, but some servers may require Stream Context instead.</p>
 				</td>
 				</tr>
-				
+
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Verify Peer/Host SSL Certificates: <a href="#" class="tip-button">[?]</a></th>
 				<td>
@@ -997,10 +1100,10 @@
 			</div> <!-- .form-padding -->
 			</div> <!-- .wpoa-settings-section -->
 			<!-- END Back Channel Configuration section -->
-			
+
 			<!-- START Maintenance & Troubleshooting section -->
 			<div id="wpoa-settings-section-maintenance-troubleshooting" class="wpoa-settings-section">
-			<h3>Maintenance & Troubleshooting</h3>
+			<h3>Maintenance &amp; Troubleshooting</h3>
 			<div class='form-padding'>
 			<table class='form-table'>
 				<tr valign='top' class="has-tip">
@@ -1010,7 +1113,7 @@
 					<p class="tip-message"><strong>Instructions:</strong> Check the box above, click the Save all settings button, and the settings will be restored to default.</p>
 					<p class="tip-message tip-warning"><strong>Warning:</strong> This will restore the default settings, erasing any API keys/secrets that you may have entered above.</p>
 				</td>
-				</tr>		
+				</tr>
 				<tr valign='top' class="has-tip">
 				<th scope='row'>Delete settings on uninstall: <a href="#" class="tip-button">[?]</a></th>
 				<td>
