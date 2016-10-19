@@ -174,6 +174,7 @@ function get_oauth_identity($wpoa) {
 		'access_token' => $_SESSION['WPOA']['ACCESS_TOKEN'], // PROVIDER SPECIFIC: the access_token is passed to Google via POST param
 	);
 	$url_params = http_build_query($params);
+	$result = "";
 	// perform the http request:
 	switch (strtolower(HTTP_UTIL)) {
 		case 'curl':
@@ -228,9 +229,20 @@ function get_oauth_identity($wpoa) {
 	  "preferred_username": "admin@example.com",
 	  "given_name": "Admin",
 	  "family_name": "User",
-	  "email": "admin@ibxgaming.com"
+	  "email": "admin@example.com"
+	}
+	{
+		"error_description":"Token invalid: Token audience doesn't match domain. Token ....",
+		"error":"invalid_grant"
 	}
 	*/
+	// Check if we got an error message
+	if( isset($result_obj["error"]) || strlen($result_obj["error"]) > 0 ) {
+		$message = strlen($result_obj["error_description"]) > 0 ? $result_obj["error_description"] : $result_obj["error"];
+		$wpoa->wpoa_end_login("Sorry, we could not log you in. " . $message);
+		return $oauth_identity;
+	}
+
 	$objtype = get_option('wpoa_custom_api_identity_id');
 	if ($objtype == null || $objtype == false || $objtype == '') {
 		$objtype = 'id';
@@ -244,7 +256,7 @@ function get_oauth_identity($wpoa) {
 
 	if (!$oauth_identity['id']) {
 		// $wpoa->wpoa_end_login("Sorry, we couldn't log you in. User identity was not found: " . $_SESSION['WPOA']['ACCESS_TOKEN']);
-		$wpoa->wpoa_end_login("Sorry, we could not log you in. User identity was not found. Please notify the admin or try again later.");
+		$wpoa->wpoa_end_login("Sorry, we could not log you in. User identity '" . $objtype . "' was not found. Please notify the admin or try again later.");
 	}
 	return $oauth_identity;
 }

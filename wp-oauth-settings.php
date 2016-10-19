@@ -1055,7 +1055,7 @@
 				<strong>Instructions:</strong>
 				<ol>
 					<li>Install a 3<sup>rd</sup>-party OAuth server, such as <a href="http://www.keycloak.org/">KeyCloack</a></li>
-					<li>Check for <em>authentication url</em>, <em>token URL</em> and <em>user url</em>. For Keycloack find them at <tt>https://<em>your-domain</em>auth/realms/<em>your-realm</em>/.well-known/openid-configuration</tt></li>
+					<li>Check for <em>authentication url</em>, <em>token URL</em> and <em>user url</em>. For Keycloack find them at <tt>https://<em>your-domain</em>/auth/realms/<em>your-realm</em>/.well-known/openid-configuration</tt></li>
 					<li>Enter details provided by your OAuth server into the input fields above.</li>
 				</ol>
 				<strong>References:</strong>

@@ -493,12 +493,14 @@ Class WPOA {
 			$this->wpoa_link_account($user_id);
 			// after linking the account, redirect user to their last url
 			$this->wpoa_end_login("Your account was linked successfully with your third party authentication provider.");
+			return;
 		}
 		// handle the logged out user or no matching user (register the user):
 		if ( !is_user_logged_in() && !$mapped_user ) {
 			// this person is not logged into a wordpress account and has no third party authentications registered, so proceed to register the wordpress user:
 			$_SESSION["WPOA"]["PREFERRED_USERNAME"] = $oauth_identity["preferred_username"];
 			include 'register.php';
+			return;
 		}
 		// we shouldn't be here, but just in case...
 		$this->wpoa_end_login("Sorry, we couldn't log you in. The login flow terminated in an unexpected way. Please notify the admin or try again later.");
