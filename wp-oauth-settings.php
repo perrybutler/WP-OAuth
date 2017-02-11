@@ -107,7 +107,7 @@
 				<tr valign='top'>
 				<th scope='row'>Enabled:</th>
 				<td>
-					<input type='checkbox' name='wpoa_${section_underscore}_api_enabled' value='1' " . checked(get_option("wpoa_${section_underscore}_api_enabled") == 1) . " />
+					<input type='checkbox' name='wpoa_${section_underscore}_api_enabled' value='1' " . checked(get_option("wpoa_${section_underscore}_api_enabled") == 1, true, false) . " />
 				</td>
 				</tr>
 
