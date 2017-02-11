@@ -76,7 +76,7 @@
                 isset($before_content) ?
                     $before_content
                 :
-                    "<input type='text' name='wpoa_${section_underscore}_api_${before_underscore}' value='" . get_option('wpoa_${$section_underscore}_api_${before_underscore}') . "' />"
+                    "<input type='text' name='wpoa_${section_underscore}_api_${before_underscore}' value='" . get_option("wpoa_${$section_underscore}_api_${before_underscore}") . "' />"
             ) .
             "
 				</td>
@@ -92,7 +92,7 @@
 				<tr valign='top'>
 				<th scope='row'>${after_name}:</th>
 				<td>
-					<input type='text' name='wpoa_${section_underscore}_api_${after_underscore}' value='" . get_option('wpoa_${$section_underscore}_api_${after_underscore}') . "' />
+					<input type='text' name='wpoa_${section_underscore}_api_${after_underscore}' value='" . get_option("wpoa_${$section_underscore}_api_${after_underscore}") . "' />
 				</td>
 				</tr>
             ";
@@ -116,14 +116,14 @@
 				<tr valign='top'>
 				<th scope='row'>${clientIDName}:</th>
 				<td>
-					<input type='text' name='wpoa_${section_underscore}_api_id' value='" . get_option('wpoa_${section_underscore}_api_id') . "' />
+					<input type='text' name='wpoa_${section_underscore}_api_id' value='" . get_option("wpoa_${section_underscore}_api_id") . "' />
 				</td>
 				</tr>
 
 				<tr valign='top'>
 				<th scope='row'>${clientSecretName}:</th>
 				<td>
-					<input type='text' name='wpoa_${section_underscore}_api_secret' value='" . get_option('wpoa_${section_underscore}_api_secret') . "' />
+					<input type='text' name='wpoa_${section_underscore}_api_secret' value='" . get_option("wpoa_${section_underscore}_api_secret") . "' />
 				</td>
 				</tr>
 
