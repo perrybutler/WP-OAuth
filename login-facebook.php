@@ -120,9 +120,9 @@ function get_oauth_token($wpoa) {
 			break;
 	}
 	// parse the result:
-	parse_str($result, $result_obj); // PROVIDER SPECIFIC: Facebook encodes the access token result as a querystring by default
+	$result_obj = json_decode($result, true); // PROVIDER SPECIFIC: Facebook encodes the access token result as a json string by default
 	$access_token = $result_obj['access_token']; // PROVIDER SPECIFIC: this is how Facebook returns the access token KEEP THIS PROTECTED!
-	$expires_in = $result_obj['expires']; // PROVIDER SPECIFIC: this is how Facebook returns the access token's expiration
+	$expires_in = $result_obj['expires_in']; // PROVIDER SPECIFIC: this is how Facebook returns the access token's expiration
 	$expires_at = time() + $expires_in;
 	// handle the result:
 	if (!$access_token || !$expires_in) {
