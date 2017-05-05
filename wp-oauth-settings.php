@@ -72,33 +72,6 @@
 				<nav><ul><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
 			</div>
 		</div>
-		<div id="wpoa-settings-section-news" class="wpoa-settings-section">
-			<h3>News</h3>
-			<div class='form-padding'>
-				<?php 
-				$rss = fetch_feed("http://glassocean.net/tag/wp-oauth/feed/");
-				if (!is_wp_error($rss)) {
-					$maxitems = $rss->get_item_quantity(5); 
-					$rss_items = $rss->get_items(0, $maxitems);
-				}
-				?>
-				<?php if ($maxitems == 0) : ?>
-					<p><?php _e("Sorry, news was inaccessible or does not exist.", 'my-text-domain' ); ?></p>
-				<?php else : ?>
-				<ul>
-					<?php foreach ($rss_items as $item) : ?>
-						<li>
-							<a href="<?php echo esc_url($item->get_permalink()); ?>"
-								title="<?php printf( __('Posted %s', 'my-text-domain'), $item->get_date('j F Y | g:i a') ); ?>"
-								target="_blank">
-								<?php echo esc_html($item->get_title()); ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-				<?php endif; ?>
-			</div>
-		</div>
 		<div id="wpoa-settings-section-config-check" class="wpoa-settings-section">
 		<h3>Config Check</h3>
 			<div class='form-padding'>
@@ -512,6 +485,14 @@
 					<input type='text' name='wpoa_google_api_secret' value='<?php echo get_option('wpoa_google_api_secret'); ?>' />
 				</td>
 				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Limit to following domains (for non gmail account) :</th>
+				<td>
+					<input type='text' name='wpoa_google_check_domain' value='<?php echo get_option('wpoa_google_check_domain'); ?>' />
+				</td>
+				</tr>
+			
 			</table> <!-- .form-table -->
 			<p>
 				<strong>Instructions:</strong>
@@ -521,6 +502,7 @@
 					<li>At Google, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new Project's Redirect URI. Don't forget the trailing slash!</li>
 					<li>At Google, you must also configure the Consent Screen with your Email Address and Product Name. This is what Google will display to users when they are asked to grant access to your site/app.</li>
 					<li>Paste your Client ID/Secret provided by Google into the fields above, then click the Save all settings button.</li>
+					<li>If you use a corporate account, you can limit to your compagny by sessing the limit domain. If you have multiple domain, use coma for separation (ie: example.com, another-example.com)</li>
 				</ol>
 			</p>
 			<?php submit_button('Save all settings'); ?>
@@ -812,10 +794,54 @@
 			<p>
 				<strong>Instructions:</strong>
 				<ol>
-					<li>Register as a Windows Live Developer at <a href='https://manage.dev.live.com' target="_blank">manage.dev.live.com</a>.</li>
+					<li>Register as a Windows Live Developer at <a href='https://apps.dev.microsoft.com/' target="_blank">apps.dev.microsoft.com/</a>.</li>
 					<li>At Windows Live, create a new App. This will enable your site to access the Windows Live API.</li>
 					<li>At Windows Live, provide your site's homepage URL (<?php echo $blog_url; ?>) for the new App's Redirect URI. Don't forget the trailing slash!</li>
 					<li>Paste your Client ID/Secret provided by Windows Live into the fields above, then click the Save all settings button.</li>
+				</ol>
+			</p>
+			<?php submit_button('Save all settings'); ?>
+			</div> <!-- .form-padding -->
+			</div> <!-- .wpoa-settings-section -->
+			<!-- END Login with Windows Live section -->
+
+			<!-- START Login with Windows Azure section -->
+			<div id="wpoa-settings-section-login-with-windowsAzure" class="wpoa-settings-section">
+			<h3>Login with Windows Azure or Office 365</h3>
+			<div class='form-padding'>
+			<table class='form-table'>
+				<tr valign='top'>
+				<th scope='row'>Enabled:</th>
+				<td>
+					<input type='checkbox' name='wpoa_windowsazure_api_enabled' value='1' <?php checked(get_option('wpoa_windowsazure_api_enabled') == 1); ?> />
+				</td>
+				</tr>
+				
+				<tr valign='top'>
+				<th scope='row'>Client ID:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_api_id' value='<?php echo get_option('wpoa_windowsazure_api_id'); ?>' />
+				</td>
+				</tr>
+				 
+				<tr valign='top'>
+				<th scope='row'>Client Secret:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_api_secret' value='<?php echo get_option('wpoa_windowsazure_api_secret'); ?>' />
+				</td>
+				</tr>
+
+				<tr valign='top'>
+				<th scope='row'>Tenant Id:</th>
+				<td>
+					<input type='text' name='wpoa_windowsazure_tenant_id' value='<?php echo get_option('wpoa_windowsazure_tenant_id'); ?>' />
+				</td>
+				</tr>
+			</table> <!-- .form-table -->
+			<p>
+				<strong>Instructions:</strong>
+				<ol>
+					<li>Follow <b>Register your application with your AD tenant</b> section : <a target="_blank" href="https://azure.microsoft.com/en-us/documentation/articles/active-directory-protocols-oauth-code/">https://azure.microsoft.com/en-us/documentation/articles/active-directory-protocols-oauth-code/</a>.</li>
 				</ol>
 			</p>
 			<?php submit_button('Save all settings'); ?>
@@ -1009,6 +1035,19 @@
 					<input type='checkbox' name='wpoa_restore_default_settings' value='1' <?php checked(get_option('wpoa_restore_default_settings') == 1); ?> />
 					<p class="tip-message"><strong>Instructions:</strong> Check the box above, click the Save all settings button, and the settings will be restored to default.</p>
 					<p class="tip-message tip-warning"><strong>Warning:</strong> This will restore the default settings, erasing any API keys/secrets that you may have entered above.</p>
+				</td>
+				</tr>
+				<tr valign='top' class="has-tip">
+				<th scope='row'>Enable debug: <a href="#" class="tip-button">[?]</a></th>
+				<td>
+					<input type='checkbox' name='wpoa_debug_plugin' value='1' <?php checked(get_option('wpoa_debug_plugin') == 1); ?> />
+					<p>
+						<strong>Instructions:</strong>
+						<ol>
+							<li>Check the box above and <a href="https://codex.wordpress.org/Debugging_in_WordPress">enable debug</a> for wordpress.</li>
+							<li>This will log request in debug.log file.</li>
+						</ol>
+					</p>
 				</td>
 				</tr>		
 				<tr valign='top' class="has-tip">
