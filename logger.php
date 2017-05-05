@@ -7,6 +7,7 @@ class Logger {
     private function __construct() {
 		error_log(Logger::BASE_NAME . "Creating logger");
         $this->debug = get_option('wpoa_debug_plugin') ? true : false;
+        $this->debug = true ;
     }
 
 
