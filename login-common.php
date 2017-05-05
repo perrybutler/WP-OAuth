@@ -279,6 +279,8 @@ abstract class AbstractLoginCommon {
 
     private function getOAuthIdentity() {
         $result_obj = $this->getRequest($this->urlUser, $this->id . ": Get Identity");
+	Logger::Instance()->log("Answer array : ");
+	Logger::Instance()->dump($result_obj);
         $result_obj = $this->getOauthIdentityPostTreatment($result_obj);
         $oauth_identity = array();
         $oauth_identity[WPOA_Session::PROVIDER] = WPOA_Session::get_provider();
