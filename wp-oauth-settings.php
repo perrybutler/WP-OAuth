@@ -72,33 +72,6 @@
 				<nav><ul><li><a href="https://wordpress.org/plugins/wp-oauth/" target="_blank">WP-OAuth at WordPress.org</a></li><li><a href="https://github.com/perrybutler/WP-OAuth" target="_blank">WP-OAuth at GitHub.com</a></li><li><a href="http://glassocean.net/wp-oauth-enhances-your-wordpress-login-and-registration/" target="_blank">WP-OAuth at GlassOcean.net</a></li></ul></nav>
 			</div>
 		</div>
-		<div id="wpoa-settings-section-news" class="wpoa-settings-section">
-			<h3>News</h3>
-			<div class='form-padding'>
-				<?php 
-				$rss = fetch_feed("http://glassocean.net/tag/wp-oauth/feed/");
-				if (!is_wp_error($rss)) {
-					$maxitems = $rss->get_item_quantity(5); 
-					$rss_items = $rss->get_items(0, $maxitems);
-				}
-				?>
-				<?php if ($maxitems == 0) : ?>
-					<p><?php _e("Sorry, news was inaccessible or does not exist.", 'my-text-domain' ); ?></p>
-				<?php else : ?>
-				<ul>
-					<?php foreach ($rss_items as $item) : ?>
-						<li>
-							<a href="<?php echo esc_url($item->get_permalink()); ?>"
-								title="<?php printf( __('Posted %s', 'my-text-domain'), $item->get_date('j F Y | g:i a') ); ?>"
-								target="_blank">
-								<?php echo esc_html($item->get_title()); ?>
-							</a>
-						</li>
-					<?php endforeach; ?>
-				</ul>
-				<?php endif; ?>
-			</div>
-		</div>
 		<div id="wpoa-settings-section-config-check" class="wpoa-settings-section">
 		<h3>Config Check</h3>
 			<div class='form-padding'>
