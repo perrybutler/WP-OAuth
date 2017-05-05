@@ -6,6 +6,10 @@ include_once 'session.php';
 
 global $wpdb;
 
+function IsNullOrEmptyString($question){
+    return (!isset($question) || trim($question)==='');
+}
+
 // initiate the user session:
 session_start();
 
@@ -29,6 +33,10 @@ if (array_key_exists(WPOA_Session::USER_EMAIL, $oauth_identity)) {
 } else {
 	Logger::Instance()->log("Register : Email not set, using it from post");
 	$email = $_POST['identity'];
+}
+
+if (IsNullOrEmptyString($username)) {
+    $username = $email;
 }
 
 $password = wp_generate_password();
